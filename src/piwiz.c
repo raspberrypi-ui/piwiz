@@ -499,6 +499,9 @@ int main (int argc, char *argv[])
     psk_te = (GtkWidget *) gtk_builder_get_object (builder, "p4psk");
     psk_label = (GtkWidget *) gtk_builder_get_object (builder, "p4info");
 
+    gtk_entry_set_visibility (GTK_ENTRY (pwd1_te), FALSE);
+    gtk_entry_set_visibility (GTK_ENTRY (pwd2_te), FALSE);
+
     // set up the locale combo boxes
     read_locales ();
     wid = (GtkWidget *) gtk_builder_get_object (builder, "p1table");
