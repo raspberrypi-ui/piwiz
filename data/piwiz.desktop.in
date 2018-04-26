@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+_Name=Raspberry Pi First-Run Wizard
+_GenericName=Raspberry Pi First-Run Wizard
+_Comment=Configure Raspberry Pi system on first run
+Icon=rpi
+Exec=sudo piwiz
+NotShowIn=GNOME;XFCE;
+StartupNotify=true
+Categories=Settings;DesktopSettings;GTK;X-LXDE-Settings;

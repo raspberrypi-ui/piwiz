@@ -152,7 +152,7 @@ animate_carrier(_unused gpointer data)
 			break;
 		}
 	}
-	gtk_status_icon_set_from_icon_name(status_icon, icon);
+	//gtk_status_icon_set_from_icon_name(status_icon, icon);
 	return true;
 }
 
@@ -178,7 +178,7 @@ animate_online(_unused gpointer data)
 	else
 		icon = scan ? get_strength_icon_name(scan->strength.value) :
 		    "network-transmit-receive";
-	gtk_status_icon_set_from_icon_name(status_icon, icon);
+	//gtk_status_icon_set_from_icon_name(status_icon, icon);
 	return true;
 }
 
@@ -240,10 +240,10 @@ update_online(DHCPCD_CONNECTION *con, bool showif)
 		scan = get_strongest_scan();
 		icon = scan ? get_strength_icon_name(scan->strength.value) :
 		    "network-transmit-receive";
-		gtk_status_icon_set_from_icon_name(status_icon, icon);
+		//gtk_status_icon_set_from_icon_name(status_icon, icon);
 	}
 
-	gtk_status_icon_set_tooltip_text(status_icon, msgs);
+	//gtk_status_icon_set_tooltip_text(status_icon, msgs);
 	g_free(msgs);
 }
 
@@ -406,11 +406,11 @@ dhcpcd_status_cb(DHCPCD_CONNECTION *con,
 			ani_counter = 0;
 		}
 		online = carrier = false;
-		gtk_status_icon_set_from_icon_name(status_icon,
-		    "network-offline");
-		gtk_status_icon_set_tooltip_text(status_icon, msg);
-		prefs_abort();
-		menu_abort();
+		//gtk_status_icon_set_from_icon_name(status_icon,
+		//    "network-offline");
+		//gtk_status_icon_set_tooltip_text(status_icon, msg);
+		//prefs_abort();
+		//menu_abort();
 		wpa_abort();
 		while ((w = TAILQ_FIRST(&wi_scans))) {
 			TAILQ_REMOVE(&wi_scans, w, next);
@@ -657,7 +657,7 @@ dhcpcd_wpa_scan_cb(DHCPCD_WPA *wpa, _unused void *data)
 			msg = "network-transmit-receive";
 		else
 			msg = "network-offline";
-		gtk_status_icon_set_from_icon_name(status_icon, msg);
+		//gtk_status_icon_set_from_icon_name(status_icon, msg);
 	}
 }
 
@@ -675,7 +675,7 @@ dhcpcd_wpa_status_cb(DHCPCD_WPA *wpa,
 		TAILQ_FOREACH_SAFE(w, &wi_scans, next, wn) {
 			if (w->interface == i) {
 				TAILQ_REMOVE(&wi_scans, w, next);
-				menu_remove_if(w);
+				//menu_remove_if(w);
 				dhcpcd_wi_scans_free(w->scans);
 				g_free(w);
 			}
@@ -704,6 +704,7 @@ bgscan(gpointer data)
 	return TRUE;
 }
 
+#if 0
 int
 main(int argc, char *argv[])
 {
@@ -750,4 +751,114 @@ main(int argc, char *argv[])
 	dhcpcd_close(con);
 	dhcpcd_free(con);
 	return 0;
+}
+#endif
+
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+// moved here from menu.c
+
+#if GTK_MAJOR_VERSION == 2
+GtkWidget *
+gtk_box_new(GtkOrientation o, gint s)
+{
+
+	if (o == GTK_ORIENTATION_HORIZONTAL)
+		return gtk_hbox_new(false, s);
+	else
+		return gtk_vbox_new(false, s);
+}
+#endif
+
+void scans_clear (void);
+void scans_add (char *str, int match, int secure, int signal);
+char *find_line (void);
+
+void menu_update_scans (WI_SCAN *wi, DHCPCD_WI_SCAN *scans)
+{
+    DHCPCD_WI_SCAN *s;
+    char *ssid = find_line ();
+    int active;
+
+    scans_clear ();
+    for (s = scans; s; s = s->next)
+    {
+        if (s->flags & WSF_SECURE && !(s->flags & WSF_PSK)) continue;
+
+        if (ssid && ssid[0] && s->ssid && !strcmp (ssid, s->ssid)) active = 1;
+        else active = 0;
+
+        scans_add (s->ssid, active, (s->flags & WSF_SECURE) && (s->flags & WSF_PSK), s->strength.value);
+    }
+
+    dhcpcd_wi_scans_free(wi->scans);
+    wi->scans = scans;
+}
+
+WI_SCAN *wi_scan_find_ssid (char *ssid, DHCPCD_WI_SCAN **dws)
+{
+    WI_SCAN *w;
+    DHCPCD_WI_SCAN *dw;
+
+    TAILQ_FOREACH(w, &wi_scans, next)
+    {
+        for (dw = w->scans; dw; dw = dw->next)
+        {
+            if (!strcmp (ssid, dw->ssid))
+            {
+                *dws = dw;
+                return w;
+            }
+        }
+    }
+    return NULL;
+}
+
+void select_ssid ()
+{
+    WI_SCAN *wi;
+    DHCPCD_WI_SCAN *scan;
+
+    char *ssid = find_line ();
+    if (ssid)
+    {
+        wi = wi_scan_find_ssid(ssid, &scan);
+        if (wi)
+        {
+            DHCPCD_CONNECTION *con;
+
+            con = dhcpcd_if_connection(wi->interface);
+            if (con)
+            {
+                DHCPCD_WPA *wpa;
+
+                wpa = dhcpcd_wpa_find(con, wi->interface->ifname);
+                if (wpa)
+                    wpa_configure(wpa, scan);
+            }
+        }
+    }
+}
+
+void init_dhcpcd (void)
+{
+    DHCPCD_CONNECTION *con;
+    online = false;
+
+    TAILQ_INIT(&wi_scans);
+    g_message(_("Connecting ..."));
+    con = dhcpcd_new();
+    if (con ==  NULL) {
+        g_critical("libdhcpcd: %s", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+    dhcpcd_set_progname(con, "dhcpcd-gtk");
+    dhcpcd_set_status_callback(con, dhcpcd_status_cb, NULL);
+    dhcpcd_set_if_callback(con, dhcpcd_if_cb, NULL);
+    dhcpcd_wpa_set_scan_callback(con, dhcpcd_wpa_scan_cb, NULL);
+    dhcpcd_wpa_set_status_callback(con, dhcpcd_wpa_status_cb, NULL);
+    if (dhcpcd_try_open(con))
+        g_timeout_add(DHCPCD_RETRYOPEN, dhcpcd_try_open, con);
+
+    g_timeout_add(DHCPCD_WPA_SCAN_SHORT, bgscan, con);
 }

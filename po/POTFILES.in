@@ -1,0 +1,5 @@
+[encoding: UTF-8]
+src/piwiz.c
+[type: gettext/glade] data/piwiz.ui
+# files added by intltool-prepare
+data/piwiz.desktop.in
