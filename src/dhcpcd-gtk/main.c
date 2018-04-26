@@ -58,6 +58,8 @@ static struct watch *watches;
 
 WI_SCANS wi_scans;
 
+void connect_success (void);
+
 static gboolean dhcpcd_try_open(gpointer data);
 static gboolean dhcpcd_wpa_try_open(gpointer data);
 
@@ -200,6 +202,7 @@ update_online(DHCPCD_CONNECTION *con, bool showif)
 			if (i->up)
 				ison = true;
 		}
+		if (i->wireless && i->state == DHS_CARRIER) connect_success ();
 		msg = dhcpcd_if_message(i, NULL);
 		if (msg) {
 			if (showif)

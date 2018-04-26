@@ -24,7 +24,7 @@
 static GtkWidget *main_dlg, *msg_dlg;
 static GtkWidget *wizard_nb, *next_btn, *prev_btn;
 static GtkWidget *country_cb, *language_cb, *timezone_cb;
-static GtkWidget *ap_tv;
+static GtkWidget *ap_tv, *psk_label;
 static GtkWidget *pwd1_te, *pwd2_te, *psk_te;
 
 /* Lists for localisation */
@@ -38,8 +38,8 @@ GtkTreeModelFilter *fcount, *flang, *fcity;
 GtkListStore *ap_list;
 
 char wifi_if[16];
-
 char *ssid;
+gboolean connecting = FALSE;
 
 /* Functions in dhcpcd-gtk/main.c */
 
@@ -144,6 +144,16 @@ static gboolean close_msg (gpointer data)
     gtk_widget_destroy (GTK_WIDGET (msg_dlg));
     gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
     return FALSE;
+}
+
+void connect_success (void)
+{
+    if (connecting)
+    {
+        connecting = FALSE;
+        gtk_widget_destroy (GTK_WIDGET (msg_dlg));
+        gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), 5);
+    }
 }
 
 static gpointer set_locale (gpointer data)
@@ -364,6 +374,8 @@ static void next_page (GtkButton* btn, gpointer ptr)
 {
     const char *psk;
     int sec;
+    char buffer[512];
+
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
     {
         case 1 :    delay_warning (_("Setting locale - please wait..."));
@@ -388,18 +400,25 @@ static void next_page (GtkButton* btn, gpointer ptr)
                     }
                     else
                     {
-                        if (sec) gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
+                        if (sec)
+                        {
+                            sprintf (buffer, _("Enter the password for the WiFi network \"%s\""), ssid);
+                            gtk_label_set_text (GTK_LABEL (psk_label), buffer);
+                            gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
+                        }
                         else
                         {
                             select_ssid (ssid, NULL);
-                            gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), 5);
+                            delay_warning (_("Connecting to WiFi network - please wait..."));
+                            connecting = TRUE;
                         }
                     }
                     break;
 
         case 4:     psk = gtk_entry_get_text (GTK_ENTRY (psk_te));
                     select_ssid (ssid, psk);
-                    gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
+                    delay_warning (_("Connecting to WiFi network - please wait..."));
+                    connecting = TRUE;
                     break;
 
         default :   gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
@@ -478,6 +497,7 @@ int main (int argc, char *argv[])
     pwd1_te = (GtkWidget *) gtk_builder_get_object (builder, "p2pwd1");
     pwd2_te = (GtkWidget *) gtk_builder_get_object (builder, "p2pwd2");
     psk_te = (GtkWidget *) gtk_builder_get_object (builder, "p4psk");
+    psk_label = (GtkWidget *) gtk_builder_get_object (builder, "p4info");
 
     // set up the locale combo boxes
     read_locales ();
