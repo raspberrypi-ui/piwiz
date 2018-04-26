@@ -791,7 +791,7 @@ void menu_update_scans (WI_SCAN *wi, DHCPCD_WI_SCAN *scans)
         scans_add (s->ssid, active, (s->flags & WSF_SECURE) && (s->flags & WSF_PSK), s->strength.value);
     }
 
-    dhcpcd_wi_scans_free(wi->scans);
+    dhcpcd_wi_scans_free (wi->scans);
     wi->scans = scans;
 }
 
@@ -800,7 +800,7 @@ WI_SCAN *wi_scan_find_ssid (char *ssid, DHCPCD_WI_SCAN **dws)
     WI_SCAN *w;
     DHCPCD_WI_SCAN *dw;
 
-    TAILQ_FOREACH(w, &wi_scans, next)
+    TAILQ_FOREACH (w, &wi_scans, next)
     {
         for (dw = w->scans; dw; dw = dw->next)
         {
@@ -814,27 +814,20 @@ WI_SCAN *wi_scan_find_ssid (char *ssid, DHCPCD_WI_SCAN **dws)
     return NULL;
 }
 
-void select_ssid ()
+void select_ssid (void)
 {
-    WI_SCAN *wi;
-    DHCPCD_WI_SCAN *scan;
-
     char *ssid = find_line ();
     if (ssid)
     {
-        wi = wi_scan_find_ssid(ssid, &scan);
+        DHCPCD_WI_SCAN *scan;
+        WI_SCAN *wi = wi_scan_find_ssid (ssid, &scan);
         if (wi)
         {
-            DHCPCD_CONNECTION *con;
-
-            con = dhcpcd_if_connection(wi->interface);
+            DHCPCD_CONNECTION *con = dhcpcd_if_connection (wi->interface);
             if (con)
             {
-                DHCPCD_WPA *wpa;
-
-                wpa = dhcpcd_wpa_find(con, wi->interface->ifname);
-                if (wpa)
-                    wpa_configure(wpa, scan);
+                DHCPCD_WPA *wpa = dhcpcd_wpa_find (con, wi->interface->ifname);
+                if (wpa) wpa_configure (wpa, scan);
             }
         }
     }
@@ -845,20 +838,21 @@ void init_dhcpcd (void)
     DHCPCD_CONNECTION *con;
     online = false;
 
-    TAILQ_INIT(&wi_scans);
-    g_message(_("Connecting ..."));
-    con = dhcpcd_new();
-    if (con ==  NULL) {
-        g_critical("libdhcpcd: %s", strerror(errno));
-        exit(EXIT_FAILURE);
+    TAILQ_INIT (&wi_scans);
+    g_message (_("Connecting ..."));
+    con = dhcpcd_new ();
+    if (con ==  NULL)
+    {
+        g_critical ("libdhcpcd: %s", strerror (errno));
+        exit (EXIT_FAILURE);
     }
-    dhcpcd_set_progname(con, "dhcpcd-gtk");
-    dhcpcd_set_status_callback(con, dhcpcd_status_cb, NULL);
-    dhcpcd_set_if_callback(con, dhcpcd_if_cb, NULL);
-    dhcpcd_wpa_set_scan_callback(con, dhcpcd_wpa_scan_cb, NULL);
-    dhcpcd_wpa_set_status_callback(con, dhcpcd_wpa_status_cb, NULL);
-    if (dhcpcd_try_open(con))
-        g_timeout_add(DHCPCD_RETRYOPEN, dhcpcd_try_open, con);
+    dhcpcd_set_progname (con, "dhcpcd-gtk");
+    dhcpcd_set_status_callback (con, dhcpcd_status_cb, NULL);
+    dhcpcd_set_if_callback (con, dhcpcd_if_cb, NULL);
+    dhcpcd_wpa_set_scan_callback (con, dhcpcd_wpa_scan_cb, NULL);
+    dhcpcd_wpa_set_status_callback (con, dhcpcd_wpa_status_cb, NULL);
+    if (dhcpcd_try_open (con))
+        g_timeout_add (DHCPCD_RETRYOPEN, dhcpcd_try_open, con);
 
-    g_timeout_add(DHCPCD_WPA_SCAN_SHORT, bgscan, con);
+    g_timeout_add (DHCPCD_WPA_SCAN_SHORT, bgscan, con);
 }

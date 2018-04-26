@@ -38,6 +38,12 @@ GtkListStore *ap_list;
 
 char wifi_if[16];
 
+/* Functions in dhcpcd-gtk/main.c */
+
+void select_ssid (void);
+void init_dhcpcd (void);
+
+
 
 /* Helpers */
 
@@ -141,7 +147,7 @@ static gpointer set_locale (gpointer data)
 {
     GtkTreeModel *model;
     GtkTreeIter iter;
-    char *cc, *lc, *city, *ext;
+    char *cc, *lc, *city, *ext, *lcc;
     char buffer[512];
     FILE *fp;
     
@@ -151,6 +157,7 @@ static gpointer set_locale (gpointer data)
     gtk_tree_model_get (model, &iter, 0, &lc, -1);
     gtk_tree_model_get (model, &iter, 1, &cc, -1);
     gtk_tree_model_get (model, &iter, 4, &ext, -1);
+    lcc = g_ascii_strdown (cc, -1);
 
     model = gtk_combo_box_get_model (GTK_COMBO_BOX (timezone_cb));
     gtk_combo_box_get_active_iter (GTK_COMBO_BOX (timezone_cb), &iter);
@@ -171,7 +178,7 @@ static gpointer set_locale (gpointer data)
     
     // set keyboard
     fp = fopen ("/etc/default/keyboard", "wb");
-    fprintf (fp, "XKBMODEL=pc105\nXKBLAYOUT=%s\nXKBVARIANT=\nXKBOPTIONS=\nBACKSPACE=guess", cc);
+    fprintf (fp, "XKBMODEL=pc105\nXKBLAYOUT=%s\nXKBVARIANT=\nXKBOPTIONS=\nBACKSPACE=guess", lcc);
     fclose (fp);
     system ("setxkbmap");
     
@@ -385,6 +392,26 @@ static void prev_page (GtkButton* btn, gpointer ptr)
 }
 
 
+static void set_init_country (char *cc)
+{
+    GtkTreeIter iter;
+    char *val;
+
+    gtk_tree_model_get_iter_first (fcount, &iter);
+    while (1)
+    {
+        gtk_tree_model_get (fcount, &iter, 1, &val, -1);
+        if (!strcmp (cc, val))
+        {
+            gtk_combo_box_set_active_iter (GTK_COMBO_BOX (country_cb), &iter);
+            return;
+        }
+        if (!gtk_tree_model_iter_next (fcount, &iter)) break;
+    }
+}
+
+
+
 /* The dialog... */
 
 int main (int argc, char *argv[])
@@ -448,19 +475,19 @@ int main (int argc, char *argv[])
 
     // initialise the country combo
     g_signal_connect (country_cb, "changed", G_CALLBACK (country_changed), NULL);
-    gtk_combo_box_set_active (GTK_COMBO_BOX (country_cb), 0);
+    set_init_country ("GB");
 
     gtk_widget_show_all (GTK_WIDGET (country_cb));
     gtk_widget_show_all (GTK_WIDGET (language_cb));
     gtk_widget_show_all (GTK_WIDGET (timezone_cb));
-    
+
     // set up the wifi AP list
     ap_tv = (GtkWidget *) gtk_builder_get_object (builder, "p3networks");
     gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (ap_tv), 0, "AP", col, "text", 0, NULL);
     gtk_tree_view_column_set_expand (gtk_tree_view_get_column (GTK_TREE_VIEW (ap_tv), 0), TRUE);
     gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (ap_tv), FALSE);
     gtk_tree_view_set_model (GTK_TREE_VIEW (ap_tv), GTK_TREE_MODEL (ap_list));
-    
+
     col = gtk_cell_renderer_pixbuf_new ();
     gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (ap_tv), 1, "Security", col, "pixbuf", 1, NULL);
     gtk_tree_view_column_set_sizing (gtk_tree_view_get_column (GTK_TREE_VIEW (ap_tv), 1), GTK_TREE_VIEW_COLUMN_FIXED);
@@ -468,7 +495,6 @@ int main (int argc, char *argv[])
     gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (ap_tv), 2, "Signal", col, "pixbuf", 2, NULL);
     gtk_tree_view_column_set_sizing (gtk_tree_view_get_column (GTK_TREE_VIEW (ap_tv), 2), GTK_TREE_VIEW_COLUMN_FIXED);
     gtk_tree_view_column_set_fixed_width (gtk_tree_view_get_column (GTK_TREE_VIEW (ap_tv), 2), 30);
-    
 
     gtk_dialog_run (GTK_DIALOG (main_dlg));
 
