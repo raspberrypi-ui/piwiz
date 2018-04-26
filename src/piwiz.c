@@ -25,6 +25,7 @@ static GtkWidget *main_dlg, *msg_dlg;
 static GtkWidget *wizard_nb, *next_btn, *prev_btn;
 static GtkWidget *country_cb, *language_cb, *timezone_cb;
 static GtkWidget *ap_tv;
+static GtkWidget *pwd1_te, *pwd2_te, *psk_te;
 
 /* Lists for localisation */
 
@@ -38,9 +39,11 @@ GtkListStore *ap_list;
 
 char wifi_if[16];
 
+char *ssid;
+
 /* Functions in dhcpcd-gtk/main.c */
 
-void select_ssid (void);
+void select_ssid (char *ssid, const char *psk);
 void init_dhcpcd (void);
 
 
@@ -336,39 +339,38 @@ void scans_add (char *str, int match, int secure, int signal)
         sprintf (icon_buf, "network-wireless-connected-%02d", dsig);
         sig_icon = gtk_icon_theme_load_icon (gtk_icon_theme_get_default(), icon_buf, 16, 0, NULL);
     }
-    gtk_list_store_set (ap_list, &iter, 0, str, 1, sec_icon, 2, sig_icon, -1);
+    gtk_list_store_set (ap_list, &iter, 0, str, 1, sec_icon, 2, sig_icon, 3, secure, -1);
 
     if (match)
         gtk_tree_selection_select_iter (gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv)), &iter);
 }
 
-char *find_line (void)
+int find_line (char **ssid, int *sec)
 {
-    char *ssid;
     GtkTreeModel *model;
     GtkTreeIter iter;
-    GtkTreeSelection *sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv));
+    GtkTreeSelection *sel;
+
+    sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv));
     if (sel && gtk_tree_selection_get_selected (sel, &model, &iter))
     {
-        gtk_tree_model_get (model, &iter, 0, &ssid, -1);
-        return ssid;   
+        gtk_tree_model_get (model, &iter, 0, ssid, 3, sec, -1);
+        return 1;
     } 
-    return NULL;
+    return 0;
 }
-
-
-
 
 static void next_page (GtkButton* btn, gpointer ptr)
 {
-    char **ssid;
+    const char *psk;
+    int sec;
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
     {
         case 1 :    delay_warning (_("Setting locale - please wait..."));
                     g_thread_new (NULL, set_locale, NULL);
                     break;
-        
-        case 2 :    if (!wifi_if[0]) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), 4);
+
+        case 2 :    if (!wifi_if[0]) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), 5);
                     else
                     {
                         init_dhcpcd ();
@@ -377,10 +379,29 @@ static void next_page (GtkButton* btn, gpointer ptr)
                         gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
                     }
                     break;
-                    
-        case 3:     select_ssid ();
+
+        case 3:     if (ssid) g_free (ssid);
+                    ssid = NULL;
+                    if (!find_line (&ssid, &sec))
+                    {
+                        gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), 5);
+                    }
+                    else
+                    {
+                        if (sec) gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
+                        else
+                        {
+                            select_ssid (ssid, NULL);
+                            gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), 5);
+                        }
+                    }
                     break;
-        
+
+        case 4:     psk = gtk_entry_get_text (GTK_ENTRY (psk_te));
+                    select_ssid (ssid, psk);
+                    gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
+                    break;
+
         default :   gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
                     break;
     }
@@ -397,16 +418,16 @@ static void set_init_country (char *cc)
     GtkTreeIter iter;
     char *val;
 
-    gtk_tree_model_get_iter_first (fcount, &iter);
+    gtk_tree_model_get_iter_first (GTK_TREE_MODEL (fcount), &iter);
     while (1)
     {
-        gtk_tree_model_get (fcount, &iter, 1, &val, -1);
+        gtk_tree_model_get (GTK_TREE_MODEL (fcount), &iter, 1, &val, -1);
         if (!strcmp (cc, val))
         {
             gtk_combo_box_set_active_iter (GTK_COMBO_BOX (country_cb), &iter);
             return;
         }
-        if (!gtk_tree_model_iter_next (fcount, &iter)) break;
+        if (!gtk_tree_model_iter_next (GTK_TREE_MODEL (fcount), &iter)) break;
     }
 }
 
@@ -439,7 +460,7 @@ int main (int argc, char *argv[])
     // create the master databases
     locale_list = gtk_list_store_new (5, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
     tz_list = gtk_list_store_new (3, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
-    ap_list = gtk_list_store_new (3, G_TYPE_STRING, GDK_TYPE_PIXBUF, GDK_TYPE_PIXBUF);
+    ap_list = gtk_list_store_new (4, G_TYPE_STRING, GDK_TYPE_PIXBUF, GDK_TYPE_PIXBUF, G_TYPE_INT);
 
     // build the UI
     builder = gtk_builder_new ();
@@ -454,6 +475,10 @@ int main (int argc, char *argv[])
     prev_btn = (GtkWidget *) gtk_builder_get_object (builder, "prev_btn");
     g_signal_connect (prev_btn, "clicked", G_CALLBACK (prev_page), NULL);
     
+    pwd1_te = (GtkWidget *) gtk_builder_get_object (builder, "p2pwd1");
+    pwd2_te = (GtkWidget *) gtk_builder_get_object (builder, "p2pwd2");
+    psk_te = (GtkWidget *) gtk_builder_get_object (builder, "p4psk");
+
     // set up the locale combo boxes
     read_locales ();
     wid = (GtkWidget *) gtk_builder_get_object (builder, "p1table");

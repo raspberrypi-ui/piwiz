@@ -772,25 +772,36 @@ gtk_box_new(GtkOrientation o, gint s)
 
 void scans_clear (void);
 void scans_add (char *str, int match, int secure, int signal);
-char *find_line (void);
+int find_line (char **ssid, int *sec);
+bool wpa_configure_psk (DHCPCD_WPA *wpa, DHCPCD_WI_SCAN *scan, const char *psk);
 
 void menu_update_scans (WI_SCAN *wi, DHCPCD_WI_SCAN *scans)
 {
     DHCPCD_WI_SCAN *s;
-    char *ssid = find_line ();
+    char *lssid = NULL;
     int active;
 
+    // get the selected line in the list of SSIDs
+    find_line (&lssid, &active);
+
+    // erase the current list
     scans_clear ();
+
+    // loop through scan results
     for (s = scans; s; s = s->next)
     {
+        // only include SSIDs which have either PSK or no security
         if (s->flags & WSF_SECURE && !(s->flags & WSF_PSK)) continue;
 
-        if (ssid && ssid[0] && s->ssid && !strcmp (ssid, s->ssid)) active = 1;
+        // if this AP matches the SSID previously selected, select it in the new list
+        if (lssid && lssid[0] && s->ssid && !strcmp (lssid, s->ssid)) active = 1;
         else active = 0;
 
+        // add this SSID to the new list
         scans_add (s->ssid, active, (s->flags & WSF_SECURE) && (s->flags & WSF_PSK), s->strength.value);
     }
 
+    if (lssid) g_free (lssid);
     dhcpcd_wi_scans_free (wi->scans);
     wi->scans = scans;
 }
@@ -814,9 +825,9 @@ WI_SCAN *wi_scan_find_ssid (char *ssid, DHCPCD_WI_SCAN **dws)
     return NULL;
 }
 
-void select_ssid (void)
+
+void select_ssid (char *ssid, const char *psk)
 {
-    char *ssid = find_line ();
     if (ssid)
     {
         DHCPCD_WI_SCAN *scan;
@@ -827,7 +838,7 @@ void select_ssid (void)
             if (con)
             {
                 DHCPCD_WPA *wpa = dhcpcd_wpa_find (con, wi->interface->ifname);
-                if (wpa) wpa_configure (wpa, scan);
+                if (wpa) wpa_configure_psk (wpa, scan, psk);
             }
         }
     }
