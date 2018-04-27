@@ -132,6 +132,13 @@ static int vsystem (const char *fmt, ...)
     return system (buffer);
 }
 
+static gboolean ok_clicked (gpointer data)
+{
+    gtk_widget_destroy (GTK_WIDGET (msg_dlg));
+    return FALSE;
+}
+
+
 static void message (char *msg, int wait)
 {
     GdkColor col;
@@ -152,10 +159,14 @@ static void message (char *msg, int wait)
 
     wid = (GtkWidget *) gtk_builder_get_object (builder, "msg_bb");
 
-    g_object_unref (builder);
-
     gtk_widget_show_all (msg_dlg);
     if (!wait) gtk_widget_set_visible (wid, FALSE);
+    else
+    {
+        wid = (GtkWidget *) gtk_builder_get_object (builder, "msg_btn");
+        g_signal_connect (wid, "clicked", G_CALLBACK (ok_clicked), NULL);
+    }
+    g_object_unref (builder);
 }
 
 static gboolean close_msg (gpointer data)
@@ -388,6 +399,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
     const char *psk;
     int sec;
     char buffer[512];
+    const char *pw1, *pw2;
 
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
     {
@@ -395,7 +407,18 @@ static void next_page (GtkButton* btn, gpointer ptr)
                     g_thread_new (NULL, set_locale, NULL);
                     break;
 
-        case 2 :    if (!wifi_if[0]) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), 5);
+        case 2 :    pw1 = gtk_entry_get_text (GTK_ENTRY (pwd1_te));
+                    pw2 = gtk_entry_get_text (GTK_ENTRY (pwd2_te));
+                    if (strlen (pw1) || strlen (pw2))
+                    {
+                        if (strlen (pw1) != strlen (pw2) || strcmp (pw1, pw2))
+                        {
+                                message (_("The two passwords entered do not match."), 1);
+                                break;
+                        }
+                        vsystem ("(echo \"%s\" ; echo \"%s\") | passwd $SUDO_USER", pw1, pw2);
+                    }
+                    if (!wifi_if[0]) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), 5);
                     else
                     {
                         init_dhcpcd ();
