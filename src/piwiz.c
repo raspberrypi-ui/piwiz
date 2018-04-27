@@ -122,20 +122,36 @@ static int get_quoted_param (char *path, char *fname, char *toseek, char *result
     return 0;
 }
 
+static int vsystem (const char *fmt, ...)
+{
+    char buffer[1024];
+    va_list arg;
+    va_start (arg, fmt);
+    vsprintf (buffer, fmt, arg);
+    va_end (arg);
+    return system (buffer);
+}
+
 static void delay_warning (char *msg)
 {
-    msg_dlg = (GtkWidget *) gtk_dialog_new ();
+    msg_dlg = (GtkWidget *) gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title (GTK_WINDOW (msg_dlg), "");
     gtk_window_set_modal (GTK_WINDOW (msg_dlg), TRUE);
     gtk_window_set_decorated (GTK_WINDOW (msg_dlg), FALSE);
     gtk_window_set_destroy_with_parent (GTK_WINDOW (msg_dlg), TRUE);
     gtk_window_set_skip_taskbar_hint (GTK_WINDOW (msg_dlg), TRUE);
     gtk_window_set_transient_for (GTK_WINDOW (msg_dlg), GTK_WINDOW (main_dlg));
+    gtk_window_set_position (GTK_WINDOW (msg_dlg), GTK_WIN_POS_CENTER_ON_PARENT);
     GtkWidget *frame = gtk_frame_new (NULL);
     GtkWidget *label = (GtkWidget *) gtk_label_new (msg);
+    GtkWidget *eb = gtk_event_box_new ();
+    GdkColor col;
+    gdk_color_parse ("#FFFFFF", &col);
+    gtk_widget_modify_bg (eb, GTK_STATE_NORMAL, &col);
     gtk_misc_set_padding (GTK_MISC (label), 20, 20);
-    gtk_container_add (GTK_CONTAINER (gtk_dialog_get_content_area (GTK_DIALOG (msg_dlg))), frame);
-    gtk_container_add (GTK_CONTAINER (frame), label);
+    gtk_container_add (GTK_CONTAINER (GTK_WINDOW (msg_dlg)), frame);
+    gtk_container_add (GTK_CONTAINER (frame), eb);
+    gtk_container_add (GTK_CONTAINER (eb), label);
     gtk_widget_show_all (msg_dlg);
 }
 
@@ -161,7 +177,6 @@ static gpointer set_locale (gpointer data)
     GtkTreeModel *model;
     GtkTreeIter iter;
     char *cc, *lc, *city, *ext, *lcc;
-    char buffer[512];
     FILE *fp;
     
     // get the combo entries and look up relevant codes in database
@@ -182,26 +197,21 @@ static gpointer set_locale (gpointer data)
     fclose (fp);
 
     // set wifi country
-    sprintf (buffer, "wpa_cli -i %s set country %s", wifi_if, cc);
-    system (buffer);
-    sprintf (buffer, "iw reg set %s", cc);
-    system (buffer);
-    sprintf (buffer, "wpa_cli -i %s save_config", wifi_if);
-    system (buffer);
-    
+    vsystem ("wpa_cli -i %s set country %s", wifi_if, cc);
+    vsystem ("iw reg set %s", cc);
+    vsystem ("wpa_cli -i %s save_config", wifi_if);
+
     // set keyboard
     fp = fopen ("/etc/default/keyboard", "wb");
     fprintf (fp, "XKBMODEL=pc105\nXKBLAYOUT=%s\nXKBVARIANT=\nXKBOPTIONS=\nBACKSPACE=guess", lcc);
     fclose (fp);
-    system ("setxkbmap");
-    
+    vsystem ("setxkbmap");
+
     // set locale
-    system ("sed -i /etc/locale.gen -e 's/^\\([^#].*\\)/# \\1/g'");
-    sprintf (buffer, "sed -i /etc/locale.gen -e 's/^# \\(%s_%s[\\. ].*UTF-8\\)/\\1/g'", lc, cc);
-    system (buffer);
-    system ("locale-gen");
-    sprintf (buffer, "update-locale LANG=%s_%s%s", lc, cc, ext);
-    system (buffer);
+    vsystem ("sed -i /etc/locale.gen -e 's/^\\([^#].*\\)/# \\1/g'");
+    vsystem ("sed -i /etc/locale.gen -e 's/^# \\(%s_%s[\\. ].*UTF-8\\)/\\1/g'", lc, cc);
+    vsystem ("locale-gen");
+    vsystem ("LC_ALL=%s_%s%s LANG=%s_%s%s LANGUAGE=%s_%s%s update-locale LANG=%s_%s%s LC_ALL=%s_%s%s LANGUAGE=%s_%s%s", lc, cc, ext, lc, cc, ext, lc, cc, ext, lc, cc, ext, lc, cc, ext, lc, cc, ext);
     
     g_idle_add (close_msg, NULL);
     return NULL;
