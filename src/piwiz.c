@@ -39,7 +39,7 @@ GtkListStore *ap_list;
 
 char wifi_if[16];
 char *ssid;
-gboolean connecting = FALSE;
+gint conn_timeout = 0;
 
 /* Functions in dhcpcd-gtk/main.c */
 
@@ -178,12 +178,20 @@ static gboolean close_msg (gpointer data)
 
 void connect_success (void)
 {
-    if (connecting)
+    if (conn_timeout)
     {
-        connecting = FALSE;
+        gtk_timeout_remove (conn_timeout);
+        conn_timeout = 0;
         gtk_widget_destroy (GTK_WIDGET (msg_dlg));
         gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), 5);
     }
+}
+
+gint connect_failure (gpointer data)
+{
+    gtk_widget_destroy (GTK_WIDGET (msg_dlg));
+    message (_("Failed to connect to network."), 1);
+    return FALSE;
 }
 
 static gpointer set_locale (gpointer data)
@@ -446,7 +454,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                         {
                             select_ssid (ssid, NULL);
                             message (_("Connecting to WiFi network - please wait..."), 0);
-                            connecting = TRUE;
+                            conn_timeout = gtk_timeout_add (30000, connect_failure, NULL);
                         }
                     }
                     break;
@@ -454,7 +462,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
         case 4:     psk = gtk_entry_get_text (GTK_ENTRY (psk_te));
                     select_ssid (ssid, psk);
                     message (_("Connecting to WiFi network - please wait..."), 0);
-                    connecting = TRUE;
+                    conn_timeout = gtk_timeout_add (30000, connect_failure, NULL);
                     break;
 
         default :   gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
@@ -464,7 +472,10 @@ static void next_page (GtkButton* btn, gpointer ptr)
 
 static void prev_page (GtkButton* btn, gpointer ptr)
 {
-    gtk_notebook_prev_page (GTK_NOTEBOOK (wizard_nb));
+    if (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)) == 5)
+        gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), 3);
+    else
+        gtk_notebook_prev_page (GTK_NOTEBOOK (wizard_nb));
 }
 
 
@@ -589,61 +600,4 @@ int main (int argc, char *argv[])
     return 0;
 }
 
-
-#if 0
-    bt->list = gtk_tree_view_new ();
-    gtk_tree_view_set_fixed_height_mode (GTK_TREE_VIEW (bt->list), TRUE);
-    gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (bt->list), FALSE);
-    gtk_widget_set_size_request (bt->list, -1, 150);
-    rend = gtk_cell_renderer_pixbuf_new ();
-    gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (bt->list), -1, "Icon", rend, "pixbuf", 5, NULL);
-    gtk_tree_view_column_set_fixed_width (gtk_tree_view_get_column (GTK_TREE_VIEW (bt->list), 0), 50);
-    rend = gtk_cell_renderer_text_new ();
-    gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (bt->list), -1, "Name", rend, "text", 1, NULL);
-    gtk_tree_view_column_set_fixed_width (gtk_tree_view_get_column (GTK_TREE_VIEW (bt->list), 1), 300);
-    gtk_tree_view_set_model (GTK_TREE_VIEW (bt->list), type == DIALOG_PAIR ? GTK_TREE_MODEL (bt->unpair_list) : GTK_TREE_MODEL (bt->pair_list));
-    gtk_tree_view_set_tooltip_column (GTK_TREE_VIEW (bt->list), 0);
-    gtk_container_add (GTK_CONTAINER (scrl), bt->list);
-    
-    
-    GVariant *var1, *var2, *var3, *var4, *var5;
-    GtkTreeIter iter;
-    GDBusInterface *interface;
-    GdkPixbuf *icon;
-
-    // add a new structure to the list store...
-    gtk_list_store_append (lst, &iter);
-
-    // ... and fill it with data about the object
-    interface = g_dbus_object_get_interface (object, "org.bluez.Device1");
-    var1 = g_dbus_proxy_get_cached_property (G_DBUS_PROXY (interface), "Alias");
-    var2 = g_dbus_proxy_get_cached_property (G_DBUS_PROXY (interface), "Paired");
-    var3 = g_dbus_proxy_get_cached_property (G_DBUS_PROXY (interface), "Connected");
-    var4 = g_dbus_proxy_get_cached_property (G_DBUS_PROXY (interface), "Trusted");
-    var5 = g_dbus_proxy_get_cached_property (G_DBUS_PROXY (interface), "Icon");
-    icon = NULL;
-    if (var5)
-    {
-        if (gtk_icon_theme_has_icon (panel_get_icon_theme (bt->panel), g_variant_get_string (var5, NULL)))
-        {
-            icon = gtk_icon_theme_load_icon (panel_get_icon_theme (bt->panel), g_variant_get_string (var5, NULL), 32, 0, NULL);
-        }
-    }
-    if (!icon) icon = gtk_icon_theme_load_icon (panel_get_icon_theme (bt->panel), "dialog-question", 32, 0, NULL);
- 
-    gtk_list_store_set (lst, &iter, 0, g_dbus_object_get_object_path (object),
-        1, var1 ? g_variant_get_string (var1, NULL) : "Unnamed device", 2, g_variant_get_boolean (var2),
-        3, g_variant_get_boolean (var3), 4, g_variant_get_boolean (var4), 
-        5, icon, -1);
-
-    g_object_unref (icon);
-    if (var1) g_variant_unref (var1);
-    if (var2) g_variant_unref (var2);
-    if (var3) g_variant_unref (var3);
-    if (var4) g_variant_unref (var4);
-    if (var5) g_variant_unref (var5);
-    g_object_unref (interface);    
-    
-
-#endif
 
