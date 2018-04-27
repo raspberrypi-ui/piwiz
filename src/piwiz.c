@@ -132,27 +132,30 @@ static int vsystem (const char *fmt, ...)
     return system (buffer);
 }
 
-static void delay_warning (char *msg)
+static void message (char *msg, int wait)
 {
-    msg_dlg = (GtkWidget *) gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title (GTK_WINDOW (msg_dlg), "");
-    gtk_window_set_modal (GTK_WINDOW (msg_dlg), TRUE);
-    gtk_window_set_decorated (GTK_WINDOW (msg_dlg), FALSE);
-    gtk_window_set_destroy_with_parent (GTK_WINDOW (msg_dlg), TRUE);
-    gtk_window_set_skip_taskbar_hint (GTK_WINDOW (msg_dlg), TRUE);
-    gtk_window_set_transient_for (GTK_WINDOW (msg_dlg), GTK_WINDOW (main_dlg));
-    gtk_window_set_position (GTK_WINDOW (msg_dlg), GTK_WIN_POS_CENTER_ON_PARENT);
-    GtkWidget *frame = gtk_frame_new (NULL);
-    GtkWidget *label = (GtkWidget *) gtk_label_new (msg);
-    GtkWidget *eb = gtk_event_box_new ();
     GdkColor col;
+    GtkWidget *wid;
+    GtkBuilder *builder = gtk_builder_new ();
+    gtk_builder_add_from_file (builder, PACKAGE_DATA_DIR "/piwiz.ui", NULL);
+
+    msg_dlg = (GtkWidget *) gtk_builder_get_object (builder, "msg");
+    gtk_window_set_position (GTK_WINDOW (msg_dlg), GTK_WIN_POS_CENTER_ON_PARENT);
+    gtk_window_set_transient_for (GTK_WINDOW (msg_dlg), GTK_WINDOW (main_dlg));
+
+    wid = (GtkWidget *) gtk_builder_get_object (builder, "msg_eb");
     gdk_color_parse ("#FFFFFF", &col);
-    gtk_widget_modify_bg (eb, GTK_STATE_NORMAL, &col);
-    gtk_misc_set_padding (GTK_MISC (label), 20, 20);
-    gtk_container_add (GTK_CONTAINER (GTK_WINDOW (msg_dlg)), frame);
-    gtk_container_add (GTK_CONTAINER (frame), eb);
-    gtk_container_add (GTK_CONTAINER (eb), label);
+    gtk_widget_modify_bg (wid, GTK_STATE_NORMAL, &col);
+
+    wid = (GtkWidget *) gtk_builder_get_object (builder, "msg_lbl");
+    gtk_label_set_text (GTK_LABEL (wid), msg);
+
+    wid = (GtkWidget *) gtk_builder_get_object (builder, "msg_bb");
+
+    g_object_unref (builder);
+
     gtk_widget_show_all (msg_dlg);
+    if (!wait) gtk_widget_set_visible (wid, FALSE);
 }
 
 static gboolean close_msg (gpointer data)
@@ -388,7 +391,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
 
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
     {
-        case 1 :    delay_warning (_("Setting locale - please wait..."));
+        case 1 :    message (_("Setting locale - please wait..."), 0);
                     g_thread_new (NULL, set_locale, NULL);
                     break;
 
@@ -419,7 +422,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                         else
                         {
                             select_ssid (ssid, NULL);
-                            delay_warning (_("Connecting to WiFi network - please wait..."));
+                            message (_("Connecting to WiFi network - please wait..."), 0);
                             connecting = TRUE;
                         }
                     }
@@ -427,7 +430,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
 
         case 4:     psk = gtk_entry_get_text (GTK_ENTRY (psk_te));
                     select_ssid (ssid, psk);
-                    delay_warning (_("Connecting to WiFi network - please wait..."));
+                    message (_("Connecting to WiFi network - please wait..."), 0);
                     connecting = TRUE;
                     break;
 
