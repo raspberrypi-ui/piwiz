@@ -147,7 +147,6 @@ static void message (char *msg, int wait)
     gtk_builder_add_from_file (builder, PACKAGE_DATA_DIR "/piwiz.ui", NULL);
 
     msg_dlg = (GtkWidget *) gtk_builder_get_object (builder, "msg");
-    gtk_window_set_position (GTK_WINDOW (msg_dlg), GTK_WIN_POS_CENTER_ON_PARENT);
     gtk_window_set_transient_for (GTK_WINDOW (msg_dlg), GTK_WINDOW (main_dlg));
 
     wid = (GtkWidget *) gtk_builder_get_object (builder, "msg_eb");
@@ -189,6 +188,7 @@ void connect_success (void)
 
 gint connect_failure (gpointer data)
 {
+    conn_timeout = 0;
     gtk_widget_destroy (GTK_WIDGET (msg_dlg));
     message (_("Failed to connect to network."), 1);
     return FALSE;
