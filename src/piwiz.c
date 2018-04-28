@@ -227,7 +227,7 @@ static gpointer set_locale (gpointer data)
     fp = fopen ("/etc/default/keyboard", "wb");
     fprintf (fp, "XKBMODEL=pc105\nXKBLAYOUT=%s\nXKBVARIANT=\nXKBOPTIONS=\nBACKSPACE=guess", lcc);
     fclose (fp);
-    vsystem ("setxkbmap");
+    vsystem ("setxkbmap -layout %s -variant \"\" -option \"\"", lcc);
 
     // set locale
     vsystem ("sed -i /etc/locale.gen -e 's/^\\([^#].*\\)/# \\1/g'");
