@@ -57,6 +57,7 @@ struct watch {
 static struct watch *watches;
 
 WI_SCANS wi_scans;
+DHCPCD_CONNECTION *con;
 
 void connect_success (void);
 
@@ -849,7 +850,6 @@ void select_ssid (char *ssid, const char *psk)
 
 void init_dhcpcd (void)
 {
-    DHCPCD_CONNECTION *con;
     online = false;
 
     TAILQ_INIT (&wi_scans);

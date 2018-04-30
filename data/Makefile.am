@@ -1,6 +1,7 @@
 uidir = $(datadir)/piwiz
 
-ui_in_files = piwiz.ui
+ui_in_files = 	piwiz.ui \
+				raspberry-pi-logo.png
 	
 ui_DATA = $(ui_in_files)
 

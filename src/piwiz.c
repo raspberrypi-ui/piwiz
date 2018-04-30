@@ -18,11 +18,17 @@
 
 #include <libintl.h>
 
+#define PAGE_INTRO 0
+#define PAGE_LOCALE 1
+#define PAGE_PASSWD 2
+#define PAGE_WIFIAP 3
+#define PAGE_WIFIPSK 4
+#define PAGE_DONE 5
 
 /* Controls */
 
 static GtkWidget *main_dlg, *msg_dlg;
-static GtkWidget *wizard_nb, *next_btn, *prev_btn;
+static GtkWidget *wizard_nb, *next_btn, *prev_btn, *skip_btn;
 static GtkWidget *country_cb, *language_cb, *timezone_cb;
 static GtkWidget *ap_tv, *psk_label;
 static GtkWidget *pwd1_te, *pwd2_te, *psk_te;
@@ -45,7 +51,7 @@ gint conn_timeout = 0;
 
 void select_ssid (char *ssid, const char *psk);
 void init_dhcpcd (void);
-
+extern void *con; // not really a void *, but let's keep the dhcpcd stuff out where possible...
 
 
 /* Helpers */
@@ -182,7 +188,7 @@ void connect_success (void)
         gtk_timeout_remove (conn_timeout);
         conn_timeout = 0;
         gtk_widget_destroy (GTK_WIDGET (msg_dlg));
-        gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), 5);
+        gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_DONE);
     }
 }
 
@@ -402,6 +408,35 @@ int find_line (char **ssid, int *sec)
     return 0;
 }
 
+
+static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int pagenum, gpointer data)
+{
+    switch (pagenum)
+    {
+        case PAGE_INTRO :   gtk_widget_set_sensitive (prev_btn, FALSE);
+                            break;
+
+        case PAGE_DONE :    gtk_button_set_label (GTK_BUTTON (next_btn), _("Quit"));
+                            gtk_widget_set_sensitive (skip_btn, FALSE);
+                            break;
+
+        case PAGE_WIFIAP :  if (!con)
+                            {
+                                init_dhcpcd ();
+                                scans_clear ();
+                                scans_add (_("Searching for networks - please wait..."), 0, 0, -1);
+                            }
+                            // fallthrough...
+
+        default :           gtk_button_set_label (GTK_BUTTON (next_btn), _("OK"));
+                            gtk_widget_set_sensitive (prev_btn, TRUE);
+                            gtk_widget_set_sensitive (next_btn, TRUE);
+                            gtk_widget_set_sensitive (skip_btn, TRUE);
+                            break;
+    }
+}
+
+
 static void next_page (GtkButton* btn, gpointer ptr)
 {
     const char *psk;
@@ -411,71 +446,76 @@ static void next_page (GtkButton* btn, gpointer ptr)
 
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
     {
-        case 1 :    message (_("Setting locale - please wait..."), 0);
-                    g_thread_new (NULL, set_locale, NULL);
-                    break;
+        case PAGE_LOCALE :  message (_("Setting locale - please wait..."), 0);
+                            g_thread_new (NULL, set_locale, NULL);
+                            break;
 
-        case 2 :    pw1 = gtk_entry_get_text (GTK_ENTRY (pwd1_te));
-                    pw2 = gtk_entry_get_text (GTK_ENTRY (pwd2_te));
-                    if (strlen (pw1) || strlen (pw2))
-                    {
-                        if (strlen (pw1) != strlen (pw2) || strcmp (pw1, pw2))
-                        {
-                                message (_("The two passwords entered do not match."), 1);
-                                break;
-                        }
-                        vsystem ("(echo \"%s\" ; echo \"%s\") | passwd $SUDO_USER", pw1, pw2);
-                    }
-                    if (!wifi_if[0]) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), 5);
-                    else
-                    {
-                        init_dhcpcd ();
-                        scans_clear ();
-                        scans_add (_("Searching for networks - please wait..."), 0, 0, -1);
-                        gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
-                    }
-                    break;
+        case PAGE_PASSWD :  pw1 = gtk_entry_get_text (GTK_ENTRY (pwd1_te));
+                            pw2 = gtk_entry_get_text (GTK_ENTRY (pwd2_te));
+                            if (strlen (pw1) || strlen (pw2))
+                            {
+                                if (strlen (pw1) != strlen (pw2) || strcmp (pw1, pw2))
+                                {
+                                    message (_("The two passwords entered do not match."), 1);
+                                    break;
+                                }
+                                vsystem ("(echo \"%s\" ; echo \"%s\") | passwd $SUDO_USER", pw1, pw2);
+                            }
+                            if (!wifi_if[0]) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_DONE);
+                            else gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
+                            break;
 
-        case 3:     if (ssid) g_free (ssid);
-                    ssid = NULL;
-                    if (!find_line (&ssid, &sec))
-                    {
-                        gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), 5);
-                    }
-                    else
-                    {
-                        if (sec)
-                        {
-                            sprintf (buffer, _("Enter the password for the WiFi network \"%s\""), ssid);
-                            gtk_label_set_text (GTK_LABEL (psk_label), buffer);
-                            gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
-                        }
-                        else
-                        {
-                            select_ssid (ssid, NULL);
+        case PAGE_WIFIAP :  if (ssid) g_free (ssid);
+                            ssid = NULL;
+                            if (!find_line (&ssid, &sec))
+                                gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_DONE);
+                            else
+                            {
+                                if (sec)
+                                {
+                                    sprintf (buffer, _("Enter the password for the WiFi network \"%s\""), ssid);
+                                    gtk_label_set_text (GTK_LABEL (psk_label), buffer);
+                                    gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
+                                }
+                                else
+                                {
+                                    select_ssid (ssid, NULL);
+                                    message (_("Connecting to WiFi network - please wait..."), 0);
+                                    conn_timeout = gtk_timeout_add (30000, connect_failure, NULL);
+                                }
+                            }
+                            break;
+
+        case PAGE_WIFIPSK : psk = gtk_entry_get_text (GTK_ENTRY (psk_te));
+                            select_ssid (ssid, psk);
                             message (_("Connecting to WiFi network - please wait..."), 0);
                             conn_timeout = gtk_timeout_add (30000, connect_failure, NULL);
-                        }
-                    }
-                    break;
+                            break;
 
-        case 4:     psk = gtk_entry_get_text (GTK_ENTRY (psk_te));
-                    select_ssid (ssid, psk);
-                    message (_("Connecting to WiFi network - please wait..."), 0);
-                    conn_timeout = gtk_timeout_add (30000, connect_failure, NULL);
-                    break;
-
-        default :   gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
-                    break;
+        default :           gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
+                            break;
     }
 }
 
 static void prev_page (GtkButton* btn, gpointer ptr)
 {
-    if (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)) == 5)
-        gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), 3);
+    if (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)) == PAGE_DONE)
+        gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIAP);
     else
         gtk_notebook_prev_page (GTK_NOTEBOOK (wizard_nb));
+}
+
+static void skip_page (GtkButton* btn, gpointer ptr)
+{
+    switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
+    {
+        case PAGE_LOCALE :
+        case PAGE_PASSWD :  gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
+                            break;
+
+        case PAGE_WIFIAP :  gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_DONE);
+                            break;
+    }
 }
 
 
@@ -496,7 +536,6 @@ static void set_init_country (char *cc)
         if (!gtk_tree_model_iter_next (GTK_TREE_MODEL (fcount), &iter)) break;
     }
 }
-
 
 
 /* The dialog... */
@@ -534,13 +573,18 @@ int main (int argc, char *argv[])
 
     main_dlg = (GtkWidget *) gtk_builder_get_object (builder, "wizard_dlg");
     wizard_nb = (GtkWidget *) gtk_builder_get_object (builder, "wizard_nb");
+    g_signal_connect (wizard_nb, "switch-page", G_CALLBACK (page_changed), NULL);
 
     next_btn = (GtkWidget *) gtk_builder_get_object (builder, "next_btn");
     g_signal_connect (next_btn, "clicked", G_CALLBACK (next_page), NULL);
 
     prev_btn = (GtkWidget *) gtk_builder_get_object (builder, "prev_btn");
     g_signal_connect (prev_btn, "clicked", G_CALLBACK (prev_page), NULL);
-    
+    gtk_widget_set_sensitive (prev_btn, FALSE);
+
+    skip_btn = (GtkWidget *) gtk_builder_get_object (builder, "skip_btn");
+    g_signal_connect (skip_btn, "clicked", G_CALLBACK (skip_page), NULL);
+
     pwd1_te = (GtkWidget *) gtk_builder_get_object (builder, "p2pwd1");
     pwd2_te = (GtkWidget *) gtk_builder_get_object (builder, "p2pwd2");
     psk_te = (GtkWidget *) gtk_builder_get_object (builder, "p4psk");
