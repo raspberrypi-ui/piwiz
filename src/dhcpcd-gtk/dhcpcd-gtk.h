@@ -37,7 +37,9 @@
 #include "dhcpcd.h"
 #include "queue.h"
 
-//#define PACKAGE "dhcpcd-gtk"
+#ifndef PACKAGE
+#define PACKAGE "dhcpcd-gtk"
+#endif
 
 #define UNCONST(a)              ((void *)(unsigned long)(const void *)(a))
 

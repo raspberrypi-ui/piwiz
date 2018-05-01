@@ -8,6 +8,7 @@ piwiz_CFLAGS = \
 	-DPACKAGE_BIN_DIR=\""$(bindir)"\" \
 	-DPACKAGE_LOCALE_DIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
 	-I$(srcdir)/libdhcpcd \
+	-I$(srcdir)/dhcpcd-gtk \
 	$(PACKAGE_CFLAGS) \
 	$(G_CAST_CHECKS)
 

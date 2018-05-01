@@ -57,9 +57,16 @@ struct watch {
 static struct watch *watches;
 
 WI_SCANS wi_scans;
-DHCPCD_CONNECTION *con;
 
-void connect_success (void);
+/*!!!!!!!!!!*/
+DHCPCD_CONNECTION *con;
+extern void connect_success (void);
+#define gtk_status_icon_set_from_icon_name(a,b) (0)
+#define gtk_status_icon_set_tooltip_text(a,b) (0)
+#define prefs_abort() (0)
+#define menu_abort() (0)
+#define menu_remove_if(a) (0)
+/*!!!!!!!!!!*/
 
 static gboolean dhcpcd_try_open(gpointer data);
 static gboolean dhcpcd_wpa_try_open(gpointer data);
@@ -155,7 +162,7 @@ animate_carrier(_unused gpointer data)
 			break;
 		}
 	}
-	//gtk_status_icon_set_from_icon_name(status_icon, icon);
+	gtk_status_icon_set_from_icon_name(status_icon, icon);
 	return true;
 }
 
@@ -181,7 +188,7 @@ animate_online(_unused gpointer data)
 	else
 		icon = scan ? get_strength_icon_name(scan->strength.value) :
 		    "network-transmit-receive";
-	//gtk_status_icon_set_from_icon_name(status_icon, icon);
+	gtk_status_icon_set_from_icon_name(status_icon, icon);
 	return true;
 }
 
@@ -203,7 +210,9 @@ update_online(DHCPCD_CONNECTION *con, bool showif)
 			if (i->up)
 				ison = true;
 		}
+/*!!!!!!!!!!*/
 		if (i->wireless && i->state == DHS_CARRIER) connect_success ();
+/*!!!!!!!!!!*/
 		msg = dhcpcd_if_message(i, NULL);
 		if (msg) {
 			if (showif)
@@ -244,10 +253,10 @@ update_online(DHCPCD_CONNECTION *con, bool showif)
 		scan = get_strongest_scan();
 		icon = scan ? get_strength_icon_name(scan->strength.value) :
 		    "network-transmit-receive";
-		//gtk_status_icon_set_from_icon_name(status_icon, icon);
+		gtk_status_icon_set_from_icon_name(status_icon, icon);
 	}
 
-	//gtk_status_icon_set_tooltip_text(status_icon, msgs);
+	gtk_status_icon_set_tooltip_text(status_icon, msgs);
 	g_free(msgs);
 }
 
@@ -410,11 +419,11 @@ dhcpcd_status_cb(DHCPCD_CONNECTION *con,
 			ani_counter = 0;
 		}
 		online = carrier = false;
-		//gtk_status_icon_set_from_icon_name(status_icon,
-		//    "network-offline");
-		//gtk_status_icon_set_tooltip_text(status_icon, msg);
-		//prefs_abort();
-		//menu_abort();
+		gtk_status_icon_set_from_icon_name(status_icon,
+		    "network-offline");
+		gtk_status_icon_set_tooltip_text(status_icon, msg);
+		prefs_abort();
+		menu_abort();
 		wpa_abort();
 		while ((w = TAILQ_FIRST(&wi_scans))) {
 			TAILQ_REMOVE(&wi_scans, w, next);
@@ -661,7 +670,7 @@ dhcpcd_wpa_scan_cb(DHCPCD_WPA *wpa, _unused void *data)
 			msg = "network-transmit-receive";
 		else
 			msg = "network-offline";
-		//gtk_status_icon_set_from_icon_name(status_icon, msg);
+		gtk_status_icon_set_from_icon_name(status_icon, msg);
 	}
 }
 
@@ -679,7 +688,7 @@ dhcpcd_wpa_status_cb(DHCPCD_WPA *wpa,
 		TAILQ_FOREACH_SAFE(w, &wi_scans, next, wn) {
 			if (w->interface == i) {
 				TAILQ_REMOVE(&wi_scans, w, next);
-				//menu_remove_if(w);
+				menu_remove_if(w);
 				dhcpcd_wi_scans_free(w->scans);
 				g_free(w);
 			}
@@ -759,94 +768,6 @@ main(int argc, char *argv[])
 #endif
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-// moved here from menu.c
-
-#if GTK_MAJOR_VERSION == 2
-GtkWidget *
-gtk_box_new(GtkOrientation o, gint s)
-{
-
-	if (o == GTK_ORIENTATION_HORIZONTAL)
-		return gtk_hbox_new(false, s);
-	else
-		return gtk_vbox_new(false, s);
-}
-#endif
-
-void scans_clear (void);
-void scans_add (char *str, int match, int secure, int signal);
-int find_line (char **ssid, int *sec);
-bool wpa_configure_psk (DHCPCD_WPA *wpa, DHCPCD_WI_SCAN *scan, const char *psk);
-
-void menu_update_scans (WI_SCAN *wi, DHCPCD_WI_SCAN *scans)
-{
-    DHCPCD_WI_SCAN *s;
-    char *lssid = NULL;
-    int active;
-
-    // get the selected line in the list of SSIDs
-    find_line (&lssid, &active);
-
-    // erase the current list
-    scans_clear ();
-
-    // loop through scan results
-    for (s = scans; s; s = s->next)
-    {
-        // only include SSIDs which have either PSK or no security
-        if (s->flags & WSF_SECURE && !(s->flags & WSF_PSK)) continue;
-
-        // if this AP matches the SSID previously selected, select it in the new list
-        if (lssid && lssid[0] && s->ssid && !strcmp (lssid, s->ssid)) active = 1;
-        else active = 0;
-
-        // add this SSID to the new list
-        scans_add (s->ssid, active, (s->flags & WSF_SECURE) && (s->flags & WSF_PSK), s->strength.value);
-    }
-
-    if (lssid) g_free (lssid);
-    dhcpcd_wi_scans_free (wi->scans);
-    wi->scans = scans;
-}
-
-WI_SCAN *wi_scan_find_ssid (char *ssid, DHCPCD_WI_SCAN **dws)
-{
-    WI_SCAN *w;
-    DHCPCD_WI_SCAN *dw;
-
-    TAILQ_FOREACH (w, &wi_scans, next)
-    {
-        for (dw = w->scans; dw; dw = dw->next)
-        {
-            if (!strcmp (ssid, dw->ssid))
-            {
-                *dws = dw;
-                return w;
-            }
-        }
-    }
-    return NULL;
-}
-
-
-void select_ssid (char *ssid, const char *psk)
-{
-    if (ssid)
-    {
-        DHCPCD_WI_SCAN *scan;
-        WI_SCAN *wi = wi_scan_find_ssid (ssid, &scan);
-        if (wi)
-        {
-            DHCPCD_CONNECTION *con = dhcpcd_if_connection (wi->interface);
-            if (con)
-            {
-                DHCPCD_WPA *wpa = dhcpcd_wpa_find (con, wi->interface->ifname);
-                if (wpa) wpa_configure_psk (wpa, scan, psk);
-            }
-        }
-    }
-}
 
 void init_dhcpcd (void)
 {

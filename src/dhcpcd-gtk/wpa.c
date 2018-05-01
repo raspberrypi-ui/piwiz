@@ -164,23 +164,3 @@ wpa_configure(DHCPCD_WPA *wpa, DHCPCD_WI_SCAN *scan)
 	}
 	return retval;
 }
-
-
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-bool wpa_configure_psk (DHCPCD_WPA *wpa, DHCPCD_WI_SCAN *scan, const char *psk)
-{
-	DHCPCD_WI_SCAN s;
-
-	/* Take a copy of scan incase it's destroyed by a scan update */
-	memcpy(&s, scan, sizeof(s));
-	s.next = NULL;
-
-	if (!(s.flags & WSF_PSK))
-		return wpa_conf(dhcpcd_wpa_configure(wpa, &s, NULL));
-
-    if (*psk == '\0')
-        return wpa_conf(dhcpcd_wpa_select(wpa, &s));
-    else
-        return wpa_conf(dhcpcd_wpa_configure(wpa, &s, psk));
-}
