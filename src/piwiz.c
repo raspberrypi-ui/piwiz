@@ -46,9 +46,14 @@ GtkTreeModelFilter *fcount, *flang, *fcity;
 
 GtkListStore *ap_list;
 
+/* Globals */
+
 char wifi_if[16];
 char *ssid;
 gint conn_timeout = 0;
+char init_country[16];
+char init_lang[16];
+char init_tz[64];
 
 /* Functions in dhcpcd-gtk/main.c */
 
@@ -68,7 +73,9 @@ static void read_locales (void);
 static gboolean unique_rows (GtkTreeModel *model, GtkTreeIter *iter, gpointer data);
 static void country_changed (GtkComboBox *cb, gpointer ptr);
 static gboolean match_country (GtkTreeModel *model, GtkTreeIter *iter, gpointer data);
+static void read_init_locale (void);
 static void set_init_country (char *cc);
+static void set_init_lang_tz (char *lc, char *city);
 static void scans_clear (void);
 static void scans_add (char *str, int match, int secure, int signal);
 static int find_line (char **ssid, int *sec);
@@ -220,14 +227,17 @@ static gpointer set_locale (gpointer data)
     gtk_tree_model_get (model, &iter, 0, &city, -1);
 
     // set timezone
-    fp = fopen ("/etc/timezone", "wb");
-    fprintf (fp, "%s\n", city);
-    fclose (fp);
+    if (strcmp (init_tz, city))
+    {
+        fp = fopen ("/etc/timezone", "wb");
+        fprintf (fp, "%s\n", city);
+        fclose (fp);
+    }
 
     // set wifi country
-    vsystem ("wpa_cli -i %s set country %s", wifi_if, cc);
+    vsystem ("wpa_cli -i %s set country %s >> /dev/null", wifi_if, cc);
     vsystem ("iw reg set %s", cc);
-    vsystem ("wpa_cli -i %s save_config", wifi_if);
+    vsystem ("wpa_cli -i %s save_config >> /dev/null", wifi_if);
 
     // set keyboard
     fp = fopen ("/etc/default/keyboard", "wb");
@@ -236,11 +246,14 @@ static gpointer set_locale (gpointer data)
     vsystem ("setxkbmap -layout %s -variant \"\" -option \"\"", lcc);
 
     // set locale
-    vsystem ("sed -i /etc/locale.gen -e 's/^\\([^#].*\\)/# \\1/g'");
-    vsystem ("sed -i /etc/locale.gen -e 's/^# \\(%s_%s[\\. ].*UTF-8\\)/\\1/g'", lc, cc);
-    vsystem ("locale-gen");
-    vsystem ("LC_ALL=%s_%s%s LANG=%s_%s%s LANGUAGE=%s_%s%s update-locale LANG=%s_%s%s LC_ALL=%s_%s%s LANGUAGE=%s_%s%s", lc, cc, ext, lc, cc, ext, lc, cc, ext, lc, cc, ext, lc, cc, ext, lc, cc, ext);
-    
+    if (strcmp (init_country, cc) || strcmp (init_lang, lc))
+    {
+        vsystem ("sed -i /etc/locale.gen -e 's/^\\([^#].*\\)/# \\1/g'");
+        vsystem ("sed -i /etc/locale.gen -e 's/^# \\(%s_%s[\\. ].*UTF-8\\)/\\1/g'", lc, cc);
+        vsystem ("locale-gen");
+        vsystem ("LC_ALL=%s_%s%s LANG=%s_%s%s LANGUAGE=%s_%s%s update-locale LANG=%s_%s%s LC_ALL=%s_%s%s LANGUAGE=%s_%s%s", lc, cc, ext, lc, cc, ext, lc, cc, ext, lc, cc, ext, lc, cc, ext, lc, cc, ext);
+    }
+
     g_idle_add (close_msg, NULL);
     return NULL;
 }
@@ -360,6 +373,22 @@ static gboolean match_country (GtkTreeModel *model, GtkTreeIter *iter, gpointer 
     return FALSE;
 }
 
+static void read_init_locale (void)
+{
+    char buffer[64];
+
+    get_string ("cat /etc/timezone", init_tz);
+    get_string ("grep LC_ALL /etc/default/locale | cut -d = -f 2", buffer);
+    if (!buffer[0])
+        get_string ("grep LANGUAGE /etc/default/locale | cut -d = -f 2", buffer);
+    if (!buffer[0])
+        get_string ("grep LANG /etc/default/locale | cut -d = -f 2", buffer);
+    if (buffer[0] && sscanf (buffer, "%[^_]_%[^. ]", init_lang, init_country) == 2)
+        return;
+    init_country[0] = 0;
+    init_lang[0] = 0;
+}
+
 static void set_init_country (char *cc)
 {
     GtkTreeIter iter;
@@ -375,6 +404,36 @@ static void set_init_country (char *cc)
             return;
         }
         if (!gtk_tree_model_iter_next (GTK_TREE_MODEL (fcount), &iter)) break;
+    }
+}
+
+static void set_init_lang_tz (char *lc, char *city)
+{
+    GtkTreeIter iter;
+    char *val;
+
+    gtk_tree_model_get_iter_first (GTK_TREE_MODEL (slang), &iter);
+    while (1)
+    {
+        gtk_tree_model_get (GTK_TREE_MODEL (slang), &iter, 0, &val, -1);
+        if (!strcmp (lc, val))
+        {
+            gtk_combo_box_set_active_iter (GTK_COMBO_BOX (language_cb), &iter);
+            break;
+        }
+        if (!gtk_tree_model_iter_next (GTK_TREE_MODEL (slang), &iter)) break;
+    }
+
+    gtk_tree_model_get_iter_first (GTK_TREE_MODEL (scity), &iter);
+    while (1)
+    {
+        gtk_tree_model_get (GTK_TREE_MODEL (scity), &iter, 0, &val, -1);
+        if (!strcmp (city, val))
+        {
+            gtk_combo_box_set_active_iter (GTK_COMBO_BOX (timezone_cb), &iter);
+            return;
+        }
+        if (!gtk_tree_model_iter_next (GTK_TREE_MODEL (scity), &iter)) break;
     }
 }
 
@@ -634,7 +693,9 @@ int main (int argc, char *argv[])
     GtkBuilder *builder;
     GtkWidget *wid;
     GtkCellRenderer *col;
-    
+
+    read_init_locale ();
+
     // get the wifi device name, if any
     get_string ("for dir in /sys/class/net/*/wireless; do if [ -d \"$dir\" ] ; then basename \"$(dirname \"$dir\")\" ; fi ; done | head -n 1", wifi_if);
                         
@@ -704,7 +765,8 @@ int main (int argc, char *argv[])
 
     // initialise the country combo
     g_signal_connect (country_cb, "changed", G_CALLBACK (country_changed), NULL);
-    set_init_country ("GB");
+    set_init_country (init_country[0] ? init_country : "GB");
+    set_init_lang_tz (init_lang[0] ? init_lang : "en", init_tz[0] ? init_tz : "Europe/London");
 
     gtk_widget_show_all (GTK_WIDGET (country_cb));
     gtk_widget_show_all (GTK_WIDGET (language_cb));
