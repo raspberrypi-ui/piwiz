@@ -76,7 +76,6 @@ static gboolean match_country (GtkTreeModel *model, GtkTreeIter *iter, gpointer 
 static void read_init_locale (void);
 static void set_init_country (char *cc);
 static void set_init_lang_tz (char *lc, char *city);
-static void scans_clear (void);
 static void scans_add (char *str, int match, int secure, int signal);
 static int find_line (char **ssid, int *sec);
 void connect_success (void);
@@ -232,6 +231,7 @@ static gpointer set_locale (gpointer data)
         fp = fopen ("/etc/timezone", "wb");
         fprintf (fp, "%s\n", city);
         fclose (fp);
+        strcpy (init_tz, city); // in case the user changes their mind...
     }
 
     // set wifi country
@@ -252,6 +252,8 @@ static gpointer set_locale (gpointer data)
         vsystem ("sed -i /etc/locale.gen -e 's/^# \\(%s_%s[\\. ].*UTF-8\\)/\\1/g'", lc, cc);
         vsystem ("locale-gen");
         vsystem ("LC_ALL=%s_%s%s LANG=%s_%s%s LANGUAGE=%s_%s%s update-locale LANG=%s_%s%s LC_ALL=%s_%s%s LANGUAGE=%s_%s%s", lc, cc, ext, lc, cc, ext, lc, cc, ext, lc, cc, ext, lc, cc, ext, lc, cc, ext);
+        strcpy (init_country, cc);
+        strcpy (init_lang, lc);
     }
 
     g_idle_add (close_msg, NULL);
@@ -439,11 +441,6 @@ static void set_init_lang_tz (char *lc, char *city)
 
 /* WiFi */
 
-static void scans_clear (void)
-{
-    gtk_list_store_clear (ap_list);
-}
-
 static void scans_add (char *str, int match, int secure, int signal)
 {
     GtkTreeIter iter;
@@ -550,7 +547,7 @@ void menu_update_scans (WI_SCAN *wi, DHCPCD_WI_SCAN *scans)
     find_line (&lssid, &active);
 
     // erase the current list
-    scans_clear ();
+    gtk_list_store_clear (ap_list);
 
     // loop through scan results
     for (s = scans; s; s = s->next)
@@ -588,7 +585,7 @@ static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int page
         case PAGE_WIFIAP :  if (!con)
                             {
                                 init_dhcpcd ();
-                                scans_clear ();
+                                gtk_list_store_clear (ap_list);
                                 scans_add (_("Searching for networks - please wait..."), 0, 0, -1);
                             }
                             // fallthrough...
