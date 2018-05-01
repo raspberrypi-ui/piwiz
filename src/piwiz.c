@@ -55,10 +55,10 @@ char init_country[16];
 char init_lang[16];
 char init_tz[64];
 
-/* Functions in dhcpcd-gtk/main.c */
+/* In dhcpcd-gtk/main.c */
 
 void init_dhcpcd (void);
-extern void *con; // not really a void *, but let's keep the dhcpcd stuff out where possible...
+extern DHCPCD_CONNECTION *con;
 
 /* Local prototypes */
 
@@ -80,7 +80,7 @@ static void scans_add (char *str, int match, int secure, int signal);
 static int find_line (char **ssid, int *sec);
 void connect_success (void);
 static gint connect_failure (gpointer data);
-static gboolean select_ssid (char *ssid, const char *psk);
+static gboolean select_ssid (char *lssid, const char *psk);
 static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int pagenum, gpointer data);
 static void next_page (GtkButton* btn, gpointer ptr);
 static void prev_page (GtkButton* btn, gpointer ptr);
@@ -468,7 +468,7 @@ static void scans_add (char *str, int match, int secure, int signal)
         gtk_tree_selection_select_iter (gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv)), &iter);
 }
 
-static int find_line (char **ssid, int *sec)
+static int find_line (char **lssid, int *sec)
 {
     GtkTreeModel *model;
     GtkTreeIter iter;
@@ -477,7 +477,7 @@ static int find_line (char **ssid, int *sec)
     sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv));
     if (sel && gtk_tree_selection_get_selected (sel, &model, &iter))
     {
-        gtk_tree_model_get (model, &iter, 0, ssid, 3, sec, -1);
+        gtk_tree_model_get (model, &iter, 0, lssid, 3, sec, -1);
         return 1;
     } 
     return 0;
@@ -502,7 +502,7 @@ static gint connect_failure (gpointer data)
     return FALSE;
 }
 
-static gboolean select_ssid (char *ssid, const char *psk)
+static gboolean select_ssid (char *lssid, const char *psk)
 {
     DHCPCD_WI_SCAN scan, *s;
     WI_SCAN *w;
@@ -511,7 +511,7 @@ static gboolean select_ssid (char *ssid, const char *psk)
     {
         for (s = w->scans; s; s = s->next)
         {
-            if (ssid && s->ssid && !strcmp (ssid, s->ssid))
+            if (lssid && s->ssid && !strcmp (lssid, s->ssid))
             {
                 DHCPCD_CONNECTION *dcon = dhcpcd_if_connection (w->interface);
                 if (!dcon) return FALSE;
