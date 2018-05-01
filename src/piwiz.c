@@ -448,36 +448,33 @@ static gint connect_failure (gpointer data)
 
 static gboolean select_ssid (char *ssid, const char *psk)
 {
-    DHCPCD_WI_SCAN *scan;
+    DHCPCD_WI_SCAN scan, *s;
     WI_SCAN *w;
 
     TAILQ_FOREACH (w, &wi_scans, next)
     {
-        for (scan = w->scans; scan; scan = scan->next)
+        for (s = w->scans; s; s = s->next)
         {
-            if (!strcmp (ssid, scan->ssid))
+            if (ssid && s->ssid && !strcmp (ssid, s->ssid))
             {
-                DHCPCD_CONNECTION *con = dhcpcd_if_connection (w->interface);
-                if (con)
-                {
-                    DHCPCD_WPA *wpa = dhcpcd_wpa_find (con, w->interface->ifname);
-                    if (wpa)
-                    {
-                        DHCPCD_WI_SCAN s;
+                DHCPCD_CONNECTION *dcon = dhcpcd_if_connection (w->interface);
+                if (!dcon) return FALSE;
 
-                        /* Take a copy of scan in case it's destroyed by a scan update */
-                        memcpy (&s, scan, sizeof (s));
-                        s.next = NULL;
+                DHCPCD_WPA *wpa = dhcpcd_wpa_find (dcon, w->interface->ifname);
+                if (!wpa) return FALSE;
 
-                        if (!(s.flags & WSF_PSK))
-                            dhcpcd_wpa_configure (wpa, &s, NULL);
-                        else if (*psk == '\0')
-                            dhcpcd_wpa_select (wpa, &s);
-                        else
-                            dhcpcd_wpa_configure (wpa, &s, psk);
-                        return TRUE;
-                    }
-                }
+                /* Take a copy of scan in case it's destroyed by a scan update */
+                memcpy (&scan, s, sizeof (scan));
+                scan.next = NULL;
+
+                if (!(scan.flags & WSF_PSK))
+                    dhcpcd_wpa_configure (wpa, &scan, NULL);
+                else if (*psk == '\0')
+                    dhcpcd_wpa_select (wpa, &scan);
+                else
+                    dhcpcd_wpa_configure (wpa, &scan, psk);
+
+                return TRUE;
             }
         }
     }
@@ -522,6 +519,7 @@ static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int page
     switch (pagenum)
     {
         case PAGE_INTRO :   gtk_widget_set_sensitive (prev_btn, FALSE);
+                            gtk_widget_set_sensitive (skip_btn, FALSE);
                             break;
 
         case PAGE_DONE :    gtk_button_set_label (GTK_BUTTON (next_btn), _("Quit"));
@@ -536,7 +534,7 @@ static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int page
                             }
                             // fallthrough...
 
-        default :           gtk_button_set_label (GTK_BUTTON (next_btn), _("OK"));
+        default :           gtk_button_set_label (GTK_BUTTON (next_btn), _("Next"));
                             gtk_widget_set_sensitive (prev_btn, TRUE);
                             gtk_widget_set_sensitive (next_btn, TRUE);
                             gtk_widget_set_sensitive (skip_btn, TRUE);
@@ -597,6 +595,9 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             select_ssid (ssid, psk);
                             message (_("Connecting to WiFi network - please wait..."), 0);
                             conn_timeout = gtk_timeout_add (30000, connect_failure, NULL);
+                            break;
+
+        case PAGE_DONE :    gtk_dialog_response (GTK_DIALOG (main_dlg), 0);
                             break;
 
         default :           gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
@@ -672,6 +673,7 @@ int main (int argc, char *argv[])
 
     skip_btn = (GtkWidget *) gtk_builder_get_object (builder, "skip_btn");
     g_signal_connect (skip_btn, "clicked", G_CALLBACK (skip_page), NULL);
+    gtk_widget_set_sensitive (skip_btn, FALSE);
 
     pwd1_te = (GtkWidget *) gtk_builder_get_object (builder, "p2pwd1");
     pwd2_te = (GtkWidget *) gtk_builder_get_object (builder, "p2pwd2");
