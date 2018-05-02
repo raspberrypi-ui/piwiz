@@ -53,6 +53,7 @@ char *ssid;
 gint conn_timeout = 0;
 char init_country[16];
 char init_lang[16];
+char init_kb[16];
 char init_tz[64];
 
 /* In dhcpcd-gtk/main.c */
@@ -73,7 +74,7 @@ static void read_locales (void);
 static gboolean unique_rows (GtkTreeModel *model, GtkTreeIter *iter, gpointer data);
 static void country_changed (GtkComboBox *cb, gpointer ptr);
 static gboolean match_country (GtkTreeModel *model, GtkTreeIter *iter, gpointer data);
-static void read_init_locale (void);
+static void read_inits (void);
 static void set_init_country (char *cc);
 static void set_init_lang_tz (char *lc, char *city);
 static void scans_add (char *str, int match, int secure, int signal);
@@ -225,6 +226,11 @@ static gpointer set_locale (gpointer data)
     gtk_combo_box_get_active_iter (GTK_COMBO_BOX (timezone_cb), &iter);
     gtk_tree_model_get (model, &iter, 0, &city, -1);
 
+    // set wifi country
+    vsystem ("wpa_cli -i %s set country %s >> /dev/null", wifi_if, cc);
+    vsystem ("iw reg set %s", cc);
+    vsystem ("wpa_cli -i %s save_config >> /dev/null", wifi_if);
+
     // set timezone
     if (strcmp (init_tz, city))
     {
@@ -234,16 +240,15 @@ static gpointer set_locale (gpointer data)
         strcpy (init_tz, city); // in case the user changes their mind...
     }
 
-    // set wifi country
-    vsystem ("wpa_cli -i %s set country %s >> /dev/null", wifi_if, cc);
-    vsystem ("iw reg set %s", cc);
-    vsystem ("wpa_cli -i %s save_config >> /dev/null", wifi_if);
-
     // set keyboard
-    fp = fopen ("/etc/default/keyboard", "wb");
-    fprintf (fp, "XKBMODEL=pc105\nXKBLAYOUT=%s\nXKBVARIANT=\nXKBOPTIONS=\nBACKSPACE=guess", lcc);
-    fclose (fp);
-    vsystem ("setxkbmap -layout %s -variant \"\" -option \"\"", lcc);
+    if (strcmp (init_kb, lcc))
+    {
+        fp = fopen ("/etc/default/keyboard", "wb");
+        fprintf (fp, "XKBMODEL=pc105\nXKBLAYOUT=%s\nXKBVARIANT=\nXKBOPTIONS=\nBACKSPACE=guess", lcc);
+        fclose (fp);
+        vsystem ("setxkbmap -layout %s -variant \"\" -option \"\"", lcc);
+        strcpy (init_kb, lcc);
+    }
 
     // set locale
     if (strcmp (init_country, cc) || strcmp (init_lang, lc))
@@ -375,11 +380,12 @@ static gboolean match_country (GtkTreeModel *model, GtkTreeIter *iter, gpointer 
     return FALSE;
 }
 
-static void read_init_locale (void)
+static void read_inits (void)
 {
     char buffer[64];
 
     get_string ("cat /etc/timezone", init_tz);
+    get_string ("grep XKBLAYOUT /etc/default/keyboard | cut -d = -f 2", init_kb);
     get_string ("grep LC_ALL /etc/default/locale | cut -d = -f 2", buffer);
     if (!buffer[0])
         get_string ("grep LANGUAGE /etc/default/locale | cut -d = -f 2", buffer);
@@ -692,7 +698,7 @@ int main (int argc, char *argv[])
     GtkCellRenderer *col;
     int res;
 
-    read_init_locale ();
+    read_inits ();
 
     // get the wifi device name, if any
     get_string ("for dir in /sys/class/net/*/wireless; do if [ -d \"$dir\" ] ; then basename \"$(dirname \"$dir\")\" ; fi ; done | head -n 1", wifi_if);
