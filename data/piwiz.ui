@@ -81,8 +81,8 @@
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
     <property name="title" translatable="yes">Welcome to Raspberry Pi</property>
-    <property name="type_hint">dialog</property>
     <property name="icon">/usr/share/raspberrypi-artwork/raspitr.png</property>
+    <property name="type_hint">dialog</property>
     <child internal-child="vbox">
       <object class="GtkVBox" id="wizard_vbox">
         <property name="visible">True</property>
@@ -220,8 +220,8 @@ Press 'Next' to get started. </property>
                     <property name="wrap">True</property>
                   </object>
                   <packing>
-                    <property name="expand">True</property>
-                    <property name="fill">True</property>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
@@ -275,8 +275,8 @@ Press 'Next' to get started. </property>
                     </child>
                   </object>
                   <packing>
-                    <property name="expand">True</property>
-                    <property name="fill">True</property>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">2</property>
                   </packing>
                 </child>
@@ -317,8 +317,8 @@ Press 'Next' to get started. </property>
                     <property name="wrap">True</property>
                   </object>
                   <packing>
-                    <property name="expand">True</property>
-                    <property name="fill">True</property>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
@@ -384,8 +384,8 @@ Press 'Next' to get started. </property>
                     </child>
                   </object>
                   <packing>
-                    <property name="expand">True</property>
-                    <property name="fill">True</property>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">2</property>
                   </packing>
                 </child>
@@ -437,6 +437,7 @@ Press 'Next' to get started. </property>
                     <property name="can_focus">True</property>
                     <property name="hscrollbar_policy">automatic</property>
                     <property name="vscrollbar_policy">automatic</property>
+                    <property name="shadow_type">in</property>
                     <child>
                       <object class="GtkTreeView" id="p3networks">
                         <property name="visible">True</property>
@@ -487,8 +488,8 @@ Press 'Next' to get started. </property>
                     <property name="label" translatable="yes">Enter the password for your wifi network</property>
                   </object>
                   <packing>
-                    <property name="expand">True</property>
-                    <property name="fill">True</property>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
@@ -527,8 +528,8 @@ Press 'Next' to get started. </property>
                     </child>
                   </object>
                   <packing>
-                    <property name="expand">True</property>
-                    <property name="fill">True</property>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">2</property>
                   </packing>
                 </child>
