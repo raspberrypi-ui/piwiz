@@ -484,7 +484,7 @@ static int find_line (char **lssid, int *sec)
     if (sel && gtk_tree_selection_get_selected (sel, &model, &iter))
     {
         gtk_tree_model_get (model, &iter, 0, lssid, 3, sec, -1);
-        return 1;
+        if (strcmp (*lssid, _("Searching for networks - please wait..."))) return 1;
     } 
     return 0;
 }
@@ -646,17 +646,23 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                 }
                                 else
                                 {
-                                    select_ssid (ssid, NULL);
-                                    message (_("Connecting to WiFi network - please wait..."), 0);
-                                    conn_timeout = gtk_timeout_add (30000, connect_failure, NULL);
+                                    if (select_ssid (ssid, NULL))
+                                    {
+                                        message (_("Connecting to WiFi network - please wait..."), 0);
+                                        conn_timeout = gtk_timeout_add (30000, connect_failure, NULL);
+                                    }
+                                    else message (_("Could not connect to this network"), 1);
                                 }
                             }
                             break;
 
         case PAGE_WIFIPSK : psk = gtk_entry_get_text (GTK_ENTRY (psk_te));
-                            select_ssid (ssid, psk);
-                            message (_("Connecting to WiFi network - please wait..."), 0);
-                            conn_timeout = gtk_timeout_add (30000, connect_failure, NULL);
+                            if (select_ssid (ssid, psk))
+                            {
+                                message (_("Connecting to WiFi network - please wait..."), 0);
+                                conn_timeout = gtk_timeout_add (30000, connect_failure, NULL);
+                            }
+                            else message (_("Could not connect to this network"), 1);
                             break;
 
         case PAGE_DONE :    gtk_dialog_response (GTK_DIALOG (main_dlg), 10);
