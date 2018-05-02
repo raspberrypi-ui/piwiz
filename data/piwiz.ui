@@ -216,7 +216,9 @@ Press 'Next' to get started. </property>
                     <property name="can_focus">False</property>
                     <property name="xalign">0</property>
                     <property name="yalign">0</property>
-                    <property name="label" translatable="yes">Enter the details of your location. This is used to set the time zone, keyboard and other international settings.</property>
+                    <property name="label" translatable="yes">Enter the details of your location.
+
+This is used to set the language, time zone, keyboard and other international settings.</property>
                     <property name="wrap">True</property>
                   </object>
                   <packing>
@@ -313,7 +315,9 @@ Press 'Next' to get started. </property>
                     <property name="can_focus">False</property>
                     <property name="xalign">0</property>
                     <property name="yalign">0</property>
-                    <property name="label" translatable="yes">The 'pi' account has the default password 'raspberry'. It is important that you change this to something only you know.</property>
+                    <property name="label" translatable="yes">The default 'pi' user account currently has the password 'raspberry'.
+
+It is strongly recommended that you change this to a different password that only you know.</property>
                     <property name="wrap">True</property>
                   </object>
                   <packing>
@@ -422,7 +426,7 @@ Press 'Next' to get started. </property>
                     <property name="can_focus">False</property>
                     <property name="xalign">0</property>
                     <property name="yalign">0</property>
-                    <property name="label" translatable="yes">Select the name of your WiFi network from the list below if you want to use wireless networking.</property>
+                    <property name="label" translatable="yes">Select your WiFi network from the list.</property>
                     <property name="wrap">True</property>
                   </object>
                   <packing>
@@ -485,7 +489,7 @@ Press 'Next' to get started. </property>
                     <property name="can_focus">False</property>
                     <property name="xalign">0</property>
                     <property name="yalign">0</property>
-                    <property name="label" translatable="yes">Enter the password for your wifi network</property>
+                    <property name="label" translatable="yes">Enter the password for your wifi network.</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
