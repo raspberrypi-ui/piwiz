@@ -578,7 +578,7 @@ static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int page
                             gtk_widget_set_sensitive (skip_btn, FALSE);
                             break;
 
-        case PAGE_DONE :    gtk_button_set_label (GTK_BUTTON (next_btn), _("Quit"));
+        case PAGE_DONE :    gtk_button_set_label (GTK_BUTTON (next_btn), _("Reboot"));
                             gtk_widget_set_sensitive (skip_btn, FALSE);
                             break;
 
@@ -653,7 +653,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             conn_timeout = gtk_timeout_add (30000, connect_failure, NULL);
                             break;
 
-        case PAGE_DONE :    gtk_dialog_response (GTK_DIALOG (main_dlg), 0);
+        case PAGE_DONE :    gtk_dialog_response (GTK_DIALOG (main_dlg), 10);
                             break;
 
         default :           gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
@@ -690,6 +690,7 @@ int main (int argc, char *argv[])
     GtkBuilder *builder;
     GtkWidget *wid;
     GtkCellRenderer *col;
+    int res;
 
     read_init_locale ();
 
@@ -784,12 +785,13 @@ int main (int argc, char *argv[])
     gtk_tree_view_column_set_sizing (gtk_tree_view_get_column (GTK_TREE_VIEW (ap_tv), 2), GTK_TREE_VIEW_COLUMN_FIXED);
     gtk_tree_view_column_set_fixed_width (gtk_tree_view_get_column (GTK_TREE_VIEW (ap_tv), 2), 30);
 
-    gtk_dialog_run (GTK_DIALOG (main_dlg));
+    res = gtk_dialog_run (GTK_DIALOG (main_dlg));
 
     g_object_unref (builder);
     gtk_widget_destroy (main_dlg);
     gdk_threads_leave ();
 
+    if (res == 10) system ("reboot");
     return 0;
 }
 
