@@ -48,13 +48,9 @@ GtkListStore *ap_list;
 
 /* Globals */
 
-char wifi_if[16];
+char *wifi_if, *init_country, *init_lang, *init_kb, *init_tz;
 char *ssid;
 gint conn_timeout = 0;
-char init_country[16];
-char init_lang[16];
-char init_kb[16];
-char init_tz[64];
 
 /* In dhcpcd-gtk/main.c */
 
@@ -63,8 +59,8 @@ extern DHCPCD_CONNECTION *con;
 
 /* Local prototypes */
 
-static void get_string (char *cmd, char *name);
-static int get_quoted_param (char *path, char *fname, char *toseek, char *result);
+static char *get_string (char *cmd);
+static char *get_quoted_param (char *path, char *fname, char *toseek);
 static int vsystem (const char *fmt, ...);
 static void message (char *msg, int wait);
 static gboolean ok_clicked (gpointer data);
@@ -97,29 +93,36 @@ GtkWidget *gtk_box_new (GtkOrientation o, gint s)
 		return gtk_vbox_new (false, s);
 }
 
-static void get_string (char *cmd, char *name)
+static char *get_string (char *cmd)
 {
+    char *line = NULL, *res = NULL;
+    int len = 0;
     FILE *fp = popen (cmd, "r");
-    char buf[64];
 
-    name[0] = 0;
-    if (fp == NULL) return;
-    if (fgets (buf, sizeof (buf) - 1, fp) != NULL)
+    if (fp == NULL) return NULL;
+    if (getline (&line, &len, fp) > 0)
     {
-        sscanf (buf, "%s", name);
+        res = line;
+        while (*res++) if (g_ascii_isspace (*res)) *res = 0;
+        res = g_strdup (line);
     }
     pclose (fp);
+    free (line);
+    return res;
 }
 
-static int get_quoted_param (char *path, char *fname, char *toseek, char *result)
+static char *get_quoted_param (char *path, char *fname, char *toseek)
 {
-    char buffer[256], *linebuf = NULL, *cptr, *dptr;
-    int len = 0;
+    char *pathname, *linebuf, *cptr, *dptr, *res;
+    int len;
 
-    sprintf (buffer, "%s/%s", path, fname);
-    FILE *fp = fopen (buffer, "rb");
-    if (!fp) return 0;
+    pathname = g_strdup_printf ("%s/%s", path, fname);
+    FILE *fp = fopen (pathname, "rb");
+    g_free (pathname);
+    if (!fp) return NULL;
 
+    linebuf = NULL;
+    len = 0;
     while (getline (&linebuf, &len, fp) > 0)
     {
         // skip whitespace at line start
@@ -134,31 +137,34 @@ static int get_quoted_param (char *path, char *fname, char *toseek, char *result
             dptr = strtok (NULL, "\"\n\r");
 
             // copy to dest
-            if (dptr) strcpy (result, dptr);
-            else result[0] = 0;
+            if (dptr) res = g_strdup (dptr);
+            else res = NULL;
 
             // done
             free (linebuf);
             fclose (fp);
-            return 1;
+            return res;
         }
     }
 
     // end of file with no match
-    result[0] = 0;
     free (linebuf);
     fclose (fp);
-    return 0;
+    return NULL;
 }
 
 static int vsystem (const char *fmt, ...)
 {
-    char buffer[1024];
+    char *cmdline;
+    int res;
+
     va_list arg;
     va_start (arg, fmt);
-    vsprintf (buffer, fmt, arg);
+    g_vasprintf (&cmdline, fmt, arg);
     va_end (arg);
-    return system (buffer);
+    res = system (cmdline);
+    g_free (cmdline);
+    return res;
 }
 
 /* Message boxes */
@@ -168,6 +174,7 @@ static void message (char *msg, int wait)
     GdkColor col;
     GtkWidget *wid;
     GtkBuilder *builder = gtk_builder_new ();
+
     gtk_builder_add_from_file (builder, PACKAGE_DATA_DIR "/piwiz.ui", NULL);
 
     msg_dlg = (GtkWidget *) gtk_builder_get_object (builder, "msg");
@@ -232,34 +239,56 @@ static gpointer set_locale (gpointer data)
     vsystem ("wpa_cli -i %s save_config >> /dev/null", wifi_if);
 
     // set timezone
-    if (strcmp (init_tz, city))
+    if (g_strcmp0 (init_tz, city))
     {
         fp = fopen ("/etc/timezone", "wb");
         fprintf (fp, "%s\n", city);
         fclose (fp);
-        strcpy (init_tz, city); // in case the user changes their mind...
+        if (init_tz)
+        {
+            g_free (init_tz);
+            init_tz = g_strdup (city);
+        }
     }
 
     // set keyboard
-    if (strcmp (init_kb, lcc))
+    if (g_strcmp0 (init_kb, lcc))
     {
         fp = fopen ("/etc/default/keyboard", "wb");
         fprintf (fp, "XKBMODEL=pc105\nXKBLAYOUT=%s\nXKBVARIANT=\nXKBOPTIONS=\nBACKSPACE=guess", lcc);
         fclose (fp);
         vsystem ("setxkbmap -layout %s -variant \"\" -option \"\"", lcc);
-        strcpy (init_kb, lcc);
+        if (init_kb)
+        {
+            g_free (init_kb);
+            init_kb = g_strdup (lcc);
+        }
     }
 
     // set locale
-    if (strcmp (init_country, cc) || strcmp (init_lang, lc))
+    if (g_strcmp0 (init_country, cc) || g_strcmp0 (init_lang, lc))
     {
         vsystem ("sed -i /etc/locale.gen -e 's/^\\([^#].*\\)/# \\1/g'");
         vsystem ("sed -i /etc/locale.gen -e 's/^# \\(%s_%s[\\. ].*UTF-8\\)/\\1/g'", lc, cc);
         vsystem ("locale-gen");
         vsystem ("LC_ALL=%s_%s%s LANG=%s_%s%s LANGUAGE=%s_%s%s update-locale LANG=%s_%s%s LC_ALL=%s_%s%s LANGUAGE=%s_%s%s", lc, cc, ext, lc, cc, ext, lc, cc, ext, lc, cc, ext, lc, cc, ext, lc, cc, ext);
-        strcpy (init_country, cc);
-        strcpy (init_lang, lc);
+        if (init_country)
+        {
+            g_free (init_country);
+            init_country = g_strdup (cc);
+        }
+        if (init_lang)
+        {
+            g_free (init_lang);
+            init_lang = g_strdup (lc);
+        }
     }
+
+    g_free (cc);
+    g_free (lc);
+    g_free (city);
+    g_free (ext);
+    g_free (lcc);
 
     g_idle_add (close_msg, NULL);
     return NULL;
@@ -267,37 +296,48 @@ static gpointer set_locale (gpointer data)
 
 static void read_locales (void)
 {
-    char ccode[16], lcode[16], cname[100], lname[100], ext[8];
-    char buffer[1024], *cptr;
+    char *cname, *lname, *buffer, *cptr, *cptr1, *cptr2;
     GtkTreeIter iter;
     FILE *fp;
+    int len, ext;
 
     // populate the locale database
+    buffer = NULL;
+    len = 0;
     fp = fopen ("/usr/share/i18n/SUPPORTED", "rb");
-    while (fgets (buffer, sizeof (buffer) - 1, fp))
+    while (getline (&buffer, &len, fp) > 0)
     {
         // does the line contain UTF-8; ignore lines with an @
         if (strstr (buffer, "UTF-8") && !strstr (buffer, "@"))
         {
-            if (strstr (buffer, ".UTF-8")) strcpy (ext, ".UTF-8");
-            else ext[0] = 0;
+            if (strstr (buffer, ".UTF-8")) ext = 1;
+            else ext = 0;
 
-            if (sscanf (buffer, "%[^_]_%[^. ]", lcode, ccode) == 2)
+            // split into lang and country codes
+            cptr1 = strtok (buffer, "_");
+            cptr2 = strtok (NULL, ". ");
+
+            if (cptr1 && cptr2)
             {
-                sprintf (buffer, "%s_%s", lcode, ccode);
-                get_quoted_param ("/usr/share/i18n/locales", buffer, "territory", cname);
-                get_quoted_param ("/usr/share/i18n/locales", buffer, "language", lname);
-                
+                // read names from locale file
+                cptr = g_strdup_printf ("%s_%s", cptr1, cptr2);
+                cname = get_quoted_param ("/usr/share/i18n/locales", cptr, "territory");
+                lname = get_quoted_param ("/usr/share/i18n/locales", cptr, "language");
+                g_free (cptr);
+
                 // deal with the likes of "malta"...
-                if (cname[0] >= 'a' && cname[0] <= 'z') cname[0] -= 32;
-                if (lname[0] >= 'a' && lname[0] <= 'z') lname[0] -= 32;
+                cname[0] = g_ascii_toupper (cname[0]);
+                lname[0] = g_ascii_toupper (lname[0]);
 
                 gtk_list_store_append (locale_list, &iter);
-                gtk_list_store_set (locale_list, &iter, 0, lcode, 1, ccode, 2, lname, 3, cname, 4, ext, -1);
+                gtk_list_store_set (locale_list, &iter, 0, cptr1, 1, cptr2, 2, lname, 3, cname, 4, ext ? ".UTF-8" : "", -1);
+                g_free (cname);
+                g_free (lname);
             }
         }
     }
     fclose (fp);
+    free (buffer);
 
     // sort and filter the database to produce the list for the country combo
     scount = GTK_TREE_MODEL_SORT (gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (locale_list)));
@@ -306,38 +346,51 @@ static void read_locales (void)
     gtk_tree_model_filter_set_visible_func (fcount, (GtkTreeModelFilterVisibleFunc) unique_rows, NULL, NULL);
 
     // populate the timezone database
+    buffer = NULL;
+    len = 0;
     fp = fopen ("/usr/share/zoneinfo/zone.tab", "rb");
-    while (fgets (buffer, sizeof (buffer) - 1, fp))
+    while (getline (&buffer, &len, fp) > 0)
     {
         // ignore lines starting #
         if (buffer[0] != '#')
         {
-            if (sscanf (buffer, "%s\t%*s\t%s", ccode, cname) == 2)
+            // split on tabs
+            cptr1 = strtok (buffer, "\t");
+            strtok (NULL, "\t");
+            cptr2 = strtok (NULL, "\t\n\r");
+
+            if (cptr1 && cptr2)
             {
-                // take the final part of the string; convert _ to space
-                cptr = strrchr (cname, '/');
-                if (cptr) strcpy (lname, cptr + 1);
-                else strcpy (lname, cname);
-                cptr = lname;
+                // split off the part after the final / and replace _ with space
+                if (strrchr (cptr2, '/')) cname = g_strdup (strrchr (cptr2, '/') + 1);
+                else cname = g_strdup (cptr2);
+                cptr = cname;
                 while (*cptr++) if (*cptr == '_') *cptr = ' ';
 
                 gtk_list_store_append (tz_list, &iter);
-                gtk_list_store_set (tz_list, &iter, 0, cname, 1, ccode, 2, lname, -1);
+                gtk_list_store_set (tz_list, &iter, 0, cptr2, 1, cptr1, 2, cname, -1);
+                g_free (cname);
             }
         }
     }
     fclose (fp);
+    free (buffer);
 }
 
 static gboolean unique_rows (GtkTreeModel *model, GtkTreeIter *iter, gpointer data)
 {
     GtkTreeIter next = *iter;
     char *str1, *str2;
+    gboolean res;
+
     if (!gtk_tree_model_iter_next (model, &next)) return TRUE;
     gtk_tree_model_get (model, iter, 1, &str1, -1);
     gtk_tree_model_get (model, &next, 1, &str2, -1);
-    if (!strcmp (str1, str2)) return FALSE;
-    return TRUE;
+    if (!g_strcmp0 (str1, str2)) res = FALSE;
+    else res = TRUE;
+    g_free (str1);
+    g_free (str2);
+    return res;
 }
 
 static void country_changed (GtkComboBox *cb, gpointer ptr)
@@ -370,31 +423,46 @@ static void country_changed (GtkComboBox *cb, gpointer ptr)
     // set up the combo box from the sorted and filtered list
     gtk_combo_box_set_model (GTK_COMBO_BOX (timezone_cb), GTK_TREE_MODEL (scity));
     gtk_combo_box_set_active (GTK_COMBO_BOX (timezone_cb), 0);
+
+    g_free (str);
 }
 
 static gboolean match_country (GtkTreeModel *model, GtkTreeIter *iter, gpointer data)
 {
     char *str;
+    gboolean res;
+
     gtk_tree_model_get (model, iter, 1, &str, -1);
-    if (!strcmp (str, (char *) data)) return TRUE;
-    return FALSE;
+    if (!g_strcmp0 (str, (char *) data)) res = TRUE;
+    else res = FALSE;
+    g_free (str);
+    return res;
 }
 
 static void read_inits (void)
 {
-    char buffer[64];
+    char *buffer, *lc, *cc;
 
-    get_string ("cat /etc/timezone", init_tz);
-    get_string ("grep XKBLAYOUT /etc/default/keyboard | cut -d = -f 2", init_kb);
-    get_string ("grep LC_ALL /etc/default/locale | cut -d = -f 2", buffer);
-    if (!buffer[0])
-        get_string ("grep LANGUAGE /etc/default/locale | cut -d = -f 2", buffer);
-    if (!buffer[0])
-        get_string ("grep LANG /etc/default/locale | cut -d = -f 2", buffer);
-    if (buffer[0] && sscanf (buffer, "%[^_]_%[^. ]", init_lang, init_country) == 2)
-        return;
-    init_country[0] = 0;
-    init_lang[0] = 0;
+    init_country = NULL;
+    init_lang = NULL;
+
+    wifi_if = get_string ("for dir in /sys/class/net/*/wireless; do if [ -d \"$dir\" ] ; then basename \"$(dirname \"$dir\")\" ; fi ; done | head -n 1");
+    init_tz = get_string ("cat /etc/timezone");
+    init_kb = get_string ("grep XKBLAYOUT /etc/default/keyboard | cut -d = -f 2");
+    buffer = get_string ("grep LC_ALL /etc/default/locale | cut -d = -f 2");
+    if (!buffer) buffer = get_string ("grep LANGUAGE /etc/default/locale | cut -d = -f 2");
+    if (!buffer) buffer = get_string ("grep LANG /etc/default/locale | cut -d = -f 2");
+    if (buffer)
+    {
+        lc = strtok (buffer, "_");
+        cc = strtok (NULL, ". ");
+        if (lc && cc)
+        {
+            init_country = g_strdup (cc);
+            init_lang = g_strdup (lc);
+        }
+        g_free (buffer);
+    }
 }
 
 static void set_init_country (char *cc)
@@ -406,11 +474,13 @@ static void set_init_country (char *cc)
     while (1)
     {
         gtk_tree_model_get (GTK_TREE_MODEL (fcount), &iter, 1, &val, -1);
-        if (!strcmp (cc, val))
+        if (!g_strcmp0 (cc, val))
         {
             gtk_combo_box_set_active_iter (GTK_COMBO_BOX (country_cb), &iter);
+            g_free (val);
             return;
         }
+        g_free (val);
         if (!gtk_tree_model_iter_next (GTK_TREE_MODEL (fcount), &iter)) break;
     }
 }
@@ -424,11 +494,13 @@ static void set_init_lang_tz (char *lc, char *city)
     while (1)
     {
         gtk_tree_model_get (GTK_TREE_MODEL (slang), &iter, 0, &val, -1);
-        if (!strcmp (lc, val))
+        if (!g_strcmp0 (lc, val))
         {
             gtk_combo_box_set_active_iter (GTK_COMBO_BOX (language_cb), &iter);
+            g_free (val);
             break;
         }
+        g_free (val);
         if (!gtk_tree_model_iter_next (GTK_TREE_MODEL (slang), &iter)) break;
     }
 
@@ -436,11 +508,13 @@ static void set_init_lang_tz (char *lc, char *city)
     while (1)
     {
         gtk_tree_model_get (GTK_TREE_MODEL (scity), &iter, 0, &val, -1);
-        if (!strcmp (city, val))
+        if (!g_strcmp0 (city, val))
         {
             gtk_combo_box_set_active_iter (GTK_COMBO_BOX (timezone_cb), &iter);
+            g_free (val);
             return;
         }
+        g_free (val);
         if (!gtk_tree_model_iter_next (GTK_TREE_MODEL (scity), &iter)) break;
     }
 }
@@ -451,7 +525,7 @@ static void scans_add (char *str, int match, int secure, int signal)
 {
     GtkTreeIter iter;
     GdkPixbuf *sec_icon = NULL, *sig_icon = NULL;
-    char icon_buf[64];
+    char *icon;
     int dsig;
     
     gtk_list_store_append (ap_list, &iter);
@@ -465,8 +539,9 @@ static void scans_add (char *str, int match, int secure, int signal)
         else if (signal > 5) dsig = 25;
         else dsig = 0;
 
-        sprintf (icon_buf, "network-wireless-connected-%02d", dsig);
-        sig_icon = gtk_icon_theme_load_icon (gtk_icon_theme_get_default(), icon_buf, 16, 0, NULL);
+        icon = g_strdup_printf ("network-wireless-connected-%02d", dsig);
+        sig_icon = gtk_icon_theme_load_icon (gtk_icon_theme_get_default(), icon, 16, 0, NULL);
+        g_free (icon);
     }
     gtk_list_store_set (ap_list, &iter, 0, str, 1, sec_icon, 2, sig_icon, 3, secure, -1);
 
@@ -484,7 +559,7 @@ static int find_line (char **lssid, int *sec)
     if (sel && gtk_tree_selection_get_selected (sel, &model, &iter))
     {
         gtk_tree_model_get (model, &iter, 0, lssid, 3, sec, -1);
-        if (strcmp (*lssid, _("Searching for networks - please wait..."))) return 1;
+        if (g_strcmp0 (*lssid, _("Searching for networks - please wait..."))) return 1;
     } 
     return 0;
 }
@@ -517,7 +592,7 @@ static gboolean select_ssid (char *lssid, const char *psk)
     {
         for (s = w->scans; s; s = s->next)
         {
-            if (lssid && s->ssid && !strcmp (lssid, s->ssid))
+            if (!g_strcmp0 (lssid, s->ssid))
             {
                 DHCPCD_CONNECTION *dcon = dhcpcd_if_connection (w->interface);
                 if (!dcon) return FALSE;
@@ -562,7 +637,7 @@ void menu_update_scans (WI_SCAN *wi, DHCPCD_WI_SCAN *scans)
         if (s->flags & WSF_SECURE && !(s->flags & WSF_PSK)) continue;
 
         // if this AP matches the SSID previously selected, select it in the new list
-        if (lssid && lssid[0] && s->ssid && !strcmp (lssid, s->ssid)) active = 1;
+        if (!g_strcmp0 (lssid, s->ssid)) active = 1;
         else active = 0;
 
         // add this SSID to the new list
@@ -608,7 +683,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
 {
     const char *psk;
     int sec;
-    char buffer[512];
+    char *text;
     const char *pw1, *pw2;
 
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
@@ -621,7 +696,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             pw2 = gtk_entry_get_text (GTK_ENTRY (pwd2_te));
                             if (strlen (pw1) || strlen (pw2))
                             {
-                                if (strlen (pw1) != strlen (pw2) || strcmp (pw1, pw2))
+                                if (strlen (pw1) != strlen (pw2) || g_strcmp0 (pw1, pw2))
                                 {
                                     message (_("The two passwords entered do not match."), 1);
                                     break;
@@ -640,8 +715,9 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             {
                                 if (sec)
                                 {
-                                    sprintf (buffer, _("Enter the password for the WiFi network \"%s\""), ssid);
-                                    gtk_label_set_text (GTK_LABEL (psk_label), buffer);
+                                    text = g_strdup_printf (_("Enter the password for the WiFi network \"%s\""), ssid);
+                                    gtk_label_set_text (GTK_LABEL (psk_label), text);
+                                    g_free (text);
                                     gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
                                 }
                                 else
@@ -704,17 +780,14 @@ int main (int argc, char *argv[])
     GtkCellRenderer *col;
     int res;
 
-    read_inits ();
-
-    // get the wifi device name, if any
-    get_string ("for dir in /sys/class/net/*/wireless; do if [ -d \"$dir\" ] ; then basename \"$(dirname \"$dir\")\" ; fi ; done | head -n 1", wifi_if);
-                        
 #ifdef ENABLE_NLS
     setlocale (LC_ALL, "");
     bindtextdomain ( GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR );
     bind_textdomain_codeset ( GETTEXT_PACKAGE, "UTF-8" );
     textdomain ( GETTEXT_PACKAGE );
 #endif
+
+    read_inits ();
 
     // GTK setup
     gdk_threads_init ();
