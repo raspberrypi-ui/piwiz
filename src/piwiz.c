@@ -618,14 +618,16 @@ void menu_update_scans (WI_SCAN *wi, DHCPCD_WI_SCAN *scans)
 
 static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int pagenum, gpointer data)
 {
+    gtk_button_set_label (GTK_BUTTON (next_btn), _("Next"));
+    gtk_widget_set_visible (prev_btn, TRUE);
+    gtk_widget_set_visible (skip_btn, FALSE);
+
     switch (pagenum)
     {
-        case PAGE_INTRO :   gtk_widget_set_sensitive (prev_btn, FALSE);
-                            gtk_widget_set_sensitive (skip_btn, FALSE);
+        case PAGE_INTRO :   gtk_widget_set_visible (prev_btn, FALSE);
                             break;
 
         case PAGE_DONE :    gtk_button_set_label (GTK_BUTTON (next_btn), _("Reboot"));
-                            gtk_widget_set_sensitive (skip_btn, FALSE);
                             break;
 
         case PAGE_WIFIAP :  if (!con)
@@ -634,12 +636,10 @@ static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int page
                                 gtk_list_store_clear (ap_list);
                                 scans_add (_("Searching for networks - please wait..."), 0, 0, -1);
                             }
-                            // fallthrough...
+                            gtk_widget_set_visible (skip_btn, TRUE);
+                            break;
 
-        default :           gtk_button_set_label (GTK_BUTTON (next_btn), _("Next"));
-                            gtk_widget_set_sensitive (prev_btn, TRUE);
-                            gtk_widget_set_sensitive (next_btn, TRUE);
-                            gtk_widget_set_sensitive (skip_btn, TRUE);
+        case PAGE_WIFIPSK : gtk_widget_set_visible (skip_btn, TRUE);
                             break;
     }
 }
@@ -778,11 +778,9 @@ int main (int argc, char *argv[])
 
     prev_btn = (GtkWidget *) gtk_builder_get_object (builder, "prev_btn");
     g_signal_connect (prev_btn, "clicked", G_CALLBACK (prev_page), NULL);
-    gtk_widget_set_sensitive (prev_btn, FALSE);
 
     skip_btn = (GtkWidget *) gtk_builder_get_object (builder, "skip_btn");
     g_signal_connect (skip_btn, "clicked", G_CALLBACK (skip_page), NULL);
-    gtk_widget_set_sensitive (skip_btn, FALSE);
 
     pwd1_te = (GtkWidget *) gtk_builder_get_object (builder, "p2pwd1");
     pwd2_te = (GtkWidget *) gtk_builder_get_object (builder, "p2pwd2");

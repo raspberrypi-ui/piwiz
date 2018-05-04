@@ -97,7 +97,7 @@
             <child>
               <object class="GtkButton" id="prev_btn">
                 <property name="label" translatable="yes">Back</property>
-                <property name="visible">True</property>
+                <property name="visible">False</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
               </object>
@@ -112,7 +112,7 @@
             <child>
               <object class="GtkButton" id="skip_btn">
                 <property name="label" translatable="yes">Skip</property>
-                <property name="visible">True</property>
+                <property name="visible">False</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
               </object>
