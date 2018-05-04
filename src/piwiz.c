@@ -71,8 +71,7 @@ static gboolean unique_rows (GtkTreeModel *model, GtkTreeIter *iter, gpointer da
 static void country_changed (GtkComboBox *cb, gpointer ptr);
 static gboolean match_country (GtkTreeModel *model, GtkTreeIter *iter, gpointer data);
 static void read_inits (void);
-static void set_init_country (char *cc);
-static void set_init_lang_tz (char *lc, char *city);
+static void set_init (GtkTreeModel *model, GtkWidget *cb, int pos, char *init);
 static void scans_add (char *str, int match, int secure, int signal);
 static int find_line (char **ssid, int *sec);
 void connect_success (void);
@@ -107,7 +106,7 @@ static char *get_string (char *cmd)
         res = g_strdup (line);
     }
     pclose (fp);
-    free (line);
+    g_free (line);
     return res;
 }
 
@@ -141,14 +140,14 @@ static char *get_quoted_param (char *path, char *fname, char *toseek)
             else res = NULL;
 
             // done
-            free (linebuf);
+            g_free (linebuf);
             fclose (fp);
             return res;
         }
     }
 
     // end of file with no match
-    free (linebuf);
+    g_free (linebuf);
     fclose (fp);
     return NULL;
 }
@@ -337,7 +336,7 @@ static void read_locales (void)
         }
     }
     fclose (fp);
-    free (buffer);
+    g_free (buffer);
 
     // sort and filter the database to produce the list for the country combo
     scount = GTK_TREE_MODEL_SORT (gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (locale_list)));
@@ -374,7 +373,7 @@ static void read_locales (void)
         }
     }
     fclose (fp);
-    free (buffer);
+    g_free (buffer);
 }
 
 static gboolean unique_rows (GtkTreeModel *model, GtkTreeIter *iter, gpointer data)
@@ -465,57 +464,23 @@ static void read_inits (void)
     }
 }
 
-static void set_init_country (char *cc)
+static void set_init (GtkTreeModel *model, GtkWidget *cb, int pos, char *init)
 {
     GtkTreeIter iter;
     char *val;
 
-    gtk_tree_model_get_iter_first (GTK_TREE_MODEL (fcount), &iter);
+    gtk_tree_model_get_iter_first (model, &iter);
     while (1)
     {
-        gtk_tree_model_get (GTK_TREE_MODEL (fcount), &iter, 1, &val, -1);
-        if (!g_strcmp0 (cc, val))
+        gtk_tree_model_get (model, &iter, pos, &val, -1);
+        if (!g_strcmp0 (init, val))
         {
-            gtk_combo_box_set_active_iter (GTK_COMBO_BOX (country_cb), &iter);
+            gtk_combo_box_set_active_iter (GTK_COMBO_BOX (cb), &iter);
             g_free (val);
             return;
         }
         g_free (val);
-        if (!gtk_tree_model_iter_next (GTK_TREE_MODEL (fcount), &iter)) break;
-    }
-}
-
-static void set_init_lang_tz (char *lc, char *city)
-{
-    GtkTreeIter iter;
-    char *val;
-
-    gtk_tree_model_get_iter_first (GTK_TREE_MODEL (slang), &iter);
-    while (1)
-    {
-        gtk_tree_model_get (GTK_TREE_MODEL (slang), &iter, 0, &val, -1);
-        if (!g_strcmp0 (lc, val))
-        {
-            gtk_combo_box_set_active_iter (GTK_COMBO_BOX (language_cb), &iter);
-            g_free (val);
-            break;
-        }
-        g_free (val);
-        if (!gtk_tree_model_iter_next (GTK_TREE_MODEL (slang), &iter)) break;
-    }
-
-    gtk_tree_model_get_iter_first (GTK_TREE_MODEL (scity), &iter);
-    while (1)
-    {
-        gtk_tree_model_get (GTK_TREE_MODEL (scity), &iter, 0, &val, -1);
-        if (!g_strcmp0 (city, val))
-        {
-            gtk_combo_box_set_active_iter (GTK_COMBO_BOX (timezone_cb), &iter);
-            g_free (val);
-            return;
-        }
-        g_free (val);
-        if (!gtk_tree_model_iter_next (GTK_TREE_MODEL (scity), &iter)) break;
+        if (!gtk_tree_model_iter_next (model, &iter)) break;
     }
 }
 
@@ -715,7 +680,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             {
                                 if (sec)
                                 {
-                                    text = g_strdup_printf (_("Enter the password for the WiFi network \"%s\""), ssid);
+                                    text = g_strdup_printf (_("Enter the password for the WiFi network \"%s\"."), ssid);
                                     gtk_label_set_text (GTK_LABEL (psk_label), text);
                                     g_free (text);
                                     gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
@@ -848,8 +813,9 @@ int main (int argc, char *argv[])
 
     // initialise the country combo
     g_signal_connect (country_cb, "changed", G_CALLBACK (country_changed), NULL);
-    set_init_country (init_country[0] ? init_country : "GB");
-    set_init_lang_tz (init_lang[0] ? init_lang : "en", init_tz[0] ? init_tz : "Europe/London");
+    set_init (GTK_TREE_MODEL (fcount), country_cb, 1, init_country[0] ? init_country : "GB");
+    set_init (GTK_TREE_MODEL (slang), language_cb, 0, init_lang[0] ? init_lang : "en");
+    set_init (GTK_TREE_MODEL (scity), timezone_cb, 0, init_tz[0] ? init_tz : "Europe/London");
 
     gtk_widget_show_all (GTK_WIDGET (country_cb));
     gtk_widget_show_all (GTK_WIDGET (language_cb));
