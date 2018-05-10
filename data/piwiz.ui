@@ -362,6 +362,7 @@ It is strongly recommended that you change this to a different password that onl
                         <property name="secondary_icon_activatable">False</property>
                         <property name="primary_icon_sensitive">True</property>
                         <property name="secondary_icon_sensitive">True</property>
+                        <property name="tooltip_text" translatable="yes">Enter a new password</property>
                       </object>
                       <packing>
                         <property name="left_attach">1</property>
@@ -378,6 +379,7 @@ It is strongly recommended that you change this to a different password that onl
                         <property name="secondary_icon_activatable">False</property>
                         <property name="primary_icon_sensitive">True</property>
                         <property name="secondary_icon_sensitive">True</property>
+                        <property name="tooltip_text" translatable="yes">Enter the new password again</property>
                       </object>
                       <packing>
                         <property name="left_attach">1</property>
@@ -442,6 +444,7 @@ It is strongly recommended that you change this to a different password that onl
                     <property name="hscrollbar_policy">automatic</property>
                     <property name="vscrollbar_policy">automatic</property>
                     <property name="shadow_type">in</property>
+                    <property name="tooltip_text" translatable="yes">Click the name of your network to select it</property>
                     <child>
                       <object class="GtkTreeView" id="p3networks">
                         <property name="visible">True</property>
@@ -489,7 +492,7 @@ It is strongly recommended that you change this to a different password that onl
                     <property name="can_focus">False</property>
                     <property name="xalign">0</property>
                     <property name="yalign">0</property>
-                    <property name="label" translatable="yes">Enter the password for your wifi network.</property>
+                    <property name="label" translatable="yes">Enter the password for your WiFi network.</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -523,6 +526,7 @@ It is strongly recommended that you change this to a different password that onl
                         <property name="secondary_icon_activatable">False</property>
                         <property name="primary_icon_sensitive">True</property>
                         <property name="secondary_icon_sensitive">True</property>
+                        <property name="tooltip_text" translatable="yes">Enter the password for your network</property>
                       </object>
                       <packing>
                         <property name="expand">True</property>
