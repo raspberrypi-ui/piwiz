@@ -53,6 +53,7 @@ GtkListStore *ap_list;
 /* Globals */
 
 char *wifi_if, *init_country, *init_lang, *init_kb, *init_tz;
+char *cc, *lc, *city, *ext;
 char *ssid;
 gint conn_timeout = 0;
 
@@ -84,7 +85,6 @@ static gboolean select_ssid (char *lssid, const char *psk);
 static void progress (PkProgress *progress, PkProgressType *type, gpointer data);
 static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data);
 static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data);
-static gpointer check_updates (gpointer data);
 static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data);
 static gpointer refresh_update_cache (gpointer data);
 static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int pagenum, gpointer data);
@@ -228,10 +228,7 @@ static gboolean ok_clicked (GtkButton *button, gpointer data)
 {
     gtk_widget_destroy (GTK_WIDGET (msg_dlg));
     msg_dlg = NULL;
-    if (data)
-    {
-        gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), (int) data);
-    }
+    if (data) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), (int) data);
     return FALSE;
 }
 
@@ -247,28 +244,8 @@ static gboolean close_msg (gpointer data)
 
 static gpointer set_locale (gpointer data)
 {
-    GtkTreeModel *model;
-    GtkTreeIter iter;
-    char *cc, *lc, *city, *ext, *lcc;
     FILE *fp;
     
-    // get the combo entries and look up relevant codes in database
-    model = gtk_combo_box_get_model (GTK_COMBO_BOX (language_cb));
-    gtk_combo_box_get_active_iter (GTK_COMBO_BOX (language_cb), &iter);
-    gtk_tree_model_get (model, &iter, 0, &lc, -1);
-    gtk_tree_model_get (model, &iter, 1, &cc, -1);
-    gtk_tree_model_get (model, &iter, 4, &ext, -1);
-    lcc = g_ascii_strdown (cc, -1);
-
-    model = gtk_combo_box_get_model (GTK_COMBO_BOX (timezone_cb));
-    gtk_combo_box_get_active_iter (GTK_COMBO_BOX (timezone_cb), &iter);
-    gtk_tree_model_get (model, &iter, 0, &city, -1);
-
-    // set wifi country
-    vsystem ("wpa_cli -i %s set country %s >> /dev/null", wifi_if, cc);
-    vsystem ("iw reg set %s", cc);
-    vsystem ("wpa_cli -i %s save_config >> /dev/null", wifi_if);
-
     // set timezone
     if (g_strcmp0 (init_tz, city))
     {
@@ -283,17 +260,19 @@ static gpointer set_locale (gpointer data)
     }
 
     // set keyboard
-    if (g_strcmp0 (init_kb, lcc))
+    if (g_ascii_strcasecmp (init_kb, cc))
     {
+        char *ccc = g_ascii_strdown (cc, -1);
         fp = fopen ("/etc/default/keyboard", "wb");
-        fprintf (fp, "XKBMODEL=pc105\nXKBLAYOUT=%s\nXKBVARIANT=\nXKBOPTIONS=\nBACKSPACE=guess", lcc);
+        fprintf (fp, "XKBMODEL=pc105\nXKBLAYOUT=%s\nXKBVARIANT=\nXKBOPTIONS=\nBACKSPACE=guess", ccc);
         fclose (fp);
-        vsystem ("setxkbmap -layout %s -variant \"\" -option \"\"", lcc);
+        vsystem ("setxkbmap -layout %s -variant \"\" -option \"\"", ccc);
         if (init_kb)
         {
             g_free (init_kb);
-            init_kb = g_strdup (lcc);
+            init_kb = g_strdup (ccc);
         }
+        g_free (ccc);
     }
 
     // set locale
@@ -319,7 +298,6 @@ static gpointer set_locale (gpointer data)
     g_free (lc);
     g_free (city);
     g_free (ext);
-    g_free (lcc);
 
     g_idle_add (close_msg, NULL);
     return NULL;
@@ -479,7 +457,7 @@ static void read_inits (void)
 
     wifi_if = get_string ("for dir in /sys/class/net/*/wireless; do if [ -d \"$dir\" ] ; then basename \"$(dirname \"$dir\")\" ; fi ; done | head -n 1");
     init_tz = get_string ("cat /etc/timezone");
-    init_kb = get_string ("grep XKBLAYOUT /etc/default/keyboard | cut -d = -f 2");
+    init_kb = get_string ("grep XKBLAYOUT /etc/default/keyboard | cut -d = -f 2 | tr -d '\"'");
     buffer = get_string ("grep LC_ALL /etc/default/locale | cut -d = -f 2");
     if (!buffer) buffer = get_string ("grep LANGUAGE /etc/default/locale | cut -d = -f 2");
     if (!buffer) buffer = get_string ("grep LANG /etc/default/locale | cut -d = -f 2");
@@ -654,7 +632,6 @@ static void progress (PkProgress *progress, PkProgressType *type, gpointer data)
 {
     int role;
 
-    //printf ("%d %s %d %d %d\n", type, pk_progress_get_package_id (progress), pk_progress_get_status (progress), pk_progress_get_role (progress), pk_progress_get_percentage (progress));
     if (msg_dlg && (int) type == PK_PROGRESS_TYPE_PERCENTAGE)
     {
         role = pk_progress_get_role (progress);
@@ -714,13 +691,6 @@ static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
         pk_task_update_packages_async (task, pk_package_sack_get_ids (sack), NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) do_updates_done, NULL);
     }
     else message (_("System is up to date"), 1, PAGE_DONE, -1);
-}
-
-static gpointer check_updates (gpointer data)
-{
-    PkTask *task = pk_task_new ();
-    pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
-    return NULL;
 }
 
 static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data)
@@ -784,15 +754,37 @@ static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int page
 
 static void next_page (GtkButton* btn, gpointer ptr)
 {
-    const char *psk;
-    int sec;
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+    const char *psk, *pw1, *pw2;
     char *text;
-    const char *pw1, *pw2;
+    int sec;
 
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
     {
-        case PAGE_LOCALE :  message (_("Setting locale - please wait..."), 0, 0, -1);
-                            g_thread_new (NULL, set_locale, NULL);
+        case PAGE_LOCALE :  // get the combo entries and look up relevant codes in database
+                            model = gtk_combo_box_get_model (GTK_COMBO_BOX (language_cb));
+                            gtk_combo_box_get_active_iter (GTK_COMBO_BOX (language_cb), &iter);
+                            gtk_tree_model_get (model, &iter, 0, &lc, -1);
+                            gtk_tree_model_get (model, &iter, 1, &cc, -1);
+                            gtk_tree_model_get (model, &iter, 4, &ext, -1);
+
+                            model = gtk_combo_box_get_model (GTK_COMBO_BOX (timezone_cb));
+                            gtk_combo_box_get_active_iter (GTK_COMBO_BOX (timezone_cb), &iter);
+                            gtk_tree_model_get (model, &iter, 0, &city, -1);
+
+                            // set wifi country - this is quick, so no need for warning
+                            vsystem ("wpa_cli -i %s set country %s >> /dev/null", wifi_if, cc);
+                            vsystem ("iw reg set %s", cc);
+                            vsystem ("wpa_cli -i %s save_config >> /dev/null", wifi_if);
+
+                            if (g_strcmp0 (init_tz, city) || g_strcmp0 (init_country, cc)
+                                || g_strcmp0 (init_lang, lc) || g_ascii_strcasecmp (init_kb, cc))
+                            {
+                                message (_("Setting locale - please wait..."), 0, 0, -1);
+                                g_thread_new (NULL, set_locale, NULL);
+                            }
+                            else gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
                             break;
 
         case PAGE_PASSWD :  pw1 = gtk_entry_get_text (GTK_ENTRY (pwd1_te));
