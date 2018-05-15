@@ -12,7 +12,6 @@
       <object class="GtkFrame" id="frame1">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="label_xalign">0</property>
         <property name="shadow_type">in</property>
         <child>
           <object class="GtkAlignment" id="alignment1">
@@ -44,23 +43,28 @@
                       <object class="GtkHBox" id="pbhbox">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
                         <child>
-                          <placeholder/>
+                          <object class="GtkProgressBar" id="msg_pb">
+                            <property name="can_focus">False</property>
+                          </object>
+                          <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
+                            <property name="padding">20</property>
+                          </packing>
                         </child>
                         <child>
-                        <object class="GtkProgressBar" id="msg_pb">
-                          <property name="can_focus">False</property>
-                        </object>
-                        <packing>
-                          <property name="expand">True</property>
-                          <property name="fill">True</property>
-                          <property name="padding">20</property>
-                        </packing>
-                        </child>
-                        <child>
-                          <placeholder/>
+                          <object class="GtkButton" id="msg_btn">
+                            <property name="label" translatable="yes">OK</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
+                            <property name="width-request">80</property>
+                          </object>
+                          <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">False</property>
+                          </packing>
                         </child>
                       </object>
                       <packing>
@@ -68,31 +72,6 @@
                         <property name="fill">False</property>
                         <property name="padding">20</property>
                         <property name="position">1</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkHButtonBox" id="msg_bb">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <child>
-                          <object class="GtkButton" id="msg_btn">
-                            <property name="label" translatable="yes">OK</property>
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="receives_default">True</property>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">False</property>
-                            <property name="position">0</property>
-                          </packing>
-                        </child>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">False</property>
-                        <property name="padding">10</property>
-                        <property name="position">2</property>
                       </packing>
                     </child>
                   </object>

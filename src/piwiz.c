@@ -34,7 +34,7 @@
 
 /* Controls */
 
-static GtkWidget *main_dlg, *msg_dlg, *msg_msg, *msg_pb, *msg_btn, *msg_bb;
+static GtkWidget *main_dlg, *msg_dlg, *msg_msg, *msg_pb, *msg_btn;
 static GtkWidget *wizard_nb, *next_btn, *prev_btn, *skip_btn;
 static GtkWidget *country_cb, *language_cb, *timezone_cb;
 static GtkWidget *ap_tv, *psk_label;
@@ -199,7 +199,6 @@ static void message (char *msg, int wait, int dest_page, int prog)
         msg_msg = (GtkWidget *) gtk_builder_get_object (builder, "msg_lbl");
         msg_pb = (GtkWidget *) gtk_builder_get_object (builder, "msg_pb");
         msg_btn = (GtkWidget *) gtk_builder_get_object (builder, "msg_btn");
-        msg_bb = (GtkWidget *) gtk_builder_get_object (builder, "msg_bb");
 
         gtk_label_set_text (GTK_LABEL (msg_msg), msg);
 
@@ -208,11 +207,11 @@ static void message (char *msg, int wait, int dest_page, int prog)
     }
     else gtk_label_set_text (GTK_LABEL (msg_msg), msg);
 
-    if (!wait) gtk_widget_set_visible (msg_bb, FALSE);
+    if (!wait) gtk_widget_set_visible (msg_btn, FALSE);
     else
     {
         g_signal_connect (msg_btn, "clicked", G_CALLBACK (ok_clicked), (void *) dest_page);
-        gtk_widget_set_visible (msg_bb, TRUE);
+        gtk_widget_set_visible (msg_btn, TRUE);
     }
 
     if (prog == -1) gtk_widget_set_visible (msg_pb, FALSE);
