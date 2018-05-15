@@ -13,6 +13,9 @@
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
 
+#define I_KNOW_THE_PACKAGEKIT_GLIB2_API_IS_SUBJECT_TO_CHANGE
+#include <packagekit-glib2/packagekit.h>
+
 #include <X11/Xlib.h>
 #include <X11/XKBlib.h>
 
@@ -26,11 +29,12 @@
 #define PAGE_PASSWD 2
 #define PAGE_WIFIAP 3
 #define PAGE_WIFIPSK 4
-#define PAGE_DONE 5
+#define PAGE_UPDATE 5
+#define PAGE_DONE 6
 
 /* Controls */
 
-static GtkWidget *main_dlg, *msg_dlg;
+static GtkWidget *main_dlg, *msg_dlg, *msg_msg, *msg_pb, *msg_btn, *msg_bb;
 static GtkWidget *wizard_nb, *next_btn, *prev_btn, *skip_btn;
 static GtkWidget *country_cb, *language_cb, *timezone_cb;
 static GtkWidget *ap_tv, *psk_label;
@@ -62,8 +66,8 @@ extern DHCPCD_CONNECTION *con;
 static char *get_string (char *cmd);
 static char *get_quoted_param (char *path, char *fname, char *toseek);
 static int vsystem (const char *fmt, ...);
-static void message (char *msg, int wait);
-static gboolean ok_clicked (gpointer data);
+static void message (char *msg, int wait, int dest_page, int prog);
+static gboolean ok_clicked (GtkButton *button, gpointer data);
 static gboolean close_msg (gpointer data);
 static gpointer set_locale (gpointer data);
 static void read_locales (void);
@@ -77,6 +81,12 @@ static int find_line (char **ssid, int *sec);
 void connect_success (void);
 static gint connect_failure (gpointer data);
 static gboolean select_ssid (char *lssid, const char *psk);
+static void progress (PkProgress *progress, PkProgressType *type, gpointer data);
+static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data);
+static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data);
+static gpointer check_updates (gpointer data);
+static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data);
+static gpointer refresh_update_cache (gpointer data);
 static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int pagenum, gpointer data);
 static void next_page (GtkButton* btn, gpointer ptr);
 static void prev_page (GtkButton* btn, gpointer ptr);
@@ -168,45 +178,67 @@ static int vsystem (const char *fmt, ...)
 
 /* Message boxes */
 
-static void message (char *msg, int wait)
+static void message (char *msg, int wait, int dest_page, int prog)
 {
-    GdkColor col;
-    GtkWidget *wid;
-    GtkBuilder *builder = gtk_builder_new ();
+    if (!msg_dlg)
+    {
+        GtkBuilder *builder;
+        GtkWidget *wid;
+        GdkColor col;
 
-    gtk_builder_add_from_file (builder, PACKAGE_DATA_DIR "/piwiz.ui", NULL);
+        builder = gtk_builder_new ();
+        gtk_builder_add_from_file (builder, PACKAGE_DATA_DIR "/piwiz.ui", NULL);
 
-    msg_dlg = (GtkWidget *) gtk_builder_get_object (builder, "msg");
-    gtk_window_set_transient_for (GTK_WINDOW (msg_dlg), GTK_WINDOW (main_dlg));
+        msg_dlg = (GtkWidget *) gtk_builder_get_object (builder, "msg");
+        gtk_window_set_transient_for (GTK_WINDOW (msg_dlg), GTK_WINDOW (main_dlg));
 
-    wid = (GtkWidget *) gtk_builder_get_object (builder, "msg_eb");
-    gdk_color_parse ("#FFFFFF", &col);
-    gtk_widget_modify_bg (wid, GTK_STATE_NORMAL, &col);
+        wid = (GtkWidget *) gtk_builder_get_object (builder, "msg_eb");
+        gdk_color_parse ("#FFFFFF", &col);
+        gtk_widget_modify_bg (wid, GTK_STATE_NORMAL, &col);
 
-    wid = (GtkWidget *) gtk_builder_get_object (builder, "msg_lbl");
-    gtk_label_set_text (GTK_LABEL (wid), msg);
+        msg_msg = (GtkWidget *) gtk_builder_get_object (builder, "msg_lbl");
+        msg_pb = (GtkWidget *) gtk_builder_get_object (builder, "msg_pb");
+        msg_btn = (GtkWidget *) gtk_builder_get_object (builder, "msg_btn");
+        msg_bb = (GtkWidget *) gtk_builder_get_object (builder, "msg_bb");
 
-    wid = (GtkWidget *) gtk_builder_get_object (builder, "msg_bb");
+        gtk_label_set_text (GTK_LABEL (msg_msg), msg);
 
-    gtk_widget_show_all (msg_dlg);
-    if (!wait) gtk_widget_set_visible (wid, FALSE);
+        gtk_widget_show_all (msg_dlg);
+        g_object_unref (builder);
+    }
+    else gtk_label_set_text (GTK_LABEL (msg_msg), msg);
+
+    if (!wait) gtk_widget_set_visible (msg_bb, FALSE);
     else
     {
-        wid = (GtkWidget *) gtk_builder_get_object (builder, "msg_btn");
-        g_signal_connect (wid, "clicked", G_CALLBACK (ok_clicked), NULL);
+        g_signal_connect (msg_btn, "clicked", G_CALLBACK (ok_clicked), (void *) dest_page);
+        gtk_widget_set_visible (msg_bb, TRUE);
     }
-    g_object_unref (builder);
+
+    if (prog == -1) gtk_widget_set_visible (msg_pb, FALSE);
+    else
+    {
+        float progress = prog / 100.0;
+        gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (msg_pb), progress);
+        gtk_widget_set_visible (msg_pb, TRUE);
+    }
 }
 
-static gboolean ok_clicked (gpointer data)
+static gboolean ok_clicked (GtkButton *button, gpointer data)
 {
     gtk_widget_destroy (GTK_WIDGET (msg_dlg));
+    msg_dlg = NULL;
+    if (data)
+    {
+        gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), (int) data);
+    }
     return FALSE;
 }
 
 static gboolean close_msg (gpointer data)
 {
     gtk_widget_destroy (GTK_WIDGET (msg_dlg));
+    msg_dlg = NULL;
     gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
     return FALSE;
 }
@@ -536,7 +568,8 @@ void connect_success (void)
         gtk_timeout_remove (conn_timeout);
         conn_timeout = 0;
         gtk_widget_destroy (GTK_WIDGET (msg_dlg));
-        gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_DONE);
+        msg_dlg = NULL;
+        gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
     }
 }
 
@@ -544,7 +577,8 @@ static gint connect_failure (gpointer data)
 {
     conn_timeout = 0;
     gtk_widget_destroy (GTK_WIDGET (msg_dlg));
-    message (_("Failed to connect to network."), 1);
+    msg_dlg = NULL;
+    message (_("Failed to connect to network."), 1, 0, -1);
     return FALSE;
 }
 
@@ -614,6 +648,106 @@ void menu_update_scans (WI_SCAN *wi, DHCPCD_WI_SCAN *scans)
     wi->scans = scans;
 }
 
+/* Updates */
+
+static void progress (PkProgress *progress, PkProgressType *type, gpointer data)
+{
+    int role;
+
+    //printf ("%d %s %d %d %d\n", type, pk_progress_get_package_id (progress), pk_progress_get_status (progress), pk_progress_get_role (progress), pk_progress_get_percentage (progress));
+    if (msg_dlg && (int) type == PK_PROGRESS_TYPE_PERCENTAGE)
+    {
+        role = pk_progress_get_role (progress);
+        switch (pk_progress_get_status (progress))
+        {
+            case PK_STATUS_ENUM_DOWNLOAD :  if (role == PK_ROLE_ENUM_REFRESH_CACHE)
+                                                message (_("Reading update list - please wait..."), 0, 0, pk_progress_get_percentage (progress));
+                                            else if (role == PK_ROLE_ENUM_UPDATE_PACKAGES)
+                                                message (_("Downloading updates - please wait..."), 0, 0, pk_progress_get_percentage (progress));
+                                            break;
+
+            case PK_STATUS_ENUM_INSTALL :   if (role == PK_ROLE_ENUM_UPDATE_PACKAGES)
+                                                message (_("Installing updates - please wait..."), 0, 0, pk_progress_get_percentage (progress));
+                                            break;
+        }
+    }
+}
+
+static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
+{
+    GError *error = NULL;
+    PkResults *results = pk_task_generic_finish (task, res, &error);
+
+    if (error != NULL)
+    {
+        char *buffer = g_strdup_printf (_("Error getting updates.\n%s"), error->message);
+        message (buffer, 1, PAGE_DONE, -1);
+        g_free (buffer);
+        g_error_free (error);
+        return;
+    }
+
+    message (_("System is up to date"), 1, PAGE_DONE, -1);
+}
+
+static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
+{
+    GError *error = NULL;
+    PkResults *results = pk_task_generic_finish (task, res, &error);
+
+    if (error != NULL)
+    {
+        char *buffer = g_strdup_printf (_("Error comparing versions.\n%s"), error->message);
+        message (buffer, 1, PAGE_DONE, -1);
+        g_free (buffer);
+        g_error_free (error);
+        return;
+    }
+
+	PkPackageSack *sack = pk_results_get_package_sack (results);
+	pk_package_sack_sort (sack, PK_PACKAGE_SACK_SORT_TYPE_NAME);
+	GPtrArray *array = pk_package_sack_get_array (sack);
+
+    if (array->len > 0)
+    {
+        message (_("Getting updates - please wait..."), 0, 0, -1);
+        pk_task_update_packages_async (task, pk_package_sack_get_ids (sack), NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) do_updates_done, NULL);
+    }
+    else message (_("System is up to date"), 1, PAGE_DONE, -1);
+}
+
+static gpointer check_updates (gpointer data)
+{
+    PkTask *task = pk_task_new ();
+    pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
+    return NULL;
+}
+
+static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data)
+{
+    GError *error = NULL;
+    PkResults *results = pk_task_generic_finish (task, res, &error);
+
+    if (error != NULL)
+    {
+        char *buffer = g_strdup_printf (_("Error checking for updates.\n%s"), error->message);
+        message (buffer, 1, PAGE_DONE, -1);
+        g_free (buffer);
+        g_error_free (error);
+        return;
+    }
+
+    message (_("Comparing versions - please wait..."), 0, 0, -1);
+    pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
+}
+
+static gpointer refresh_update_cache (gpointer data)
+{
+    PkTask *task = pk_task_new ();
+    pk_client_refresh_cache_async (PK_CLIENT (task), TRUE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) refresh_cache_done, NULL);
+    return NULL;
+}
+
 /* Page management */
 
 static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int pagenum, gpointer data)
@@ -639,6 +773,9 @@ static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int page
                             gtk_widget_set_visible (skip_btn, TRUE);
                             break;
 
+        case PAGE_UPDATE :  gtk_widget_set_visible (skip_btn, TRUE);
+                            break;
+
         case PAGE_WIFIPSK : gtk_widget_set_visible (skip_btn, TRUE);
                             break;
     }
@@ -653,7 +790,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
 
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
     {
-        case PAGE_LOCALE :  message (_("Setting locale - please wait..."), 0);
+        case PAGE_LOCALE :  message (_("Setting locale - please wait..."), 0, 0, -1);
                             g_thread_new (NULL, set_locale, NULL);
                             break;
 
@@ -663,7 +800,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             {
                                 if (strlen (pw1) != strlen (pw2) || g_strcmp0 (pw1, pw2))
                                 {
-                                    message (_("The two passwords entered do not match."), 1);
+                                    message (_("The two passwords entered do not match."), 1, 0, -1);
                                     break;
                                 }
                                 vsystem ("(echo \"%s\" ; echo \"%s\") | passwd $SUDO_USER", pw1, pw2);
@@ -675,7 +812,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
         case PAGE_WIFIAP :  if (ssid) g_free (ssid);
                             ssid = NULL;
                             if (!find_line (&ssid, &sec))
-                                gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_DONE);
+                                gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
                             else
                             {
                                 if (sec)
@@ -689,10 +826,10 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                 {
                                     if (select_ssid (ssid, NULL))
                                     {
-                                        message (_("Connecting to WiFi network - please wait..."), 0);
+                                        message (_("Connecting to WiFi network - please wait..."), 0, 0, -1);
                                         conn_timeout = gtk_timeout_add (30000, connect_failure, NULL);
                                     }
-                                    else message (_("Could not connect to this network"), 1);
+                                    else message (_("Could not connect to this network"), 1, 0, -1);
                                 }
                             }
                             break;
@@ -700,13 +837,17 @@ static void next_page (GtkButton* btn, gpointer ptr)
         case PAGE_WIFIPSK : psk = gtk_entry_get_text (GTK_ENTRY (psk_te));
                             if (select_ssid (ssid, psk))
                             {
-                                message (_("Connecting to WiFi network - please wait..."), 0);
+                                message (_("Connecting to WiFi network - please wait..."), 0, 0, -1);
                                 conn_timeout = gtk_timeout_add (30000, connect_failure, NULL);
                             }
-                            else message (_("Could not connect to this network"), 1);
+                            else message (_("Could not connect to this network"), 1, 0, -1);
                             break;
 
         case PAGE_DONE :    gtk_dialog_response (GTK_DIALOG (main_dlg), 10);
+                            break;
+
+        case PAGE_UPDATE :  message (_("Checking for updates - please wait..."), 0, 0, -1);
+                            g_thread_new (NULL, refresh_update_cache, NULL);
                             break;
 
         default :           gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
@@ -716,7 +857,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
 
 static void prev_page (GtkButton* btn, gpointer ptr)
 {
-    if (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)) == PAGE_DONE)
+    if (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)) == PAGE_UPDATE)
         gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIAP);
     else
         gtk_notebook_prev_page (GTK_NOTEBOOK (wizard_nb));
@@ -731,7 +872,9 @@ static void skip_page (GtkButton* btn, gpointer ptr)
         case PAGE_WIFIPSK : gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
                             break;
 
-        case PAGE_WIFIAP :  gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_DONE);
+        case PAGE_WIFIAP :  gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
+                            break;
+        case PAGE_UPDATE :  gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_DONE);
                             break;
     }
 }
@@ -769,6 +912,7 @@ int main (int argc, char *argv[])
     builder = gtk_builder_new ();
     gtk_builder_add_from_file (builder, PACKAGE_DATA_DIR "/piwiz.ui", NULL);
 
+    msg_dlg = NULL;
     main_dlg = (GtkWidget *) gtk_builder_get_object (builder, "wizard_dlg");
     wizard_nb = (GtkWidget *) gtk_builder_get_object (builder, "wizard_nb");
     g_signal_connect (wizard_nb, "switch-page", G_CALLBACK (page_changed), NULL);
