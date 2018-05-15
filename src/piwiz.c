@@ -704,9 +704,9 @@ static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
         return;
     }
 
-	PkPackageSack *sack = pk_results_get_package_sack (results);
-	pk_package_sack_sort (sack, PK_PACKAGE_SACK_SORT_TYPE_NAME);
-	GPtrArray *array = pk_package_sack_get_array (sack);
+    PkPackageSack *sack = pk_results_get_package_sack (results);
+    pk_package_sack_sort (sack, PK_PACKAGE_SACK_SORT_TYPE_NAME);
+    GPtrArray *array = pk_package_sack_get_array (sack);
 
     if (array->len > 0)
     {
@@ -753,12 +753,13 @@ static gpointer refresh_update_cache (gpointer data)
 static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int pagenum, gpointer data)
 {
     gtk_button_set_label (GTK_BUTTON (next_btn), _("Next"));
+    gtk_button_set_label (GTK_BUTTON (prev_btn), _("Back"));
     gtk_widget_set_visible (prev_btn, TRUE);
     gtk_widget_set_visible (skip_btn, FALSE);
 
     switch (pagenum)
     {
-        case PAGE_INTRO :   gtk_widget_set_visible (prev_btn, FALSE);
+        case PAGE_INTRO :   gtk_button_set_label (GTK_BUTTON (prev_btn), _("Cancel"));
                             break;
 
         case PAGE_DONE :    gtk_button_set_label (GTK_BUTTON (next_btn), _("Reboot"));
@@ -843,7 +844,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             else message (_("Could not connect to this network"), 1, 0, -1);
                             break;
 
-        case PAGE_DONE :    gtk_dialog_response (GTK_DIALOG (main_dlg), 10);
+        case PAGE_DONE :    gtk_dialog_response (GTK_DIALOG (main_dlg), GTK_RESPONSE_OK);
                             break;
 
         case PAGE_UPDATE :  message (_("Checking for updates - please wait..."), 0, 0, -1);
@@ -857,10 +858,17 @@ static void next_page (GtkButton* btn, gpointer ptr)
 
 static void prev_page (GtkButton* btn, gpointer ptr)
 {
-    if (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)) == PAGE_UPDATE)
-        gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIAP);
-    else
-        gtk_notebook_prev_page (GTK_NOTEBOOK (wizard_nb));
+    switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
+    {
+        case PAGE_UPDATE :  gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIAP);
+                            break;
+
+        case PAGE_INTRO :   gtk_dialog_response (GTK_DIALOG (main_dlg), GTK_RESPONSE_CANCEL);
+                            break;
+
+        default :           gtk_notebook_prev_page (GTK_NOTEBOOK (wizard_nb));
+                            break;
+    }
 }
 
 static void skip_page (GtkButton* btn, gpointer ptr)
@@ -986,8 +994,12 @@ int main (int argc, char *argv[])
     g_object_unref (builder);
     gtk_widget_destroy (main_dlg);
     gdk_threads_leave ();
+    if (res == GTK_RESPONSE_CANCEL || res == GTK_RESPONSE_OK)
+    {
+        // kill the autostart here
+    }
 
-    if (res == 10) system ("reboot");
+    if (res == GTK_RESPONSE_OK) system ("reboot");
     return 0;
 }
 
