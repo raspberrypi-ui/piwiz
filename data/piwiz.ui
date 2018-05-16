@@ -8,6 +8,7 @@
     <property name="window_position">center-on-parent</property>
     <property name="skip_taskbar_hint">True</property>
     <property name="decorated">False</property>
+    <property name="resizable">false</property>
     <child>
       <object class="GtkFrame" id="frame1">
         <property name="visible">True</property>
@@ -92,6 +93,7 @@
     <property name="title" translatable="yes">Welcome to Raspberry Pi</property>
     <property name="icon">/usr/share/raspberrypi-artwork/raspitr.png</property>
     <property name="type_hint">dialog</property>
+    <property name="resizable">false</property>
     <child internal-child="vbox">
       <object class="GtkVBox" id="wizard_vbox">
         <property name="visible">True</property>
