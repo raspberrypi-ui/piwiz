@@ -56,6 +56,8 @@ char *wifi_if, *init_country, *init_lang, *init_kb, *init_tz;
 char *cc, *lc, *city, *ext;
 char *ssid;
 gint conn_timeout = 0;
+gboolean pulse;
+guint pulse_timer;
 
 /* In dhcpcd-gtk/main.c */
 
@@ -178,6 +180,16 @@ static int vsystem (const char *fmt, ...)
 
 /* Message boxes */
 
+static gboolean pulse_pb (gpointer data)
+{
+    if (msg_dlg)
+    {
+        gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
+        return pulse;
+    }
+    else return FALSE;
+}
+
 static void message (char *msg, int wait, int dest_page, int prog)
 {
     if (!msg_dlg)
@@ -207,19 +219,30 @@ static void message (char *msg, int wait, int dest_page, int prog)
     }
     else gtk_label_set_text (GTK_LABEL (msg_msg), msg);
 
-    if (!wait) gtk_widget_set_visible (msg_btn, FALSE);
-    else
+    if (pulse) g_source_remove (pulse_timer);
+    pulse = FALSE;
+    if (wait)
     {
         g_signal_connect (msg_btn, "clicked", G_CALLBACK (ok_clicked), (void *) dest_page);
+        gtk_widget_set_visible (msg_pb, FALSE);
         gtk_widget_set_visible (msg_btn, TRUE);
     }
-
-    if (prog == -1) gtk_widget_set_visible (msg_pb, FALSE);
     else
     {
-        float progress = prog / 100.0;
-        gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (msg_pb), progress);
+        gtk_widget_set_visible (msg_btn, FALSE);
         gtk_widget_set_visible (msg_pb, TRUE);
+        if (prog == -1)
+        {
+            gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
+            pulse = TRUE;
+            pulse_timer = g_timeout_add (200, pulse_pb, NULL);
+        }
+        else
+        {
+            float progress = prog / 100.0;
+            gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (msg_pb), progress);
+            gtk_widget_set_visible (msg_pb, TRUE);
+        }
     }
 }
 
@@ -631,22 +654,31 @@ static void progress (PkProgress *progress, PkProgressType *type, gpointer data)
 {
     int role;
 
-    if (msg_dlg && (int) type == PK_PROGRESS_TYPE_PERCENTAGE)
+    if (msg_dlg)
     {
-        role = pk_progress_get_role (progress);
-        switch (pk_progress_get_status (progress))
+        if ((int) type == PK_PROGRESS_TYPE_PERCENTAGE)
         {
-            case PK_STATUS_ENUM_DOWNLOAD :  if (role == PK_ROLE_ENUM_REFRESH_CACHE)
-                                                message (_("Reading update list - please wait..."), 0, 0, pk_progress_get_percentage (progress));
-                                            else if (role == PK_ROLE_ENUM_UPDATE_PACKAGES)
-                                                message (_("Downloading updates - please wait..."), 0, 0, pk_progress_get_percentage (progress));
-                                            break;
+            role = pk_progress_get_role (progress);
+            switch (pk_progress_get_status (progress))
+            {
+                case PK_STATUS_ENUM_DOWNLOAD :  if (role == PK_ROLE_ENUM_REFRESH_CACHE)
+                                                    message (_("Reading update list - please wait..."), 0, 0, pk_progress_get_percentage (progress));
+                                                else if (role == PK_ROLE_ENUM_UPDATE_PACKAGES)
+                                                    message (_("Downloading updates - please wait..."), 0, 0, pk_progress_get_percentage (progress));
+                                                else gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
+                                                break;
 
-            case PK_STATUS_ENUM_INSTALL :   if (role == PK_ROLE_ENUM_UPDATE_PACKAGES)
-                                                message (_("Installing updates - please wait..."), 0, 0, pk_progress_get_percentage (progress));
-                                            break;
+                case PK_STATUS_ENUM_INSTALL :   if (role == PK_ROLE_ENUM_UPDATE_PACKAGES)
+                                                    message (_("Installing updates - please wait..."), 0, 0, pk_progress_get_percentage (progress));
+                                                else gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
+                                                break;
+
+                default :                       gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
+                                                break;
+            }
         }
-    }
+        else gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
+   }
 }
 
 static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
