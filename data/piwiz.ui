@@ -419,6 +419,19 @@ Press 'Next' to get started. </property>
                   </packing>
                 </child>
                 <child>
+                  <object class="GtkCheckButton" id="p2check">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="label" translatable="yes">Hide Passwords</property>
+                    <property name="tooltip_text" translatable="yes">Show or hide the letters in your password</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">3</property>
+                  </packing>
+                </child>
+                <child>
                   <object class="GtkLabel" id="p2prompt">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
@@ -430,7 +443,7 @@ Press 'Next' to get started. </property>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
-                    <property name="position">3</property>
+                    <property name="position">4</property>
                   </packing>
                 </child>
               </object>
@@ -502,7 +515,7 @@ Press 'Next' to get started. </property>
                     <property name="can_focus">False</property>
                     <property name="xalign">0</property>
                     <property name="yalign">0</property>
-                    <property name="label" translatable="yes">Press 'Next' to connect, or 'Skip' to skip this.</property>
+                    <property name="label" translatable="yes">Press 'Next' to connect, or 'Skip' to continue without connecting.</property>
                     <property name="wrap">True</property>
                   </object>
                   <packing>
@@ -576,6 +589,7 @@ Press 'Next' to get started. </property>
                         <property name="can_focus">True</property>
                         <property name="tooltip_text" translatable="yes">Enter the password for your network</property>
                         <property name="invisible_char">•</property>
+                        <property name="invisible_char_set">True</property>
                         <property name="primary_icon_activatable">False</property>
                         <property name="secondary_icon_activatable">False</property>
                         <property name="primary_icon_sensitive">True</property>
@@ -595,18 +609,31 @@ Press 'Next' to get started. </property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkLabel" id="p4prompt">
+                  <object class="GtkCheckButton" id="p4check">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
-                    <property name="yalign">0</property>
-                    <property name="label" translatable="yes">Press 'Next' to connect, or 'Skip' to skip this.</property>
-                    <property name="wrap">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="label" translatable="yes">Hide Password</property>
+                    <property name="tooltip_text" translatable="yes">Show or hide the letters in your password</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
                     <property name="position">3</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="p4prompt">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="xalign">0</property>
+                    <property name="yalign">0</property>
+                    <property name="label" translatable="yes">Press 'Next' to connect, or 'Skip' to continue without connecting.</property>
+                    <property name="wrap">True</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">4</property>
                   </packing>
                 </child>
               </object>
@@ -677,8 +704,8 @@ Press 'Reboot' to reboot your Pi so that the new settings can take effect.</prop
                     <property name="wrap">True</property>
                   </object>
                   <packing>
-                    <property name="expand">True</property>
-                    <property name="fill">True</property>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">0</property>
                   </packing>
                 </child>

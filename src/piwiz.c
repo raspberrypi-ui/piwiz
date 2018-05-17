@@ -39,6 +39,7 @@ static GtkWidget *wizard_nb, *next_btn, *prev_btn, *skip_btn;
 static GtkWidget *country_cb, *language_cb, *timezone_cb;
 static GtkWidget *ap_tv, *psk_label;
 static GtkWidget *pwd1_te, *pwd2_te, *psk_te;
+static GtkWidget *pwd_hide, *psk_hide;
 
 /* Lists for localisation */
 
@@ -908,6 +909,32 @@ static void skip_page (GtkButton* btn, gpointer ptr)
     }
 }
 
+static void pwd_toggle (GtkButton *btn, gpointer ptr)
+{
+    if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (pwd_hide)))
+    {
+        gtk_entry_set_visibility (GTK_ENTRY (pwd1_te), FALSE);
+        gtk_entry_set_visibility (GTK_ENTRY (pwd2_te), FALSE);
+    }
+    else
+    {
+        gtk_entry_set_visibility (GTK_ENTRY (pwd1_te), TRUE);
+        gtk_entry_set_visibility (GTK_ENTRY (pwd2_te), TRUE);
+    }
+}
+
+static void psk_toggle (GtkButton *btn, gpointer ptr)
+{
+    if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (psk_hide)))
+    {
+        gtk_entry_set_visibility (GTK_ENTRY (psk_te), FALSE);
+    }
+    else
+    {
+        gtk_entry_set_visibility (GTK_ENTRY (psk_te), TRUE);
+    }
+}
+
 /* The dialog... */
 
 int main (int argc, char *argv[])
@@ -960,8 +987,16 @@ int main (int argc, char *argv[])
     psk_te = (GtkWidget *) gtk_builder_get_object (builder, "p4psk");
     psk_label = (GtkWidget *) gtk_builder_get_object (builder, "p4info");
 
+    pwd_hide = (GtkWidget *) gtk_builder_get_object (builder, "p2check");
+    g_signal_connect (pwd_hide, "toggled", G_CALLBACK (pwd_toggle), NULL);
+    psk_hide = (GtkWidget *) gtk_builder_get_object (builder, "p4check");
+    g_signal_connect (psk_hide, "toggled", G_CALLBACK (psk_toggle), NULL);
+
     gtk_entry_set_visibility (GTK_ENTRY (pwd1_te), FALSE);
     gtk_entry_set_visibility (GTK_ENTRY (pwd2_te), FALSE);
+    gtk_entry_set_visibility (GTK_ENTRY (psk_te), FALSE);
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pwd_hide), TRUE);
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (psk_hide), TRUE);
 
     // set up the locale combo boxes
     read_locales ();
