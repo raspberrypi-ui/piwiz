@@ -1,0 +1,5 @@
+	../src/piwiz.c \
+	../src/dhcpcd-gtk/main.c \
+	../src/dhcpcd-gtk/wpa.c \
+	../data/piwiz.ui \
+	../data/piwiz.desktop.in

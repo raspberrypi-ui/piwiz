@@ -1,8 +1,11 @@
 [Desktop Entry]
 Type=Application
 Name=Raspberry Pi First-Run Wizard
+Name[en_GB]=Raspberry Pi First-Run Wizard
 GenericName=Raspberry Pi First-Run Wizard
+GenericName[en_GB]=Raspberry Pi First-Run Wizard
 Comment=Configure Raspberry Pi system on first run
+Comment[en_GB]=Configure Raspberry Pi system on first run
 Icon=rpi
 Exec=sudo piwiz
 NotShowIn=GNOME;XFCE;

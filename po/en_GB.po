@@ -1,0 +1,393 @@
+# English translations for piwiz package.
+# Copyright (C) 2018 Raspberry Pi Ltd
+# This file is distributed under the same license as the piwiz package.
+# Simon Long <simon@raspberrypi.org>, 2018.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: piwiz 1.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-05-17 08:08+0100\n"
+"PO-Revision-Date: 2018-05-17 08:09+0100\n"
+"Last-Translator: Simon Long <simon@raspberrypi.org>\n"
+"Language-Team: English (British)\n"
+"Language: en_GB\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ASCII\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ../src/piwiz.c:560 ../src/piwiz.c:773
+msgid "Searching for networks - please wait..."
+msgstr "Searching for networks - please wait..."
+
+#: ../src/piwiz.c:582
+msgid "Failed to connect to network."
+msgstr "Failed to connect to network."
+
+#: ../src/piwiz.c:666
+msgid "Reading update list - please wait..."
+msgstr "Reading update list - please wait..."
+
+#: ../src/piwiz.c:668
+msgid "Downloading updates - please wait..."
+msgstr "Downloading updates - please wait..."
+
+#: ../src/piwiz.c:673
+msgid "Installing updates - please wait..."
+msgstr "Installing updates - please wait..."
+
+#: ../src/piwiz.c:692
+#, c-format
+msgid ""
+"Error getting updates.\n"
+"%s"
+msgstr ""
+"Error getting updates.\n"
+"%s"
+
+#: ../src/piwiz.c:699 ../src/piwiz.c:725
+msgid "System is up to date"
+msgstr "System is up to date"
+
+#: ../src/piwiz.c:709
+#, c-format
+msgid ""
+"Error comparing versions.\n"
+"%s"
+msgstr ""
+"Error comparing versions.\n"
+"%s"
+
+#: ../src/piwiz.c:722
+msgid "Getting updates - please wait..."
+msgstr "Getting updates - please wait..."
+
+#: ../src/piwiz.c:735
+#, c-format
+msgid ""
+"Error checking for updates.\n"
+"%s"
+msgstr ""
+"Error checking for updates.\n"
+"%s"
+
+#: ../src/piwiz.c:742
+msgid "Comparing versions - please wait..."
+msgstr "Comparing versions - please wait..."
+
+#: ../src/piwiz.c:757 ../data/piwiz.ui.h:6
+msgid "Next"
+msgstr "Next"
+
+#: ../src/piwiz.c:758
+msgid "Back"
+msgstr "Back"
+
+#: ../src/piwiz.c:763 ../data/piwiz.ui.h:4
+msgid "Cancel"
+msgstr "Cancel"
+
+#: ../src/piwiz.c:766
+msgid "Reboot"
+msgstr "Reboot"
+
+#: ../src/piwiz.c:813
+msgid "Setting locale - please wait..."
+msgstr "Setting locale - please wait..."
+
+#: ../src/piwiz.c:825
+msgid "The two passwords entered do not match."
+msgstr "The two passwords entered do not match."
+
+#: ../src/piwiz.c:844
+#, c-format
+msgid "Enter the password for the WiFi network \"%s\"."
+msgstr "Enter the password for the WiFi network \"%s\"."
+
+#: ../src/piwiz.c:853 ../src/piwiz.c:864
+msgid "Connecting to WiFi network - please wait..."
+msgstr "Connecting to WiFi network - please wait..."
+
+#: ../src/piwiz.c:856 ../src/piwiz.c:867
+msgid "Could not connect to this network"
+msgstr "Could not connect to this network"
+
+#: ../src/piwiz.c:873
+msgid "Checking for updates - please wait..."
+msgstr "Checking for updates - please wait..."
+
+#: ../src/piwiz.c:1010
+msgid "Set the country in which you are using your Pi"
+msgstr "Set the country in which you are using your Pi"
+
+#: ../src/piwiz.c:1011
+msgid "Set the language in which applications should appear"
+msgstr "Set the language in which applications should appear"
+
+#: ../src/piwiz.c:1012
+msgid "Set the closest city to your location"
+msgstr "Set the closest city to your location"
+
+#: ../src/dhcpcd-gtk/main.c:375
+msgid "Error creating new GIO Channel\n"
+msgstr "Error creating new GIO Channel\n"
+
+#: ../src/dhcpcd-gtk/main.c:380
+msgid "Error creating watch\n"
+msgstr "Error creating watch\n"
+
+#: ../src/dhcpcd-gtk/main.c:387
+msgid "g_try_malloc\n"
+msgstr "g_try_malloc\n"
+
+#: ../src/dhcpcd-gtk/main.c:415
+msgid "Connection to dhcpcd lost"
+msgstr "Connection to dhcpcd lost"
+
+#: ../src/dhcpcd-gtk/main.c:437
+#, c-format
+msgid "Connected to %s-%s"
+msgstr "Connected to %s-%s"
+
+#: ../src/dhcpcd-gtk/main.c:455
+msgid "dhcpcd connection lost"
+msgstr "dhcpcd connection lost"
+
+#: ../src/dhcpcd-gtk/main.c:520
+msgid "Network event"
+msgstr "Network event"
+
+#: ../src/dhcpcd-gtk/main.c:561
+#, c-format
+msgid "dhcpcd WPA connection lost: %s"
+msgstr "dhcpcd WPA connection lost: %s"
+
+#: ../src/dhcpcd-gtk/main.c:617
+#, c-format
+msgid "%s: Received scan results"
+msgstr "%s: Received scan results"
+
+#: ../src/dhcpcd-gtk/main.c:640
+msgid "New Access Point"
+msgstr "New Access Point"
+
+#: ../src/dhcpcd-gtk/main.c:649
+msgid "New Access Points"
+msgstr "New Access Points"
+
+#: ../src/dhcpcd-gtk/main.c:738
+msgid "Connecting to dhcpcd ..."
+msgstr "Connecting to dhcpcd ..."
+
+#: ../src/dhcpcd-gtk/main.c:746 ../src/dhcpcd-gtk/main.c:777
+msgid "Connecting ..."
+msgstr "Connecting ..."
+
+#: ../src/dhcpcd-gtk/wpa.c:76
+msgid "Failed to disconnect."
+msgstr "Failed to disconnect."
+
+#: ../src/dhcpcd-gtk/wpa.c:79
+msgid "Faile to reconfigure."
+msgstr "Faile to reconfigure."
+
+#: ../src/dhcpcd-gtk/wpa.c:82
+msgid "Failed to set key management."
+msgstr "Failed to set key management."
+
+#: ../src/dhcpcd-gtk/wpa.c:85
+msgid "Failed to set password, probably too short."
+msgstr "Failed to set password, probably too short."
+
+#: ../src/dhcpcd-gtk/wpa.c:88
+msgid "Failed to enable the network."
+msgstr "Failed to enable the network."
+
+#: ../src/dhcpcd-gtk/wpa.c:91
+msgid "Failed to select the network."
+msgstr "Failed to select the network."
+
+#: ../src/dhcpcd-gtk/wpa.c:94
+msgid "Failed to start association."
+msgstr "Failed to start association."
+
+#: ../src/dhcpcd-gtk/wpa.c:97
+msgid ""
+"Failed to save wpa_supplicant configuration.\n"
+"\n"
+"You should add update_config=1 to /etc/wpa_supplicant.conf."
+msgstr ""
+"Failed to save wpa_supplicant configuration.\n"
+"\n"
+"You should add update_config=1 to /etc/wpa_supplicant.conf."
+
+#: ../src/dhcpcd-gtk/wpa.c:103
+msgid "Error enabling network"
+msgstr "Error enabling network"
+
+#: ../src/dhcpcd-gtk/wpa.c:141
+msgid "Pre Shared Key:"
+msgstr "Pre Shared Key:"
+
+#: ../data/piwiz.ui.h:1
+msgid "label"
+msgstr "label"
+
+#: ../data/piwiz.ui.h:2
+msgid "OK"
+msgstr "OK"
+
+#: ../data/piwiz.ui.h:3
+msgid "Welcome to Raspberry Pi"
+msgstr "Welcome to Raspberry Pi"
+
+#: ../data/piwiz.ui.h:5
+msgid "Skip"
+msgstr "Skip"
+
+#: ../data/piwiz.ui.h:7
+msgid ""
+"Welcome to the Raspberry Pi Desktop!\n"
+"\n"
+"Before you start using it, there are a few things to set up.\n"
+"\n"
+"Press 'Next' to get started. "
+msgstr ""
+"Welcome to the Raspberry Pi Desktop!\n"
+"\n"
+"Before you start using it, there are a few things to set up.\n"
+"\n"
+"Press 'Next' to get started. "
+
+#: ../data/piwiz.ui.h:12
+msgid "<b>Set Country</b>"
+msgstr "<b>Set Country</b>"
+
+#: ../data/piwiz.ui.h:13
+msgid ""
+"Enter the details of your location. This is used to set the language, time "
+"zone, keyboard and other international settings."
+msgstr ""
+"Enter the details of your location. This is used to set the language, time "
+"zone, keyboard and other international settings."
+
+#: ../data/piwiz.ui.h:14
+msgid "Country:"
+msgstr "Country:"
+
+#: ../data/piwiz.ui.h:15
+msgid "Language:"
+msgstr "Language:"
+
+#: ../data/piwiz.ui.h:16
+msgid "Timezone:"
+msgstr "Timezone:"
+
+#: ../data/piwiz.ui.h:17
+msgid "Press 'Next' when you have made your selection."
+msgstr "Press 'Next' when you have made your selection."
+
+#: ../data/piwiz.ui.h:18
+msgid "<b>Change Password</b>"
+msgstr "<b>Change Password</b>"
+
+#: ../data/piwiz.ui.h:19
+msgid ""
+"The default 'pi' user account currently has the password 'raspberry'. It is "
+"strongly recommended that you change this to a different password that only "
+"you know."
+msgstr ""
+"The default 'pi' user account currently has the password 'raspberry'. It is "
+"strongly recommended that you change this to a different password that only "
+"you know."
+
+#: ../data/piwiz.ui.h:20
+msgid "Enter new password:"
+msgstr "Enter new password:"
+
+#: ../data/piwiz.ui.h:21
+msgid "Confirm new password:"
+msgstr "Confirm new password:"
+
+#: ../data/piwiz.ui.h:22
+msgid "Enter a new password"
+msgstr "Enter a new password"
+
+#: ../data/piwiz.ui.h:23
+msgid "Enter the new password again"
+msgstr "Enter the new password again"
+
+#: ../data/piwiz.ui.h:24
+msgid "Hide Passwords"
+msgstr "Hide Passwords"
+
+#: ../data/piwiz.ui.h:25
+msgid "Show or hide the letters in your password"
+msgstr "Show or hide the letters in your password"
+
+#: ../data/piwiz.ui.h:26
+msgid "Press 'Next' to activate your new password."
+msgstr "Press 'Next' to activate your new password."
+
+#: ../data/piwiz.ui.h:27
+msgid "<b>Select WiFi Network</b>"
+msgstr "<b>Select WiFi Network</b>"
+
+#: ../data/piwiz.ui.h:28
+msgid "Select your WiFi network from the list."
+msgstr "Select your WiFi network from the list."
+
+#: ../data/piwiz.ui.h:29
+msgid "Click the name of your network to select it"
+msgstr "Click the name of your network to select it"
+
+#: ../data/piwiz.ui.h:30
+msgid "Press 'Next' to connect, or 'Skip' to continue without connecting."
+msgstr "Press 'Next' to connect, or 'Skip' to continue without connecting."
+
+#: ../data/piwiz.ui.h:31
+msgid "<b>Enter WiFi Password</b>"
+msgstr "<b>Enter WiFi Password</b>"
+
+#: ../data/piwiz.ui.h:32
+msgid "Enter the password for your WiFi network."
+msgstr "Enter the password for your WiFi network."
+
+#: ../data/piwiz.ui.h:33
+msgid "Password:"
+msgstr "Password:"
+
+#: ../data/piwiz.ui.h:34
+msgid "Enter the password for your network"
+msgstr "Enter the password for your network"
+
+#: ../data/piwiz.ui.h:35
+msgid "Hide Password"
+msgstr "Hide Password"
+
+#: ../data/piwiz.ui.h:36
+msgid "<b>Check For Updates</b>"
+msgstr "<b>Check For Updates</b>"
+
+#: ../data/piwiz.ui.h:37
+msgid "Press 'Next' to check that Raspbian is up to date."
+msgstr "Press 'Next' to check that Raspbian is up to date."
+
+#: ../data/piwiz.ui.h:38
+msgid ""
+"Your Raspberry Pi now is set up and ready to go.\n"
+"\n"
+"Press 'Reboot' to reboot your Pi so that the new settings can take effect."
+msgstr ""
+"Your Raspberry Pi now is set up and ready to go.\n"
+"\n"
+"Press 'Reboot' to reboot your Pi so that the new settings can take effect."
+
+#: ../data/piwiz.desktop.in.h:1
+msgid "Raspberry Pi First-Run Wizard"
+msgstr "Raspberry Pi First-Run Wizard"
+
+#: ../data/piwiz.desktop.in.h:2
+msgid "Configure Raspberry Pi system on first run"
+msgstr "Configure Raspberry Pi system on first run"

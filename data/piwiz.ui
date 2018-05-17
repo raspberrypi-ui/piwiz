@@ -8,7 +8,6 @@
     <property name="window_position">center-on-parent</property>
     <property name="skip_taskbar_hint">True</property>
     <property name="decorated">False</property>
-    <property name="resizable">false</property>
     <child>
       <object class="GtkFrame" id="frame1">
         <property name="visible">True</property>

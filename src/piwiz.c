@@ -56,9 +56,7 @@ GtkListStore *ap_list;
 char *wifi_if, *init_country, *init_lang, *init_kb, *init_tz;
 char *cc, *lc, *city, *ext;
 char *ssid;
-gint conn_timeout = 0;
-gboolean pulse;
-guint pulse_timer;
+gint conn_timeout = 0, pulse_timer = 0;
 
 /* In dhcpcd-gtk/main.c */
 
@@ -70,7 +68,7 @@ extern DHCPCD_CONNECTION *con;
 static char *get_string (char *cmd);
 static char *get_quoted_param (char *path, char *fname, char *toseek);
 static int vsystem (const char *fmt, ...);
-static void message (char *msg, int wait, int dest_page, int prog);
+static void message (char *msg, int wait, int dest_page, int prog, gboolean pulse);
 static gboolean ok_clicked (GtkButton *button, gpointer data);
 static gboolean close_msg (gpointer data);
 static gpointer set_locale (gpointer data);
@@ -186,12 +184,12 @@ static gboolean pulse_pb (gpointer data)
     if (msg_dlg)
     {
         gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
-        return pulse;
+        return TRUE;
     }
     else return FALSE;
 }
 
-static void message (char *msg, int wait, int dest_page, int prog)
+static void message (char *msg, int wait, int dest_page, int prog, gboolean pulse)
 {
     if (!msg_dlg)
     {
@@ -220,8 +218,8 @@ static void message (char *msg, int wait, int dest_page, int prog)
     }
     else gtk_label_set_text (GTK_LABEL (msg_msg), msg);
 
-    if (pulse) g_source_remove (pulse_timer);
-    pulse = FALSE;
+    if (pulse_timer) g_source_remove (pulse_timer);
+    pulse_timer = 0;
     if (wait)
     {
         g_signal_connect (msg_btn, "clicked", G_CALLBACK (ok_clicked), (void *) dest_page);
@@ -234,15 +232,16 @@ static void message (char *msg, int wait, int dest_page, int prog)
         gtk_widget_set_visible (msg_pb, TRUE);
         if (prog == -1)
         {
-            gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
-            pulse = TRUE;
-            pulse_timer = g_timeout_add (200, pulse_pb, NULL);
+            if (pulse)
+            {
+                gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
+                pulse_timer = g_timeout_add (200, pulse_pb, NULL);
+            }
         }
         else
         {
             float progress = prog / 100.0;
             gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (msg_pb), progress);
-            gtk_widget_set_visible (msg_pb, TRUE);
         }
     }
 }
@@ -579,7 +578,7 @@ static gint connect_failure (gpointer data)
     conn_timeout = 0;
     gtk_widget_destroy (GTK_WIDGET (msg_dlg));
     msg_dlg = NULL;
-    message (_("Failed to connect to network."), 1, 0, -1);
+    message (_("Failed to connect to network."), 1, 0, -1, FALSE);
     return FALSE;
 }
 
@@ -653,33 +652,32 @@ void menu_update_scans (WI_SCAN *wi, DHCPCD_WI_SCAN *scans)
 
 static void progress (PkProgress *progress, PkProgressType *type, gpointer data)
 {
-    int role;
+    int role = pk_progress_get_role (progress);
 
     if (msg_dlg)
     {
-        if ((int) type == PK_PROGRESS_TYPE_PERCENTAGE)
+        switch (pk_progress_get_status (progress))
         {
-            role = pk_progress_get_role (progress);
-            switch (pk_progress_get_status (progress))
-            {
-                case PK_STATUS_ENUM_DOWNLOAD :  if (role == PK_ROLE_ENUM_REFRESH_CACHE)
-                                                    message (_("Reading update list - please wait..."), 0, 0, pk_progress_get_percentage (progress));
+            case PK_STATUS_ENUM_DOWNLOAD :  if ((int) type == PK_PROGRESS_TYPE_PERCENTAGE)
+                                            {
+                                                if (role == PK_ROLE_ENUM_REFRESH_CACHE)
+                                                    message (_("Reading update list - please wait..."), 0, 0, pk_progress_get_percentage (progress), FALSE);
                                                 else if (role == PK_ROLE_ENUM_UPDATE_PACKAGES)
-                                                    message (_("Downloading updates - please wait..."), 0, 0, pk_progress_get_percentage (progress));
-                                                else gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
-                                                break;
+                                                    message (_("Downloading updates - please wait..."), 0, 0, pk_progress_get_percentage (progress), FALSE);
+                                            }
+                                            break;
 
-                case PK_STATUS_ENUM_INSTALL :   if (role == PK_ROLE_ENUM_UPDATE_PACKAGES)
-                                                    message (_("Installing updates - please wait..."), 0, 0, pk_progress_get_percentage (progress));
-                                                else gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
-                                                break;
+            case PK_STATUS_ENUM_INSTALL :   if ((int) type == PK_PROGRESS_TYPE_PERCENTAGE)
+                                            {
+                                                if (role == PK_ROLE_ENUM_UPDATE_PACKAGES)
+                                                    message (_("Installing updates - please wait..."), 0, 0, pk_progress_get_percentage (progress), FALSE);
+                                            }
+                                            break;
 
-                default :                       gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
-                                                break;
-            }
+            default :                       gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
+                                            break;
         }
-        else gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
-   }
+    }
 }
 
 static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
@@ -690,13 +688,13 @@ static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
     if (error != NULL)
     {
         char *buffer = g_strdup_printf (_("Error getting updates.\n%s"), error->message);
-        message (buffer, 1, PAGE_DONE, -1);
+        message (buffer, 1, PAGE_DONE, -1, FALSE);
         g_free (buffer);
         g_error_free (error);
         return;
     }
 
-    message (_("System is up to date"), 1, PAGE_DONE, -1);
+    message (_("System is up to date"), 1, PAGE_DONE, -1, FALSE);
 }
 
 static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
@@ -707,7 +705,7 @@ static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
     if (error != NULL)
     {
         char *buffer = g_strdup_printf (_("Error comparing versions.\n%s"), error->message);
-        message (buffer, 1, PAGE_DONE, -1);
+        message (buffer, 1, PAGE_DONE, -1, FALSE);
         g_free (buffer);
         g_error_free (error);
         return;
@@ -719,10 +717,10 @@ static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
 
     if (array->len > 0)
     {
-        message (_("Getting updates - please wait..."), 0, 0, -1);
+        message (_("Getting updates - please wait..."), 0, 0, -1, FALSE);
         pk_task_update_packages_async (task, pk_package_sack_get_ids (sack), NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) do_updates_done, NULL);
     }
-    else message (_("System is up to date"), 1, PAGE_DONE, -1);
+    else message (_("System is up to date"), 1, PAGE_DONE, -1, FALSE);
 }
 
 static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data)
@@ -733,13 +731,13 @@ static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data)
     if (error != NULL)
     {
         char *buffer = g_strdup_printf (_("Error checking for updates.\n%s"), error->message);
-        message (buffer, 1, PAGE_DONE, -1);
+        message (buffer, 1, PAGE_DONE, -1, FALSE);
         g_free (buffer);
         g_error_free (error);
         return;
     }
 
-    message (_("Comparing versions - please wait..."), 0, 0, -1);
+    message (_("Comparing versions - please wait..."), 0, 0, -1, FALSE);
     pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
 }
 
@@ -810,7 +808,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             if (g_strcmp0 (init_tz, city) || g_strcmp0 (init_country, cc)
                                 || g_strcmp0 (init_lang, lc) || g_ascii_strcasecmp (init_kb, cc))
                             {
-                                message (_("Setting locale - please wait..."), 0, 0, -1);
+                                message (_("Setting locale - please wait..."), 0, 0, -1, TRUE);
                                 g_thread_new (NULL, set_locale, NULL);
                             }
                             else gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
@@ -822,7 +820,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             {
                                 if (g_strcmp0 (pw1, pw2))
                                 {
-                                    message (_("The two passwords entered do not match."), 1, 0, -1);
+                                    message (_("The two passwords entered do not match."), 1, 0, -1, FALSE);
                                     break;
                                 }
                                 vsystem ("(echo \"%s\" ; echo \"%s\") | passwd $SUDO_USER", pw1, pw2);
@@ -850,10 +848,10 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                 {
                                     if (select_ssid (ssid, NULL))
                                     {
-                                        message (_("Connecting to WiFi network - please wait..."), 0, 0, -1);
+                                        message (_("Connecting to WiFi network - please wait..."), 0, 0, -1, TRUE);
                                         conn_timeout = gtk_timeout_add (30000, connect_failure, NULL);
                                     }
-                                    else message (_("Could not connect to this network"), 1, 0, -1);
+                                    else message (_("Could not connect to this network"), 1, 0, -1, FALSE);
                                 }
                             }
                             break;
@@ -861,16 +859,16 @@ static void next_page (GtkButton* btn, gpointer ptr)
         case PAGE_WIFIPSK : psk = gtk_entry_get_text (GTK_ENTRY (psk_te));
                             if (select_ssid (ssid, psk))
                             {
-                                message (_("Connecting to WiFi network - please wait..."), 0, 0, -1);
+                                message (_("Connecting to WiFi network - please wait..."), 0, 0, -1, TRUE);
                                 conn_timeout = gtk_timeout_add (30000, connect_failure, NULL);
                             }
-                            else message (_("Could not connect to this network"), 1, 0, -1);
+                            else message (_("Could not connect to this network"), 1, 0, -1, FALSE);
                             break;
 
         case PAGE_DONE :    gtk_dialog_response (GTK_DIALOG (main_dlg), GTK_RESPONSE_OK);
                             break;
 
-        case PAGE_UPDATE :  message (_("Checking for updates - please wait..."), 0, 0, -1);
+        case PAGE_UPDATE :  message (_("Checking for updates - please wait..."), 0, 0, -1, FALSE);
                             g_thread_new (NULL, refresh_update_cache, NULL);
                             break;
 
@@ -1052,10 +1050,10 @@ int main (int argc, char *argv[])
     gdk_threads_leave ();
     if (res == GTK_RESPONSE_CANCEL || res == GTK_RESPONSE_OK)
     {
-        system ("rm /etc/xdg/autostart/piwiz.desktop");
+        vsystem ("rm /etc/xdg/autostart/piwiz.desktop");
     }
 
-    if (res == GTK_RESPONSE_OK) system ("reboot");
+    if (res == GTK_RESPONSE_OK) vsystem ("reboot");
     return 0;
 }
 
