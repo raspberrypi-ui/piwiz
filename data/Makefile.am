@@ -5,7 +5,7 @@ ui_in_files = 	piwiz.ui \
 	
 ui_DATA = $(ui_in_files)
 
-desktopdir=$(datadir)/applications
+desktopdir=/etc/xdg/autostart
 
 desktop_in_files= \
 	piwiz.desktop.in \

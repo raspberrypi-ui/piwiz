@@ -778,8 +778,11 @@ static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int page
                             gtk_widget_set_visible (skip_btn, TRUE);
                             break;
 
-        case PAGE_UPDATE :
         case PAGE_WIFIPSK : gtk_widget_set_visible (skip_btn, TRUE);
+                            gtk_entry_set_text (GTK_ENTRY (psk_te), "");
+                            break;
+
+        case PAGE_UPDATE :  gtk_widget_set_visible (skip_btn, TRUE);
                             break;
     }
 }
