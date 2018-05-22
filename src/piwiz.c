@@ -44,8 +44,8 @@ static GtkWidget *pwd_hide, *psk_hide;
 /* Lists for localisation */
 
 GtkListStore *locale_list, *tz_list;
-GtkTreeModelSort *scount, *slang, *scity;
-GtkTreeModelFilter *fcount, *flang, *fcity;
+GtkTreeModelSort *slang, *scity;
+GtkTreeModelFilter *fcount;
 
 /* List of APs */
 
@@ -201,7 +201,10 @@ static void message (char *msg, int wait, int dest_page, int prog, gboolean puls
         gtk_builder_add_from_file (builder, PACKAGE_DATA_DIR "/piwiz.ui", NULL);
 
         msg_dlg = (GtkWidget *) gtk_builder_get_object (builder, "msg");
+        gtk_window_set_modal (GTK_WINDOW (msg_dlg), TRUE);
         gtk_window_set_transient_for (GTK_WINDOW (msg_dlg), GTK_WINDOW (main_dlg));
+        gtk_window_set_position (GTK_WINDOW (msg_dlg), GTK_WIN_POS_CENTER_ON_PARENT);
+        gtk_window_set_destroy_with_parent (GTK_WINDOW (msg_dlg), TRUE);
 
         wid = (GtkWidget *) gtk_builder_get_object (builder, "msg_eb");
         gdk_color_parse ("#FFFFFF", &col);
@@ -328,6 +331,7 @@ static gpointer set_locale (gpointer data)
 static void read_locales (void)
 {
     char *cname, *lname, *buffer, *cptr, *cptr1, *cptr2;
+    GtkTreeModelSort *scount;
     GtkTreeIter iter;
     FILE *fp;
     int len, ext;
@@ -427,6 +431,7 @@ static gboolean unique_rows (GtkTreeModel *model, GtkTreeIter *iter, gpointer da
 static void country_changed (GtkComboBox *cb, gpointer ptr)
 {
     GtkTreeModel *model;
+    GtkTreeModelFilter *flang, *fcity;
     GtkTreeIter iter;
     char *str;
 
@@ -524,7 +529,7 @@ static void scans_add (char *str, int match, int secure, int signal)
     GdkPixbuf *sec_icon = NULL, *sig_icon = NULL;
     char *icon;
     int dsig;
-    
+
     gtk_list_store_append (ap_list, &iter);
     if (secure)
         sec_icon = gtk_icon_theme_load_icon (gtk_icon_theme_get_default(), "network-wireless-encrypted", 16, 0, NULL);
