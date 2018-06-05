@@ -1,3 +1,30 @@
+/*
+Copyright (c) 2018 Raspberry Pi (Trading) Ltd.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the name of the copyright holder nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -31,6 +58,8 @@
 #define PAGE_WIFIPSK 4
 #define PAGE_UPDATE 5
 #define PAGE_DONE 6
+
+#define LABEL_WIDTH(name, w) {GtkWidget *l = (GtkWidget *) gtk_builder_get_object (builder, name); gtk_widget_set_size_request (l, w, -1);}
 
 /* Controls */
 
@@ -1064,6 +1093,21 @@ int main (int argc, char *argv[])
     gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (ap_tv), 2, "Signal", col, "pixbuf", 2, NULL);
     gtk_tree_view_column_set_sizing (gtk_tree_view_get_column (GTK_TREE_VIEW (ap_tv), 2), GTK_TREE_VIEW_COLUMN_FIXED);
     gtk_tree_view_column_set_fixed_width (gtk_tree_view_get_column (GTK_TREE_VIEW (ap_tv), 2), 30);
+
+    // GTK word wrapping is great; no, really; I'm not being sarcastic. Honest. Why don't you believe me?
+    res = 480;
+    LABEL_WIDTH ("p0label", res);
+    LABEL_WIDTH ("p1info", res);
+    LABEL_WIDTH ("p2info", res);
+    LABEL_WIDTH ("p3info", res);
+    LABEL_WIDTH ("p4info", res);
+    LABEL_WIDTH ("p5info", res);
+    LABEL_WIDTH ("p6info", res);
+    LABEL_WIDTH ("p1prompt", res);
+    LABEL_WIDTH ("p2prompt", res);
+    LABEL_WIDTH ("p3prompt", res);
+    LABEL_WIDTH ("p4prompt", res);
+    LABEL_WIDTH ("p6prompt", res);
 
     res = gtk_dialog_run (GTK_DIALOG (main_dlg));
 
