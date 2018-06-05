@@ -99,8 +99,9 @@ static char *get_string (char *cmd);
 static char *get_quoted_param (char *path, char *fname, char *toseek);
 static int vsystem (const char *fmt, ...);
 static void message (char *msg, int wait, int dest_page, int prog, gboolean pulse);
+static void hide_message (void);
 static gboolean ok_clicked (GtkButton *button, gpointer data);
-static gboolean close_msg (gpointer data);
+static gboolean loc_done (gpointer data);
 static gpointer set_locale (gpointer data);
 static void read_locales (void);
 static gboolean unique_rows (GtkTreeModel *model, GtkTreeIter *iter, gpointer data);
@@ -246,6 +247,10 @@ static void message (char *msg, int wait, int dest_page, int prog, gboolean puls
 
         gtk_label_set_text (GTK_LABEL (msg_msg), msg);
 
+        gtk_widget_set_sensitive (prev_btn, FALSE);
+        gtk_widget_set_sensitive (next_btn, FALSE);
+        gtk_widget_set_sensitive (skip_btn, FALSE);
+
         gtk_widget_show_all (msg_dlg);
         g_object_unref (builder);
     }
@@ -279,18 +284,25 @@ static void message (char *msg, int wait, int dest_page, int prog, gboolean puls
     }
 }
 
-static gboolean ok_clicked (GtkButton *button, gpointer data)
+static void hide_message (void)
 {
     gtk_widget_destroy (GTK_WIDGET (msg_dlg));
     msg_dlg = NULL;
+    gtk_widget_set_sensitive (prev_btn, TRUE);
+    gtk_widget_set_sensitive (next_btn, TRUE);
+    gtk_widget_set_sensitive (skip_btn, TRUE);
+}
+
+static gboolean ok_clicked (GtkButton *button, gpointer data)
+{
+    hide_message ();
     if (data) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), (int) data);
     return FALSE;
 }
 
-static gboolean close_msg (gpointer data)
+static gboolean loc_done (gpointer data)
 {
-    gtk_widget_destroy (GTK_WIDGET (msg_dlg));
-    msg_dlg = NULL;
+    hide_message ();
     gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
     return FALSE;
 }
@@ -354,7 +366,7 @@ static gpointer set_locale (gpointer data)
     g_free (city);
     g_free (ext);
 
-    g_idle_add (close_msg, NULL);
+    g_idle_add (loc_done, NULL);
     return NULL;
 }
 
@@ -602,8 +614,7 @@ void connect_success (void)
     {
         gtk_timeout_remove (conn_timeout);
         conn_timeout = 0;
-        gtk_widget_destroy (GTK_WIDGET (msg_dlg));
-        msg_dlg = NULL;
+        hide_message ();
         gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
     }
 }
@@ -611,8 +622,7 @@ void connect_success (void)
 static gint connect_failure (gpointer data)
 {
     conn_timeout = 0;
-    gtk_widget_destroy (GTK_WIDGET (msg_dlg));
-    msg_dlg = NULL;
+    hide_message ();
     message (_("Failed to connect to network."), 1, 0, -1, FALSE);
     return FALSE;
 }
