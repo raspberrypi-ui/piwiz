@@ -759,24 +759,24 @@ static gpointer refresh_update_cache (gpointer data)
 
 static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int pagenum, gpointer data)
 {
-    gtk_button_set_label (GTK_BUTTON (next_btn), _("Next"));
-    gtk_button_set_label (GTK_BUTTON (prev_btn), _("Back"));
+    gtk_button_set_label (GTK_BUTTON (next_btn), _("_Next"));
+    gtk_button_set_label (GTK_BUTTON (prev_btn), _("_Back"));
     gtk_widget_set_visible (skip_btn, FALSE);
 
     switch (pagenum)
     {
-        case PAGE_INTRO :   gtk_button_set_label (GTK_BUTTON (prev_btn), _("Cancel"));
+        case PAGE_INTRO :   gtk_button_set_label (GTK_BUTTON (prev_btn), _("_Cancel"));
                             break;
 
         case PAGE_DONE :    if (reboot)
                             {
                                 gtk_widget_show (prompt);
-                                gtk_button_set_label (GTK_BUTTON (next_btn), _("Reboot"));
+                                gtk_button_set_label (GTK_BUTTON (next_btn), _("_Reboot"));
                             }
                             else
                             {
                                 gtk_widget_hide (prompt);
-                                gtk_button_set_label (GTK_BUTTON (next_btn), _("Done"));
+                                gtk_button_set_label (GTK_BUTTON (next_btn), _("_Done"));
                             }
                             break;
 
