@@ -37,7 +37,7 @@
 static GtkWidget *main_dlg, *msg_dlg, *msg_msg, *msg_pb, *msg_btn;
 static GtkWidget *wizard_nb, *next_btn, *prev_btn, *skip_btn;
 static GtkWidget *country_cb, *language_cb, *timezone_cb;
-static GtkWidget *ap_tv, *psk_label;
+static GtkWidget *ap_tv, *psk_label, *prompt;
 static GtkWidget *pwd1_te, *pwd2_te, *psk_te;
 static GtkWidget *pwd_hide, *psk_hide;
 
@@ -57,6 +57,7 @@ char *wifi_if, *init_country, *init_lang, *init_kb, *init_tz;
 char *cc, *lc, *city, *ext;
 char *ssid;
 gint conn_timeout = 0, pulse_timer = 0;
+gboolean reboot;
 
 /* In dhcpcd-gtk/main.c */
 
@@ -722,6 +723,7 @@ static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
 
     if (array->len > 0)
     {
+        reboot = TRUE;
         message (_("Getting updates - please wait..."), 0, 0, -1, FALSE);
         pk_task_update_packages_async (task, pk_package_sack_get_ids (sack), NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) do_updates_done, NULL);
     }
@@ -766,7 +768,16 @@ static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int page
         case PAGE_INTRO :   gtk_button_set_label (GTK_BUTTON (prev_btn), _("Cancel"));
                             break;
 
-        case PAGE_DONE :    gtk_button_set_label (GTK_BUTTON (next_btn), _("Reboot"));
+        case PAGE_DONE :    if (reboot)
+                            {
+                                gtk_widget_show (prompt);
+                                gtk_button_set_label (GTK_BUTTON (next_btn), _("Reboot"));
+                            }
+                            else
+                            {
+                                gtk_widget_hide (prompt);
+                                gtk_button_set_label (GTK_BUTTON (next_btn), _("Done"));
+                            }
                             break;
 
         case PAGE_WIFIAP :  if (!con)
@@ -816,6 +827,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             if (g_strcmp0 (init_tz, city) || g_strcmp0 (init_country, cc)
                                 || g_strcmp0 (init_lang, lc) || g_ascii_strcasecmp (init_kb, cc))
                             {
+                                reboot = TRUE;
                                 message (_("Setting locale - please wait..."), 0, 0, -1, TRUE);
                                 g_thread_new (NULL, set_locale, NULL);
                             }
@@ -957,6 +969,7 @@ int main (int argc, char *argv[])
     textdomain ( GETTEXT_PACKAGE );
 #endif
 
+    reboot = FALSE;
     read_inits ();
 
     // GTK setup
@@ -992,6 +1005,7 @@ int main (int argc, char *argv[])
     pwd2_te = (GtkWidget *) gtk_builder_get_object (builder, "p2pwd2");
     psk_te = (GtkWidget *) gtk_builder_get_object (builder, "p4psk");
     psk_label = (GtkWidget *) gtk_builder_get_object (builder, "p4info");
+    prompt = (GtkWidget *) gtk_builder_get_object (builder, "p6prompt");
 
     pwd_hide = (GtkWidget *) gtk_builder_get_object (builder, "p2check");
     g_signal_connect (pwd_hide, "toggled", G_CALLBACK (pwd_toggle), NULL);
@@ -1061,7 +1075,7 @@ int main (int argc, char *argv[])
         vsystem ("rm /etc/xdg/autostart/piwiz.desktop");
     }
 
-    if (res == GTK_RESPONSE_OK) vsystem ("reboot");
+    if (res == GTK_RESPONSE_OK && reboot) vsystem ("reboot");
     return 0;
 }
 
