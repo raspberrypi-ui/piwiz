@@ -97,8 +97,8 @@ msgid "_Done"
 msgstr "_Done"
 
 #: ../src/piwiz.c:870
-msgid "Setting locale - please wait..."
-msgstr "Setting locale - please wait..."
+msgid "Setting location - please wait..."
+msgstr "Setting location - please wait..."
 
 #: ../src/piwiz.c:882
 msgid "The two passwords entered do not match."

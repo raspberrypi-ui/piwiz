@@ -312,6 +312,7 @@ static gboolean loc_done (gpointer data)
 static gpointer set_locale (gpointer data)
 {
     FILE *fp;
+    char *ccc;
     
     // set timezone
     if (g_strcmp0 (init_tz, city))
@@ -319,6 +320,8 @@ static gpointer set_locale (gpointer data)
         fp = fopen ("/etc/timezone", "wb");
         fprintf (fp, "%s\n", city);
         fclose (fp);
+        vsystem ("rm /etc/localtime");
+        vsystem ("dpkg-reconfigure --frontend noninteractive tzdata");
         if (init_tz)
         {
             g_free (init_tz);
@@ -329,7 +332,8 @@ static gpointer set_locale (gpointer data)
     // set keyboard
     if (g_ascii_strcasecmp (init_kb, cc))
     {
-        char *ccc = g_ascii_strdown (cc, -1);
+        reboot = TRUE;
+        ccc = g_ascii_strdown (cc, -1);
         fp = fopen ("/etc/default/keyboard", "wb");
         fprintf (fp, "XKBMODEL=pc105\nXKBLAYOUT=%s\nXKBVARIANT=\nXKBOPTIONS=\nBACKSPACE=guess", ccc);
         fclose (fp);
@@ -345,6 +349,7 @@ static gpointer set_locale (gpointer data)
     // set locale
     if (g_strcmp0 (init_country, cc) || g_strcmp0 (init_lang, lc))
     {
+        reboot = TRUE;
         vsystem ("sed -i /etc/locale.gen -e 's/^\\([^#].*\\)/# \\1/g'");
         vsystem ("sed -i /etc/locale.gen -e 's/^# \\(%s_%s[\\. ].*UTF-8\\)/\\1/g'", lc, cc);
         vsystem ("locale-gen");
@@ -866,8 +871,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             if (g_strcmp0 (init_tz, city) || g_strcmp0 (init_country, cc)
                                 || g_strcmp0 (init_lang, lc) || g_ascii_strcasecmp (init_kb, cc))
                             {
-                                reboot = TRUE;
-                                message (_("Setting locale - please wait..."), 0, 0, -1, TRUE);
+                                message (_("Setting location - please wait..."), 0, 0, -1, TRUE);
                                 g_thread_new (NULL, set_locale, NULL);
                             }
                             else gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
