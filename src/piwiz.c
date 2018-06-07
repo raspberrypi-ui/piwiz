@@ -82,7 +82,7 @@ GtkListStore *ap_list;
 
 /* Globals */
 
-char *wifi_if, *init_country, *init_lang, *init_kb, *init_tz;
+char *wifi_if, *init_country, *init_lang, *init_kb, *init_var, *init_tz;
 char *cc, *lc, *city, *ext;
 char *ssid;
 gint conn_timeout = 0, pulse_timer = 0;
@@ -312,7 +312,9 @@ static gboolean loc_done (gpointer data)
 static gpointer set_locale (gpointer data)
 {
     FILE *fp;
-    char *ccc;
+    char *ccc, *buffer, *cptr, *var;
+    int siz;
+    gboolean in_list, var_match;
     
     // set timezone
     if (g_strcmp0 (init_tz, city))
@@ -330,20 +332,60 @@ static gpointer set_locale (gpointer data)
     }
 
     // set keyboard
-    if (g_ascii_strcasecmp (init_kb, cc))
+    ccc = g_ascii_strdown (cc, -1);
+
+    // parse the database file to find variants for this layout
+    buffer = g_strdup_printf ("    '%s'", ccc);
+    cptr = NULL;
+    in_list = FALSE;
+    var_match = FALSE;
+    fp = fopen ("/usr/share/console-setup/KeyboardNames.pl", "rb");
+    while (getline (&cptr, &siz, fp) > 0)
+    {
+        if (in_list)
+        {
+            if (cptr[4] == '}') break;
+            else
+            {
+                strtok (cptr, "'");
+                strtok (NULL, "'");
+                strtok (NULL, "'");
+                var = strtok (NULL, "'");
+                strtok (NULL, "'");
+                if (in_list == TRUE && !g_strcmp0 (var, lc))
+                {
+                    var_match = TRUE;
+                    break;
+                }
+            }
+        }
+        if (!strncmp (buffer, cptr, strlen (buffer))) in_list = TRUE;
+    }
+    if (var_match)
+        var = g_strdup (lc);
+    else
+        var = g_strdup ("");
+    fclose (fp);
+    g_free (cptr);
+    g_free (buffer);
+
+    if (g_ascii_strcasecmp (init_kb, cc) || g_strcmp0 (init_var, var))
     {
         reboot = TRUE;
-        ccc = g_ascii_strdown (cc, -1);
         fp = fopen ("/etc/default/keyboard", "wb");
-        fprintf (fp, "XKBMODEL=pc105\nXKBLAYOUT=%s\nXKBVARIANT=\nXKBOPTIONS=\nBACKSPACE=guess", ccc);
+        fprintf (fp, "XKBMODEL=pc105\nXKBLAYOUT=%s\nXKBVARIANT=%s\nXKBOPTIONS=\nBACKSPACE=guess", ccc, var);
         fclose (fp);
-        vsystem ("setxkbmap -layout %s -variant \"\" -option \"\"", ccc);
+        vsystem ("setxkbmap -layout %s -variant \"%s\" -option \"\"", ccc, var);
         if (init_kb)
         {
             g_free (init_kb);
             init_kb = g_strdup (ccc);
         }
-        g_free (ccc);
+        if (init_var)
+        {
+            g_free (init_var);
+            init_var = g_strdup (var);
+        }
     }
 
     // set locale
@@ -366,6 +408,8 @@ static gpointer set_locale (gpointer data)
         }
     }
 
+    g_free (ccc);
+    g_free (var);
     g_free (cc);
     g_free (lc);
     g_free (city);
@@ -532,6 +576,7 @@ static void read_inits (void)
     wifi_if = get_string ("for dir in /sys/class/net/*/wireless; do if [ -d \"$dir\" ] ; then basename \"$(dirname \"$dir\")\" ; fi ; done | head -n 1");
     init_tz = get_string ("cat /etc/timezone");
     init_kb = get_string ("grep XKBLAYOUT /etc/default/keyboard | cut -d = -f 2 | tr -d '\"'");
+    init_kb = get_string ("grep XKBVARIANT /etc/default/keyboard | cut -d = -f 2 | tr -d '\"'");
     buffer = get_string ("grep LC_ALL /etc/default/locale | cut -d = -f 2");
     if (!buffer) buffer = get_string ("grep LANGUAGE /etc/default/locale | cut -d = -f 2");
     if (!buffer) buffer = get_string ("grep LANG /etc/default/locale | cut -d = -f 2");
