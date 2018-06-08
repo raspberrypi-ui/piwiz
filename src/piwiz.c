@@ -140,7 +140,7 @@ static char *get_string (char *cmd)
     int len = 0;
     FILE *fp = popen (cmd, "r");
 
-    if (fp == NULL) return NULL;
+    if (fp == NULL) return g_strdup ("");
     if (getline (&line, &len, fp) > 0)
     {
         res = line;
@@ -149,7 +149,7 @@ static char *get_string (char *cmd)
     }
     pclose (fp);
     g_free (line);
-    return res;
+    return res ? res : g_strdup ("");
 }
 
 static char *get_quoted_param (char *path, char *fname, char *toseek)
@@ -578,9 +578,9 @@ static void read_inits (void)
     init_kb = get_string ("grep XKBLAYOUT /etc/default/keyboard | cut -d = -f 2 | tr -d '\"\n'");
     init_var = get_string ("grep XKBVARIANT /etc/default/keyboard | cut -d = -f 2 | tr -d '\"\n'");
     buffer = get_string ("grep LC_ALL /etc/default/locale | cut -d = -f 2");
-    if (!buffer) buffer = get_string ("grep LANGUAGE /etc/default/locale | cut -d = -f 2");
-    if (!buffer) buffer = get_string ("grep LANG /etc/default/locale | cut -d = -f 2");
-    if (buffer)
+    if (!buffer[0]) buffer = get_string ("grep LANGUAGE /etc/default/locale | cut -d = -f 2");
+    if (!buffer[0]) buffer = get_string ("grep LANG /etc/default/locale | cut -d = -f 2");
+    if (buffer[0])
     {
         lc = strtok (buffer, "_");
         cc = strtok (NULL, ". ");
@@ -1130,8 +1130,8 @@ int main (int argc, char *argv[])
 
     // initialise the country combo
     g_signal_connect (country_cb, "changed", G_CALLBACK (country_changed), NULL);
-    set_init (GTK_TREE_MODEL (fcount), country_cb, 1, init_country[0] ? init_country : "GB");
-    set_init (GTK_TREE_MODEL (slang), language_cb, 0, init_lang[0] ? init_lang : "en");
+    set_init (GTK_TREE_MODEL (fcount), country_cb, 1, init_country ? init_country : "GB");
+    set_init (GTK_TREE_MODEL (slang), language_cb, 0, init_lang ? init_lang : "en");
     set_init (GTK_TREE_MODEL (scity), timezone_cb, 0, init_tz[0] ? init_tz : "Europe/London");
 
     gtk_widget_show_all (GTK_WIDGET (country_cb));
