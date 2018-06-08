@@ -369,7 +369,7 @@ static gpointer set_locale (gpointer data)
     g_free (cptr);
     g_free (buffer);
 
-    if (g_ascii_strcasecmp (init_kb, cc) || g_strcmp0 (init_var, var))
+    if (g_strcmp0 (init_kb, ccc) || g_strcmp0 (init_var, var))
     {
         reboot = TRUE;
         fp = fopen ("/etc/default/keyboard", "wb");
@@ -575,8 +575,8 @@ static void read_inits (void)
 
     wifi_if = get_string ("for dir in /sys/class/net/*/wireless; do if [ -d \"$dir\" ] ; then basename \"$(dirname \"$dir\")\" ; fi ; done | head -n 1");
     init_tz = get_string ("cat /etc/timezone");
-    init_kb = get_string ("grep XKBLAYOUT /etc/default/keyboard | cut -d = -f 2 | tr -d '\"'");
-    init_kb = get_string ("grep XKBVARIANT /etc/default/keyboard | cut -d = -f 2 | tr -d '\"'");
+    init_kb = get_string ("grep XKBLAYOUT /etc/default/keyboard | cut -d = -f 2 | tr -d '\"\n'");
+    init_var = get_string ("grep XKBVARIANT /etc/default/keyboard | cut -d = -f 2 | tr -d '\"\n'");
     buffer = get_string ("grep LC_ALL /etc/default/locale | cut -d = -f 2");
     if (!buffer) buffer = get_string ("grep LANGUAGE /etc/default/locale | cut -d = -f 2");
     if (!buffer) buffer = get_string ("grep LANG /etc/default/locale | cut -d = -f 2");
