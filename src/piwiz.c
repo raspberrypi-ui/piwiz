@@ -909,9 +909,12 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             gtk_tree_model_get (model, &iter, 0, &city, -1);
 
                             // set wifi country - this is quick, so no need for warning
-                            vsystem ("wpa_cli -i %s set country %s >> /dev/null", wifi_if, cc);
-                            vsystem ("iw reg set %s", cc);
-                            vsystem ("wpa_cli -i %s save_config >> /dev/null", wifi_if);
+                            if (wifi_if[0])
+                            {
+                                vsystem ("wpa_cli -i %s set country %s >> /dev/null", wifi_if, cc);
+                                vsystem ("iw reg set %s", cc);
+                                vsystem ("wpa_cli -i %s save_config >> /dev/null", wifi_if);
+                            }
 
                             if (g_strcmp0 (init_tz, city) || g_strcmp0 (init_country, cc)
                                 || g_strcmp0 (init_lang, lc) || g_ascii_strcasecmp (init_kb, cc))
