@@ -180,6 +180,9 @@ then
     sysconfdir=/etc
 fi
 
+AC_DEFINE([HAVE_STRVERSCMP], [1], [Has strverscmp function])
+AC_DEFINE([strlcpy(dst, src, n)],[((size_t)snprintf(dst, n, "%s", src))],[Replacement strlcpy function])
+
 AC_CONFIG_FILES([
     Makefile
     src/Makefile
