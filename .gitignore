@@ -19,6 +19,7 @@ config.sub
 Makefile
 Makefile.in
 POTFILES
+LINGUAS
 po/.intltool-merge-cache
 po/stamp-it
 aclocal.m4
@@ -34,4 +35,10 @@ stamp-h1
 .libs/
 autom4te.cache/
 m4/
+autoreconf.*
+*.substvars
+debian/files
+debian/debhelper-build-stamp
+debian/.debhelper/
+debian/piwiz/
 piwiz
