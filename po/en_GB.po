@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: piwiz 1.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-05 14:19+0100\n"
+"POT-Creation-Date: 2018-06-26 15:16+0100\n"
 "PO-Revision-Date: 2018-06-05 14:19+0100\n"
 "Last-Translator: Simon Long <simon@raspberrypi.org>\n"
 "Language-Team: English (British)\n"
@@ -17,27 +17,27 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../src/piwiz.c:606 ../src/piwiz.c:826
+#: ../src/piwiz.c:656 ../src/piwiz.c:876
 msgid "Searching for networks - please wait..."
 msgstr "Searching for networks - please wait..."
 
-#: ../src/piwiz.c:626
+#: ../src/piwiz.c:676
 msgid "Failed to connect to network."
 msgstr "Failed to connect to network."
 
-#: ../src/piwiz.c:709
+#: ../src/piwiz.c:759
 msgid "Reading update list - please wait..."
 msgstr "Reading update list - please wait..."
 
-#: ../src/piwiz.c:711
+#: ../src/piwiz.c:761
 msgid "Downloading updates - please wait..."
 msgstr "Downloading updates - please wait..."
 
-#: ../src/piwiz.c:718
+#: ../src/piwiz.c:768
 msgid "Installing updates - please wait..."
 msgstr "Installing updates - please wait..."
 
-#: ../src/piwiz.c:735
+#: ../src/piwiz.c:785
 #, c-format
 msgid ""
 "Error getting updates.\n"
@@ -46,11 +46,11 @@ msgstr ""
 "Error getting updates.\n"
 "%s"
 
-#: ../src/piwiz.c:742 ../src/piwiz.c:769
+#: ../src/piwiz.c:792 ../src/piwiz.c:819
 msgid "System is up to date"
 msgstr "System is up to date"
 
-#: ../src/piwiz.c:752
+#: ../src/piwiz.c:802
 #, c-format
 msgid ""
 "Error comparing versions.\n"
@@ -59,11 +59,11 @@ msgstr ""
 "Error comparing versions.\n"
 "%s"
 
-#: ../src/piwiz.c:766
+#: ../src/piwiz.c:816
 msgid "Getting updates - please wait..."
 msgstr "Getting updates - please wait..."
 
-#: ../src/piwiz.c:779
+#: ../src/piwiz.c:829
 #, c-format
 msgid ""
 "Error checking for updates.\n"
@@ -72,64 +72,64 @@ msgstr ""
 "Error checking for updates.\n"
 "%s"
 
-#: ../src/piwiz.c:786
+#: ../src/piwiz.c:836
 msgid "Comparing versions - please wait..."
 msgstr "Comparing versions - please wait..."
 
-#: ../src/piwiz.c:801 ../data/piwiz.ui.h:5
+#: ../src/piwiz.c:851 ../data/piwiz.ui.h:5
 msgid "_Next"
 msgstr "_Next"
 
-#: ../src/piwiz.c:802
+#: ../src/piwiz.c:852
 msgid "_Back"
 msgstr "_Back"
 
-#: ../src/piwiz.c:807 ../data/piwiz.ui.h:3
+#: ../src/piwiz.c:857 ../data/piwiz.ui.h:3
 msgid "_Cancel"
 msgstr "_Cancel"
 
-#: ../src/piwiz.c:813
+#: ../src/piwiz.c:863
 msgid "_Reboot"
 msgstr "_Reboot"
 
-#: ../src/piwiz.c:818
+#: ../src/piwiz.c:868
 msgid "_Done"
 msgstr "_Done"
 
-#: ../src/piwiz.c:870
+#: ../src/piwiz.c:922
 msgid "Setting location - please wait..."
 msgstr "Setting location - please wait..."
 
-#: ../src/piwiz.c:882
+#: ../src/piwiz.c:934
 msgid "The two passwords entered do not match."
 msgstr "The two passwords entered do not match."
 
-#: ../src/piwiz.c:901
+#: ../src/piwiz.c:953
 #, c-format
 msgid "Enter the password for the WiFi network \"%s\"."
 msgstr "Enter the password for the WiFi network \"%s\"."
 
-#: ../src/piwiz.c:910 ../src/piwiz.c:921
+#: ../src/piwiz.c:962 ../src/piwiz.c:973
 msgid "Connecting to WiFi network - please wait..."
 msgstr "Connecting to WiFi network - please wait..."
 
-#: ../src/piwiz.c:913 ../src/piwiz.c:924
+#: ../src/piwiz.c:965 ../src/piwiz.c:976
 msgid "Could not connect to this network"
 msgstr "Could not connect to this network"
 
-#: ../src/piwiz.c:930
+#: ../src/piwiz.c:982
 msgid "Checking for updates - please wait..."
 msgstr "Checking for updates - please wait..."
 
-#: ../src/piwiz.c:1069
+#: ../src/piwiz.c:1121
 msgid "Set the country in which you are using your Pi"
 msgstr "Set the country in which you are using your Pi"
 
-#: ../src/piwiz.c:1070
+#: ../src/piwiz.c:1122
 msgid "Set the language in which applications should appear"
 msgstr "Set the language in which applications should appear"
 
-#: ../src/piwiz.c:1071
+#: ../src/piwiz.c:1123
 msgid "Set the closest city to your location"
 msgstr "Set the closest city to your location"
 
@@ -371,8 +371,12 @@ msgid "<b>Check For Updates</b>"
 msgstr "<b>Check For Updates</b>"
 
 #: ../data/piwiz.ui.h:36
-msgid "Press 'Next' to check that Raspbian is up to date."
-msgstr "Press 'Next' to check that Raspbian is up to date."
+msgid ""
+"Press 'Next' to check that Raspbian is up to date, or 'Skip' to continue "
+"without checking."
+msgstr ""
+"Press 'Next' to check that Raspbian is up to date, or 'Skip' to continue "
+"without checking."
 
 #: ../data/piwiz.ui.h:37
 msgid "<b>Setup Complete</b>"
