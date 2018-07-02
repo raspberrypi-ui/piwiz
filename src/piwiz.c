@@ -123,6 +123,7 @@ static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int page
 static void next_page (GtkButton* btn, gpointer ptr);
 static void prev_page (GtkButton* btn, gpointer ptr);
 static void skip_page (GtkButton* btn, gpointer ptr);
+static gboolean show_ip (void);
 
 /* Helpers */
 
@@ -1044,6 +1045,24 @@ static void psk_toggle (GtkButton *btn, gpointer ptr)
     }
 }
 
+static gboolean show_ip (void)
+{
+    char *ip, *buf;
+
+    // display the ip address on the first page
+    ip = get_string ("ifconfig eth0 | grep inet[^6] | tr -s ' ' | cut -d ' ' -f 3");
+    if (ip && strlen (ip))
+    {
+        buf = g_strdup_printf ("<span font_desc=\"10.0\">IP : %s</span>", ip);
+        gtk_label_set_markup (GTK_LABEL (ip_label), buf);
+        g_free (buf);
+        g_free (ip);
+        return FALSE;
+    }
+    g_free (ip);
+    return TRUE;
+}
+
 /* The dialog... */
 
 int main (int argc, char *argv[])
@@ -1052,7 +1071,6 @@ int main (int argc, char *argv[])
     GtkWidget *wid;
     GtkCellRenderer *col;
     int res;
-    char *ip, *buf;
 
 #ifdef ENABLE_NLS
     setlocale (LC_ALL, "");
@@ -1173,12 +1191,8 @@ int main (int argc, char *argv[])
     LABEL_WIDTH ("p4prompt", res);
     LABEL_WIDTH ("p6prompt", res);
 
-    // display the ip address on the first page
-    ip = get_string ("ifconfig eth0 | grep inet[^6] | tr -s ' ' | cut -d ' ' -f 3");
-    buf = g_strdup_printf ("<span font_desc=\"10.0\">IP : %s</span>", ip);
-    gtk_label_set_markup (GTK_LABEL (ip_label), buf);
-    g_free (buf);
-    g_free (ip);
+    /* start timed event to detect IP address being available */
+    g_timeout_add (1000, (GSourceFunc) show_ip, NULL);
 
     res = gtk_dialog_run (GTK_DIALOG (main_dlg));
 
