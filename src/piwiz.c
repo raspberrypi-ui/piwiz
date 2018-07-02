@@ -66,7 +66,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static GtkWidget *main_dlg, *msg_dlg, *msg_msg, *msg_pb, *msg_btn;
 static GtkWidget *wizard_nb, *next_btn, *prev_btn, *skip_btn;
 static GtkWidget *country_cb, *language_cb, *timezone_cb;
-static GtkWidget *ap_tv, *psk_label, *prompt;
+static GtkWidget *ap_tv, *psk_label, *prompt, *ip_label;
 static GtkWidget *pwd1_te, *pwd2_te, *psk_te;
 static GtkWidget *pwd_hide, *psk_hide;
 
@@ -1052,6 +1052,7 @@ int main (int argc, char *argv[])
     GtkWidget *wid;
     GtkCellRenderer *col;
     int res;
+    char *ip, *buf;
 
 #ifdef ENABLE_NLS
     setlocale (LC_ALL, "");
@@ -1092,6 +1093,7 @@ int main (int argc, char *argv[])
     skip_btn = (GtkWidget *) gtk_builder_get_object (builder, "skip_btn");
     g_signal_connect (skip_btn, "clicked", G_CALLBACK (skip_page), NULL);
 
+    ip_label = (GtkWidget *) gtk_builder_get_object (builder, "p0ip");
     pwd1_te = (GtkWidget *) gtk_builder_get_object (builder, "p2pwd1");
     pwd2_te = (GtkWidget *) gtk_builder_get_object (builder, "p2pwd2");
     psk_te = (GtkWidget *) gtk_builder_get_object (builder, "p4psk");
@@ -1170,6 +1172,13 @@ int main (int argc, char *argv[])
     LABEL_WIDTH ("p3prompt", res);
     LABEL_WIDTH ("p4prompt", res);
     LABEL_WIDTH ("p6prompt", res);
+
+    // display the ip address on the first page
+    ip = get_string ("ifconfig eth0 | grep inet[^6] | tr -s ' ' | cut -d ' ' -f 3");
+    buf = g_strdup_printf ("<span font_desc=\"10.0\">IP : %s</span>", ip);
+    gtk_label_set_markup (GTK_LABEL (ip_label), buf);
+    g_free (buf);
+    g_free (ip);
 
     res = gtk_dialog_run (GTK_DIALOG (main_dlg));
 
