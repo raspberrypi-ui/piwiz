@@ -315,7 +315,7 @@ static gpointer set_locale (gpointer data)
     FILE *fp;
     char *ccc, *buffer, *cptr, *var;
     int siz;
-    gboolean in_list, var_match;
+    gboolean in_list, var_match, cc_match;
     
     // set timezone
     if (g_strcmp0 (init_tz, city))
@@ -340,6 +340,7 @@ static gpointer set_locale (gpointer data)
     cptr = NULL;
     in_list = FALSE;
     var_match = FALSE;
+    cc_match = FALSE;
     fp = fopen ("/usr/share/console-setup/KeyboardNames.pl", "rb");
     while (getline (&cptr, &siz, fp) > 0)
     {
@@ -360,12 +361,21 @@ static gpointer set_locale (gpointer data)
                 }
             }
         }
-        if (!strncmp (buffer, cptr, strlen (buffer))) in_list = TRUE;
+        if (!strncmp (buffer, cptr, strlen (buffer)))
+        {
+            in_list = TRUE;
+            cc_match = TRUE;
+        }
     }
     if (var_match)
         var = g_strdup (lc);
     else
         var = g_strdup ("");
+    if (!cc_match)
+    {
+        g_free (ccc);
+        ccc = g_strdup ("");
+    }
     fclose (fp);
     g_free (cptr);
     g_free (buffer);
