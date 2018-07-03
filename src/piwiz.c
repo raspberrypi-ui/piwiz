@@ -88,6 +88,14 @@ char *ssid;
 gint conn_timeout = 0, pulse_timer = 0;
 gboolean reboot;
 
+/* Map from country code to keyboard */
+
+static const char keyboard_map[][6] = {
+    "ar", "latam",
+    "ae", "ara",
+    ""
+};
+
 /* In dhcpcd-gtk/main.c */
 
 void init_dhcpcd (void);
@@ -102,6 +110,7 @@ static void message (char *msg, int wait, int dest_page, int prog, gboolean puls
 static void hide_message (void);
 static gboolean ok_clicked (GtkButton *button, gpointer data);
 static gboolean loc_done (gpointer data);
+static void lookup_keyboard (char *country, char *language, char **layout, char **variant);
 static gpointer set_locale (gpointer data);
 static void read_locales (void);
 static gboolean unique_rows (GtkTreeModel *model, GtkTreeIter *iter, gpointer data);
@@ -310,13 +319,85 @@ static gboolean loc_done (gpointer data)
 
 /* Internationalisation */
 
+static void lookup_keyboard (char *country, char *language, char **layout, char **variant)
+{
+    FILE *fp;
+    char *ccc, *var, *cptr, *buffer;
+    int n;
+    gboolean in_list, var_match, cc_match;
+
+    // set keyboard
+    ccc = g_ascii_strdown (country, -1);
+
+    // lookup keyboard mapping for this code, if any
+    n = 0;
+    while (1)
+    {
+        if (*keyboard_map[n * 2] == 0) break;
+        if (!g_strcmp0 (ccc, keyboard_map[n * 2]))
+        {
+            g_free (ccc);
+            ccc = g_strdup (keyboard_map[n * 2 + 1]);
+            break;
+        }
+        n++;
+    }
+
+    // parse the database file to find variants for this layout, if any
+    buffer = g_strdup_printf ("    '%s'", ccc);
+    cptr = NULL;
+    n = 0;
+    in_list = FALSE;
+    var_match = FALSE;
+    cc_match = FALSE;
+    fp = fopen ("/usr/share/console-setup/KeyboardNames.pl", "rb");
+    while (getline (&cptr, &n, fp) > 0)
+    {
+        if (in_list)
+        {
+            if (cptr[4] == '}') break;
+            else
+            {
+                strtok (cptr, "'");
+                strtok (NULL, "'");
+                strtok (NULL, "'");
+                var = strtok (NULL, "'");
+                strtok (NULL, "'");
+                if (in_list == TRUE && !g_strcmp0 (var, language))
+                {
+                    var_match = TRUE;
+                    break;
+                }
+            }
+        }
+        if (!strncmp (buffer, cptr, strlen (buffer)))
+        {
+            in_list = TRUE;
+            cc_match = TRUE;
+        }
+    }
+    fclose (fp);
+    g_free (cptr);
+    g_free (buffer);
+
+    if (cc_match)
+        *layout = g_strdup (ccc);
+    else
+        *layout = g_strdup ("");
+    g_free (ccc);
+
+    if (var_match)
+        *variant = g_strdup (language);
+    else
+        *variant = g_strdup ("");
+}
+
 static gpointer set_locale (gpointer data)
 {
     FILE *fp;
-    char *ccc, *buffer, *cptr, *var;
+    char *lay, *var;
     int siz;
-    gboolean in_list, var_match, cc_match;
-    
+
     // set timezone
     if (g_strcmp0 (init_tz, city))
     {
@@ -333,64 +414,19 @@ static gpointer set_locale (gpointer data)
     }
 
     // set keyboard
-    ccc = g_ascii_strdown (cc, -1);
-
-    // parse the database file to find variants for this layout
-    buffer = g_strdup_printf ("    '%s'", ccc);
-    cptr = NULL;
-    in_list = FALSE;
-    var_match = FALSE;
-    cc_match = FALSE;
-    fp = fopen ("/usr/share/console-setup/KeyboardNames.pl", "rb");
-    while (getline (&cptr, &siz, fp) > 0)
-    {
-        if (in_list)
-        {
-            if (cptr[4] == '}') break;
-            else
-            {
-                strtok (cptr, "'");
-                strtok (NULL, "'");
-                strtok (NULL, "'");
-                var = strtok (NULL, "'");
-                strtok (NULL, "'");
-                if (in_list == TRUE && !g_strcmp0 (var, lc))
-                {
-                    var_match = TRUE;
-                    break;
-                }
-            }
-        }
-        if (!strncmp (buffer, cptr, strlen (buffer)))
-        {
-            in_list = TRUE;
-            cc_match = TRUE;
-        }
-    }
-    if (var_match)
-        var = g_strdup (lc);
-    else
-        var = g_strdup ("");
-    if (!cc_match)
-    {
-        g_free (ccc);
-        ccc = g_strdup ("");
-    }
-    fclose (fp);
-    g_free (cptr);
-    g_free (buffer);
-
-    if (g_strcmp0 (init_kb, ccc) || g_strcmp0 (init_var, var))
+    lookup_keyboard (cc, lc, &lay, &var);
+    printf ("layout = %s variant = %s\n", lay, var);
+    if (g_strcmp0 (init_kb, lay) || g_strcmp0 (init_var, var))
     {
         reboot = TRUE;
         fp = fopen ("/etc/default/keyboard", "wb");
-        fprintf (fp, "XKBMODEL=pc105\nXKBLAYOUT=%s\nXKBVARIANT=%s\nXKBOPTIONS=\nBACKSPACE=guess", ccc, var);
+        fprintf (fp, "XKBMODEL=pc105\nXKBLAYOUT=%s\nXKBVARIANT=%s\nXKBOPTIONS=\nBACKSPACE=guess", lay, var);
         fclose (fp);
-        vsystem ("setxkbmap -layout %s -variant \"%s\" -option \"\"", ccc, var);
+        vsystem ("setxkbmap -layout %s -variant \"%s\" -option \"\"", lay, var);
         if (init_kb)
         {
             g_free (init_kb);
-            init_kb = g_strdup (ccc);
+            init_kb = g_strdup (lay);
         }
         if (init_var)
         {
@@ -419,7 +455,7 @@ static gpointer set_locale (gpointer data)
         }
     }
 
-    g_free (ccc);
+    g_free (lay);
     g_free (var);
     g_free (cc);
     g_free (lc);
