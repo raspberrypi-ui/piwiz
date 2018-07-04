@@ -161,6 +161,7 @@ static int find_line (char **ssid, int *sec);
 void connect_success (void);
 static gint connect_failure (gpointer data);
 static gboolean select_ssid (char *lssid, const char *psk);
+static char *find_psk_for_network (char *ssid);
 static void progress (PkProgress *progress, PkProgressType *type, gpointer data);
 static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data);
 static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data);
@@ -801,10 +802,10 @@ void menu_update_scans (WI_SCAN *wi, DHCPCD_WI_SCAN *scans)
 {
     DHCPCD_WI_SCAN *s;
     char *lssid = NULL;
-    int active;
+    int active, sel;
 
     // get the selected line in the list of SSIDs
-    find_line (&lssid, &active);
+    sel = find_line (&lssid, &active);
 
     // erase the current list
     gtk_list_store_clear (ap_list);
@@ -819,6 +820,9 @@ void menu_update_scans (WI_SCAN *wi, DHCPCD_WI_SCAN *scans)
         if (!g_strcmp0 (lssid, s->ssid)) active = 1;
         else active = 0;
 
+        // is this network already active? - potentially confusing; not convinced this is a good idea... !!!!
+        if (!sel && dhcpcd_wi_associated (wi->interface, s)) active = 1;
+
         // add this SSID to the new list
         scans_add (s->ssid, active, (s->flags & WSF_SECURE) && (s->flags & WSF_PSK), s->strength.value);
     }
@@ -826,6 +830,39 @@ void menu_update_scans (WI_SCAN *wi, DHCPCD_WI_SCAN *scans)
     if (lssid) g_free (lssid);
     dhcpcd_wi_scans_free (wi->scans);
     wi->scans = scans;
+}
+
+static char *find_psk_for_network (char *ssid)
+{
+    FILE *fp;
+    char *line = NULL, *seek, *res, *ret = NULL;
+    int len = 0, state = 0;
+
+    seek = g_strdup_printf ("ssid=\"%s\"", ssid);
+    fp = fopen ("/etc/wpa_supplicant/wpa_supplicant.conf", "rb");
+    if (fp)
+    {
+        while (getline (&line, &len, fp) > 0)
+        {
+            // state : 1 in a network block; 2 in network block with matching ssid; 0 otherwise
+            if (strstr (line, "network={")) state = 1;
+            else if (strstr (line, "}")) state = 0;
+            else if (state)
+            {
+                if (strstr (line, seek)) state = 2;
+                else if (state == 2 && (res = strstr (line, "psk=")))
+                {
+                    strtok (res, "\"");
+                    ret = g_strdup (strtok (NULL, "\""));
+                    break;
+                }
+            }
+        }
+        g_free (line);
+        fclose (fp);
+    }
+    g_free (seek);
+    return ret;
 }
 
 /* Updates */
@@ -964,7 +1001,6 @@ static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int page
                             break;
 
         case PAGE_WIFIPSK : gtk_widget_set_visible (skip_btn, TRUE);
-                            gtk_entry_set_text (GTK_ENTRY (psk_te), "");
                             break;
 
         case PAGE_UPDATE :  gtk_widget_set_visible (skip_btn, TRUE);
@@ -1038,6 +1074,11 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                     text = g_strdup_printf (_("Enter the password for the WiFi network \"%s\"."), ssid);
                                     gtk_label_set_text (GTK_LABEL (psk_label), text);
                                     g_free (text);
+
+                                    text = find_psk_for_network (ssid);
+                                    gtk_entry_set_text (GTK_ENTRY (psk_te), text ? text : "");
+                                    g_free (text);
+
                                     gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIPSK);
                                 }
                                 else
