@@ -421,7 +421,7 @@ static void lookup_keyboard (char *country, char *language, char **layout, char 
     if (cc_match)
         *layout = g_strdup (ccc);
     else
-        *layout = g_strdup ("");
+        *layout = g_strdup ("us");
     g_free (ccc);
 
     if (var_match)
