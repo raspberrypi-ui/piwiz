@@ -390,33 +390,36 @@ static void lookup_keyboard (char *country, char *language, char **layout, char 
     var_match = FALSE;
     cc_match = FALSE;
     fp = fopen ("/usr/share/console-setup/KeyboardNames.pl", "rb");
-    while (getline (&cptr, &n, fp) > 0)
+    if (fp)
     {
-        if (in_list)
+        while (getline (&cptr, &n, fp) > 0)
         {
-            if (cptr[4] == '}') break;
-            else
+            if (in_list)
             {
-                strtok (cptr, "'");
-                strtok (NULL, "'");
-                strtok (NULL, "'");
-                var = strtok (NULL, "'");
-                strtok (NULL, "'");
-                if (in_list == TRUE && !g_strcmp0 (var, language))
+                if (cptr[4] == '}') break;
+                else
                 {
-                    var_match = TRUE;
-                    break;
+                    strtok (cptr, "'");
+                    strtok (NULL, "'");
+                    strtok (NULL, "'");
+                    var = strtok (NULL, "'");
+                    strtok (NULL, "'");
+                    if (in_list == TRUE && !g_strcmp0 (var, language))
+                    {
+                        var_match = TRUE;
+                        break;
+                    }
                 }
             }
+            if (!strncmp (buffer, cptr, strlen (buffer)))
+            {
+                in_list = TRUE;
+                cc_match = TRUE;
+            }
         }
-        if (!strncmp (buffer, cptr, strlen (buffer)))
-        {
-            in_list = TRUE;
-            cc_match = TRUE;
-        }
+        g_free (cptr);
+        fclose (fp);
     }
-    fclose (fp);
-    g_free (cptr);
     g_free (buffer);
 
     if (cc_match)
@@ -441,8 +444,11 @@ static gpointer set_locale (gpointer data)
     if (g_strcmp0 (init_tz, city))
     {
         fp = fopen ("/etc/timezone", "wb");
-        fprintf (fp, "%s\n", city);
-        fclose (fp);
+        if (fp)
+        {
+            fprintf (fp, "%s\n", city);
+            fclose (fp);
+        }
         vsystem ("rm /etc/localtime");
         vsystem ("dpkg-reconfigure --frontend noninteractive tzdata");
         if (init_tz)
@@ -454,13 +460,15 @@ static gpointer set_locale (gpointer data)
 
     // set keyboard
     lookup_keyboard (cc, lc, &lay, &var);
-    printf ("layout = %s variant = %s\n", lay, var);
     if (g_strcmp0 (init_kb, lay) || g_strcmp0 (init_var, var))
     {
         reboot = TRUE;
         fp = fopen ("/etc/default/keyboard", "wb");
-        fprintf (fp, "XKBMODEL=pc105\nXKBLAYOUT=%s\nXKBVARIANT=%s\nXKBOPTIONS=\nBACKSPACE=guess", lay, var);
-        fclose (fp);
+        if (fp)
+        {
+            fprintf (fp, "XKBMODEL=pc105\nXKBLAYOUT=%s\nXKBVARIANT=%s\nXKBOPTIONS=\nBACKSPACE=guess", lay, var);
+            fclose (fp);
+        }
         vsystem ("setxkbmap -layout %s -variant \"%s\" -option \"\"", lay, var);
         if (init_kb)
         {
@@ -517,39 +525,42 @@ static void read_locales (void)
     buffer = NULL;
     len = 0;
     fp = fopen ("/usr/share/i18n/SUPPORTED", "rb");
-    while (getline (&buffer, &len, fp) > 0)
+    if (fp)
     {
-        // does the line contain UTF-8; ignore lines with an @
-        if (strstr (buffer, "UTF-8") && !strstr (buffer, "@"))
+        while (getline (&buffer, &len, fp) > 0)
         {
-            if (strstr (buffer, ".UTF-8")) ext = 1;
-            else ext = 0;
-
-            // split into lang and country codes
-            cptr1 = strtok (buffer, "_");
-            cptr2 = strtok (NULL, ". ");
-
-            if (cptr1 && cptr2)
+            // does the line contain UTF-8; ignore lines with an @
+            if (strstr (buffer, "UTF-8") && !strstr (buffer, "@"))
             {
-                // read names from locale file
-                cptr = g_strdup_printf ("%s_%s", cptr1, cptr2);
-                cname = get_quoted_param ("/usr/share/i18n/locales", cptr, "territory");
-                lname = get_quoted_param ("/usr/share/i18n/locales", cptr, "language");
-                g_free (cptr);
+                if (strstr (buffer, ".UTF-8")) ext = 1;
+                else ext = 0;
 
-                // deal with the likes of "malta"...
-                cname[0] = g_ascii_toupper (cname[0]);
-                lname[0] = g_ascii_toupper (lname[0]);
+                // split into lang and country codes
+                cptr1 = strtok (buffer, "_");
+                cptr2 = strtok (NULL, ". ");
 
-                gtk_list_store_append (locale_list, &iter);
-                gtk_list_store_set (locale_list, &iter, 0, cptr1, 1, cptr2, 2, lname, 3, cname, 4, ext ? ".UTF-8" : "", -1);
-                g_free (cname);
-                g_free (lname);
+                if (cptr1 && cptr2)
+                {
+                    // read names from locale file
+                    cptr = g_strdup_printf ("%s_%s", cptr1, cptr2);
+                    cname = get_quoted_param ("/usr/share/i18n/locales", cptr, "territory");
+                    lname = get_quoted_param ("/usr/share/i18n/locales", cptr, "language");
+                    g_free (cptr);
+
+                    // deal with the likes of "malta"...
+                    cname[0] = g_ascii_toupper (cname[0]);
+                    lname[0] = g_ascii_toupper (lname[0]);
+
+                    gtk_list_store_append (locale_list, &iter);
+                    gtk_list_store_set (locale_list, &iter, 0, cptr1, 1, cptr2, 2, lname, 3, cname, 4, ext ? ".UTF-8" : "", -1);
+                    g_free (cname);
+                    g_free (lname);
+                }
             }
         }
+        g_free (buffer);
+        fclose (fp);
     }
-    fclose (fp);
-    g_free (buffer);
 
     // sort and filter the database to produce the list for the country combo
     scount = GTK_TREE_MODEL_SORT (gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (locale_list)));
@@ -561,32 +572,35 @@ static void read_locales (void)
     buffer = NULL;
     len = 0;
     fp = fopen ("/usr/share/zoneinfo/zone.tab", "rb");
-    while (getline (&buffer, &len, fp) > 0)
+    if (fp)
     {
-        // ignore lines starting #
-        if (buffer[0] != '#')
+        while (getline (&buffer, &len, fp) > 0)
         {
-            // split on tabs
-            cptr1 = strtok (buffer, "\t");
-            strtok (NULL, "\t");
-            cptr2 = strtok (NULL, "\t\n\r");
-
-            if (cptr1 && cptr2)
+            // ignore lines starting #
+            if (buffer[0] != '#')
             {
-                // split off the part after the final / and replace _ with space
-                if (strrchr (cptr2, '/')) cname = g_strdup (strrchr (cptr2, '/') + 1);
-                else cname = g_strdup (cptr2);
-                cptr = cname;
-                while (*cptr++) if (*cptr == '_') *cptr = ' ';
+                // split on tabs
+                cptr1 = strtok (buffer, "\t");
+                strtok (NULL, "\t");
+                cptr2 = strtok (NULL, "\t\n\r");
 
-                gtk_list_store_append (tz_list, &iter);
-                gtk_list_store_set (tz_list, &iter, 0, cptr2, 1, cptr1, 2, cname, -1);
-                g_free (cname);
+                if (cptr1 && cptr2)
+                {
+                    // split off the part after the final / and replace _ with space
+                    if (strrchr (cptr2, '/')) cname = g_strdup (strrchr (cptr2, '/') + 1);
+                    else cname = g_strdup (cptr2);
+                    cptr = cname;
+                    while (*cptr++) if (*cptr == '_') *cptr = ' ';
+
+                    gtk_list_store_append (tz_list, &iter);
+                    gtk_list_store_set (tz_list, &iter, 0, cptr2, 1, cptr1, 2, cname, -1);
+                    g_free (cname);
+                }
             }
         }
+        g_free (buffer);
+        fclose (fp);
     }
-    fclose (fp);
-    g_free (buffer);
 }
 
 static gboolean unique_rows (GtkTreeModel *model, GtkTreeIter *iter, gpointer data)
