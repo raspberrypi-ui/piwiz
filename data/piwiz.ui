@@ -260,7 +260,7 @@ Press 'Next' to get started. </property>
                   <object class="GtkTable" id="p1table">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="n_rows">3</property>
+                    <property name="n_rows">4</property>
                     <property name="n_columns">2</property>
                     <property name="column_spacing">5</property>
                     <child>
@@ -300,8 +300,35 @@ Press 'Next' to get started. </property>
                         <property name="label" translatable="yes">Timezone:</property>
                       </object>
                       <packing>
+                        <property name="top_attach">3</property>
+                        <property name="bottom_attach">4</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkHBox" id="p1chbox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <child>
+                          <object class="GtkCheckButton" id="p1check">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="label" translatable="yes">Use US keyboard</property>
+                            <property name="tooltip_text" translatable="yes">Use the US keyboard layout instead of the default keyboard for this country</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">False</property>
+                            <property name="position">0</property>
+                            <property name="pack-type">end</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
                         <property name="top_attach">2</property>
                         <property name="bottom_attach">3</property>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                        <property name="y-padding">4</property>
                       </packing>
                     </child>
                   </object>
@@ -438,11 +465,23 @@ Press 'Next' to get started. </property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkCheckButton" id="p2check">
+                  <object class="GtkHBox" id="p2chbox">
                     <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="label" translatable="yes">Hide Passwords</property>
-                    <property name="tooltip_text" translatable="yes">Show or hide the letters in your password</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkCheckButton" id="p2check">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="label" translatable="yes">Hide passwords</property>
+                        <property name="tooltip_text" translatable="yes">Show or hide the characters in your password</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="position">0</property>
+                        <property name="pack-type">end</property>
+                      </packing>
+                    </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -629,11 +668,23 @@ Press 'Next' to get started. </property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkCheckButton" id="p4check">
+                  <object class="GtkHBox" id="p4chbox">
                     <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="label" translatable="yes">Hide Password</property>
-                    <property name="tooltip_text" translatable="yes">Show or hide the letters in your password</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkCheckButton" id="p4check">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="label" translatable="yes">Hide password</property>
+                        <property name="tooltip_text" translatable="yes">Show or hide the characters in your password</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="position">0</property>
+                        <property name="pack-type">end</property>
+                      </packing>
+                    </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>

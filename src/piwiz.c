@@ -68,7 +68,7 @@ static GtkWidget *wizard_nb, *next_btn, *prev_btn, *skip_btn;
 static GtkWidget *country_cb, *language_cb, *timezone_cb;
 static GtkWidget *ap_tv, *psk_label, *prompt, *ip_label;
 static GtkWidget *pwd1_te, *pwd2_te, *psk_te;
-static GtkWidget *pwd_hide, *psk_hide;
+static GtkWidget *pwd_hide, *psk_hide, *us_key;
 
 /* Lists for localisation */
 
@@ -83,7 +83,7 @@ GtkListStore *ap_list;
 /* Globals */
 
 char *wifi_if, *init_country, *init_lang, *init_kb, *init_var, *init_tz;
-char *cc, *lc, *city, *ext;
+char *cc, *lc, *city, *ext, *lay, *var;
 char *ssid;
 gint conn_timeout = 0, pulse_timer = 0;
 gboolean reboot;
@@ -458,8 +458,6 @@ static void lookup_keyboard (char *country, char *language, char **layout, char 
 static gpointer set_locale (gpointer data)
 {
     FILE *fp;
-    char *lay, *var;
-    int siz;
 
     // set timezone
     if (g_strcmp0 (init_tz, city))
@@ -480,7 +478,6 @@ static gpointer set_locale (gpointer data)
     }
 
     // set keyboard
-    lookup_keyboard (cc, lc, &lay, &var);
     if (g_strcmp0 (init_kb, lay) || g_strcmp0 (init_var, var))
     {
         reboot = TRUE;
@@ -1064,6 +1061,13 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             gtk_combo_box_get_active_iter (GTK_COMBO_BOX (timezone_cb), &iter);
                             gtk_tree_model_get (model, &iter, 0, &city, -1);
 
+                            if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (us_key)))
+                            {
+                                lay = g_strdup ("us");
+                                var = g_strdup ("");
+                            }
+                            else lookup_keyboard (cc, lc, &lay, &var);
+
                             // set wifi country - this is quick, so no need for warning
                             if (wifi_if[0])
                             {
@@ -1073,7 +1077,8 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             }
 
                             if (g_strcmp0 (init_tz, city) || g_strcmp0 (init_country, cc)
-                                || g_strcmp0 (init_lang, lc) || g_ascii_strcasecmp (init_kb, cc))
+                                || g_strcmp0 (init_lang, lc) || g_ascii_strcasecmp (init_kb, lay)
+                                || g_strcmp0 (init_var, var))
                             {
                                 message (_("Setting location - please wait..."), 0, 0, -1, TRUE);
                                 g_thread_new (NULL, set_locale, NULL);
@@ -1282,12 +1287,14 @@ int main (int argc, char *argv[])
     g_signal_connect (pwd_hide, "toggled", G_CALLBACK (pwd_toggle), NULL);
     psk_hide = (GtkWidget *) gtk_builder_get_object (builder, "p4check");
     g_signal_connect (psk_hide, "toggled", G_CALLBACK (psk_toggle), NULL);
+    us_key = (GtkWidget *) gtk_builder_get_object (builder, "p1check");
 
     gtk_entry_set_visibility (GTK_ENTRY (pwd1_te), FALSE);
     gtk_entry_set_visibility (GTK_ENTRY (pwd2_te), FALSE);
     gtk_entry_set_visibility (GTK_ENTRY (psk_te), FALSE);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pwd_hide), TRUE);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (psk_hide), TRUE);
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (us_key), FALSE);
 
     // set up the locale combo boxes
     read_locales ();
@@ -1297,7 +1304,7 @@ int main (int argc, char *argv[])
     timezone_cb = gtk_combo_box_new ();
     gtk_table_attach (GTK_TABLE (wid), GTK_WIDGET (country_cb), 1, 2, 0, 1, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 0);
     gtk_table_attach (GTK_TABLE (wid), GTK_WIDGET (language_cb), 1, 2, 1, 2, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 0);
-    gtk_table_attach (GTK_TABLE (wid), GTK_WIDGET (timezone_cb), 1, 2, 2, 3, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 0);
+    gtk_table_attach (GTK_TABLE (wid), GTK_WIDGET (timezone_cb), 1, 2, 3, 4, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 0);
     gtk_widget_set_tooltip_text (GTK_WIDGET (country_cb), _("Set the country in which you are using your Pi"));
     gtk_widget_set_tooltip_text (GTK_WIDGET (language_cb), _("Set the language in which applications should appear"));
     gtk_widget_set_tooltip_text (GTK_WIDGET (timezone_cb), _("Set the closest city to your location"));
