@@ -90,48 +90,127 @@ gboolean reboot;
 
 /* Map from country code to keyboard */
 
-static const char keyboard_map[][6] = {
-    "ae", "ara",
-    "bh", "ara",
-    "eg", "ara",
-    "jo", "ara",
-    "kw", "ara",
-    "lb", "ara",
-    "ly", "ara",
-    "om", "ara",
-    "qa", "ara",
-    "sa", "ara",
-    "sd", "ara",
-    "ss", "ara",
-    "tn", "ara",
-    "ye", "ara",
-    "ar", "latam",
-    "bo", "latam",
-    "cl", "latam",
-    "co", "latam",
-    "cr", "latam",
-    "cu", "latam",
-    "do", "latam",
-    "ec", "latam",
-    "gt", "latam",
-    "hn", "latam",
-    "mx", "latam",
-    "ni", "latam",
-    "pa", "latam",
-    "pe", "latam",
-    "pr", "latam",
-    "py", "latam",
-    "sv", "latam",
-    "uy", "latam",
-    "ve", "latam",
-    "hk", "gb",
-    "sg", "gb",
-    "my", "us",
-    "nz", "us",
-    "zw", "us",
-    "li", "ch",
-    "lu", "ch",
-    ""
+static const char keyboard_map[][13] = {
+	"",	    "AL",	"al",	    "",
+	"",	    "AZ",	"az",	    "",
+	"",	    "BD",	"bd",	    "",     //us
+	"",	    "BE",	"be",	    "",
+	"",	    "BG",	"bg",	    "",     //us
+	"",	    "BR",	"br",	    "",
+	"",	    "BT",	"bt",	    "",     //us
+	"",	    "BY",	"by",	    "",     //us
+	"fr",	"CA",	"ca",	    "",
+	"",	    "CA",	"us",	    "",
+	"de",	"CH",	"ch",	    "",
+	"fr",	"CH",	"ch",	    "fr",
+	"",	    "CH",	"ch",	    "",
+	"",	    "CZ",	"cz",	    "",
+	"",	    "DK",	"dk",	    "",
+	"",	    "EE",	"ee",	    "",
+	"ast",	"ES",	"es",	    "ast",
+	"bo",	"",	    "cn",	    "tib",  //us
+	"ca",	"ES",	"es",	    "cat",
+	"",	    "ES",	"es",	    "",
+	"",	    "ET",	"et",	    "",     //us
+	"se",	"FI",	"fi",	    "smi",
+	"",	    "FI",	"fi",	    "",
+	"",	    "FR",	"fr",	    "latin9",
+	"",	    "GB",	"gb",	    "",
+	"",	    "GG",	"gb",	    "",
+	"",	    "HU",	"hu",	    "",
+	"",	    "IE",	"ie",	    "",
+	"",	    "IL",	"il",	    "",     //us
+	"",	    "IM",	"gb",	    "",
+	"",	    "IR",	"ir",	    "",     //us
+	"",	    "IS",	"is",	    "",
+	"",	    "IT",	"it",	    "",
+	"",	    "JE",	"gb",	    "",
+	"",	    "JP",	"jp",	    "",
+	"",	    "LT",	"lt",	    "",
+	"",	    "LV",	"lv",	    "",
+	"",	    "KG",	"kg",	    "",     //us
+	"",	    "KH",	"kh",	    "",     //us
+	"",	    "KR",	"kr",	    "kr104",
+	"",	    "KZ",	"kz",	    "",     //us
+	"",	    "LK",	"lk",	    "",     //us
+	"",	    "MA",	"ma",	    "",     //us
+	"",	    "MK",	"mk",	    "",     //us
+	"",	    "NL",	"us",	    "",
+	"",	    "MM",	"mm",	    "",     //us
+	"",	    "MN",	"mn",	    "",     //us
+	"",	    "MT",	"mt",	    "",
+	"se",	"NO",	"no",	    "smi",
+	"",	    "NO",	"no",	    "",
+	"",	    "NP",	"np",	    "",     //us
+	"",	    "PH",	"ph",	    "",
+	"",	    "PL",	"pl",	    "",
+	"",	    "PT",	"pt",	    "",
+	"",	    "RO",	"ro",	    "",
+	"",	    "RU",	"ru",	    "",     //us
+	"se",	"SE",	"se",	    "smi",
+	"",	    "SK",	"sk",	    "",
+	"",	    "SI",	"si",	    "",
+	"tg",	"",	    "tj",	    "",     //us
+	"",	    "TJ",	"tj",	    "",     //us
+	"",	    "TH",	"th",	    "",     //us
+	"ku",	"TR",	"tr",	    "ku",
+	"",	    "TR",	"tr",	    "",
+	"",	    "UA",	"ua",	    "",     //us
+	"en",	"US",	"us",	    "",
+	"",	    "VN",	"us",	    "",
+	"",	    "ZA",	"za",	    "",
+	"",	    "AR",	"latam",	"",
+	"",	    "BO",	"latam",	"",
+	"",	    "CL",	"latam",	"",
+	"",	    "CO",	"latam",	"",
+	"",	    "CR",	"latam",	"",
+	"",	    "DO",	"latam",	"",
+	"",	    "EC",	"latam",	"",
+	"",	    "GT",	"latam",	"",
+	"",	    "HN",	"latam",	"",
+	"",	    "MX",	"latam",	"",
+	"",	    "NI",	"latam",	"",
+	"",	    "PA",	"latam",	"",
+	"",	    "PE",	"latam",	"",
+	"es",	"PR",	"latam",	"",
+	"",	    "PY",	"latam",	"",
+	"",	    "SV",	"latam",	"",
+	"es",	"US",	"latam",	"",
+	"",	    "UY",	"latam",	"",
+	"",	    "VE",	"latam",    "",
+	"ar",	"",	    "ara",	    "",     //us
+	"bn",	"",	    "in",	    "ben",  //us
+	"bs",	"",	    "ba",	    "",
+	"de",	"LI",	"ch",	    "",
+	"de",	"",	    "de",	    "",
+	"el",	"",	    "gr",	    "",     //us
+	"eo",	"",     "epo",      "",
+	"fr",	"",	    "fr",	    "latin9",
+	"gu",	"",	    "in",	    "guj",  //us
+	"hi",	"",	    "in",	    "",     //us
+	"hr",	"",	    "hr",	    "",
+	"hy",	"",	    "am",	    "",     //us
+	"ka",	"",	    "ge",	    "",     //us
+	"kn",	"",	    "in",	    "kan",  //us
+	"ku",	"",	    "tr",	    "ku",
+	"lo",	"",	    "la",	    "",     //us
+	"mr",	"",	    "in",	    "",     //us
+	"ml",	"",	    "in",	    "mal",  //us
+	"my",	"",	    "mm",	    "",     //us
+	"ne",	"",	    "np",	    "",     //us
+	"os",	"",	    "ru",	    "os",
+	"pa",	"",	    "in",	    "guru", //us
+	"si",	"",	    "si",	    "sin_phonetic",     //us
+	"sr",	"",	    "rs",	    "latin",
+	"sv",	"",	    "se",	    "",
+	"ta",	"",	    "in",	    "tam",  //us
+	"te",	"",	    "in",	    "tel",  //us
+	"tg",	"",	    "tj",	    "",     //us
+	"the",	"",	    "np",	    "",     //us
+	"tl",	"",	    "ph",	    "",
+	"ug",	"",	    "cn",	    "ug",   //us
+	"zh",	"",	    "cn",	    "",
+	"",	    "",	    "us",	    ""
 };
 
 /* In dhcpcd-gtk/main.c */
@@ -360,78 +439,20 @@ static gboolean loc_done (gpointer data)
 
 static void lookup_keyboard (char *country, char *language, char **layout, char **variant)
 {
-    FILE *fp;
-    char *ccc, *var, *cptr, *buffer;
-    int n;
-    gboolean in_list, var_match, cc_match;
+    int n = 0;
 
-    // set keyboard
-    ccc = g_ascii_strdown (country, -1);
-
-    // lookup keyboard mapping for this code, if any
-    n = 0;
+    // this will always exit as long as the last entry in the map has two nulls...
     while (1)
     {
-        if (*keyboard_map[n * 2] == 0) break;
-        if (!g_strcmp0 (ccc, keyboard_map[n * 2]))
+        if ((*keyboard_map[n] == 0 || !g_strcmp0 (language, keyboard_map[n])) &&
+            (*keyboard_map[n + 1] == 0 || !g_strcmp0 (country, keyboard_map[n + 1])))
         {
-            g_free (ccc);
-            ccc = g_strdup (keyboard_map[n * 2 + 1]);
-            break;
+            *layout = g_strdup (keyboard_map[n + 2]);
+            *variant = g_strdup (keyboard_map[n + 3]);
+            return;
         }
-        n++;
+        n += 4;
     }
-
-    // parse the database file to find variants for this layout, if any
-    buffer = g_strdup_printf ("    '%s'", ccc);
-    cptr = NULL;
-    n = 0;
-    in_list = FALSE;
-    var_match = FALSE;
-    cc_match = FALSE;
-    fp = fopen ("/usr/share/console-setup/KeyboardNames.pl", "rb");
-    if (fp)
-    {
-        while (getline (&cptr, &n, fp) > 0)
-        {
-            if (in_list)
-            {
-                if (cptr[4] == '}') break;
-                else
-                {
-                    strtok (cptr, "'");
-                    strtok (NULL, "'");
-                    strtok (NULL, "'");
-                    var = strtok (NULL, "'");
-                    strtok (NULL, "'");
-                    if (in_list == TRUE && !g_strcmp0 (var, language))
-                    {
-                        var_match = TRUE;
-                        break;
-                    }
-                }
-            }
-            if (!strncmp (buffer, cptr, strlen (buffer)))
-            {
-                in_list = TRUE;
-                cc_match = TRUE;
-            }
-        }
-        g_free (cptr);
-        fclose (fp);
-    }
-    g_free (buffer);
-
-    if (cc_match)
-        *layout = g_strdup (ccc);
-    else
-        *layout = g_strdup ("us");
-    g_free (ccc);
-
-    if (var_match)
-        *variant = g_strdup (language);
-    else
-        *variant = g_strdup ("");
 }
 
 static gpointer set_locale (gpointer data)
