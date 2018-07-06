@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: piwiz 1.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-26 15:16+0100\n"
+"POT-Creation-Date: 2018-07-06 07:19+0100\n"
 "PO-Revision-Date: 2018-06-05 14:19+0100\n"
 "Last-Translator: Simon Long <simon@raspberrypi.org>\n"
 "Language-Team: English (British)\n"
@@ -17,27 +17,27 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../src/piwiz.c:656 ../src/piwiz.c:876
+#: ../src/piwiz.c:774 ../src/piwiz.c:1030
 msgid "Searching for networks - please wait..."
 msgstr "Searching for networks - please wait..."
 
-#: ../src/piwiz.c:676
+#: ../src/piwiz.c:794
 msgid "Failed to connect to network."
 msgstr "Failed to connect to network."
 
-#: ../src/piwiz.c:759
+#: ../src/piwiz.c:913
 msgid "Reading update list - please wait..."
 msgstr "Reading update list - please wait..."
 
-#: ../src/piwiz.c:761
+#: ../src/piwiz.c:915
 msgid "Downloading updates - please wait..."
 msgstr "Downloading updates - please wait..."
 
-#: ../src/piwiz.c:768
+#: ../src/piwiz.c:922
 msgid "Installing updates - please wait..."
 msgstr "Installing updates - please wait..."
 
-#: ../src/piwiz.c:785
+#: ../src/piwiz.c:939
 #, c-format
 msgid ""
 "Error getting updates.\n"
@@ -46,11 +46,11 @@ msgstr ""
 "Error getting updates.\n"
 "%s"
 
-#: ../src/piwiz.c:792 ../src/piwiz.c:819
+#: ../src/piwiz.c:946 ../src/piwiz.c:973
 msgid "System is up to date"
 msgstr "System is up to date"
 
-#: ../src/piwiz.c:802
+#: ../src/piwiz.c:956
 #, c-format
 msgid ""
 "Error comparing versions.\n"
@@ -59,11 +59,11 @@ msgstr ""
 "Error comparing versions.\n"
 "%s"
 
-#: ../src/piwiz.c:816
+#: ../src/piwiz.c:970
 msgid "Getting updates - please wait..."
 msgstr "Getting updates - please wait..."
 
-#: ../src/piwiz.c:829
+#: ../src/piwiz.c:983
 #, c-format
 msgid ""
 "Error checking for updates.\n"
@@ -72,64 +72,68 @@ msgstr ""
 "Error checking for updates.\n"
 "%s"
 
-#: ../src/piwiz.c:836
+#: ../src/piwiz.c:990
 msgid "Comparing versions - please wait..."
 msgstr "Comparing versions - please wait..."
 
-#: ../src/piwiz.c:851 ../data/piwiz.ui.h:5
+#: ../src/piwiz.c:1005 ../data/piwiz.ui.h:5
 msgid "_Next"
 msgstr "_Next"
 
-#: ../src/piwiz.c:852
+#: ../src/piwiz.c:1006
 msgid "_Back"
 msgstr "_Back"
 
-#: ../src/piwiz.c:857 ../data/piwiz.ui.h:3
+#: ../src/piwiz.c:1011 ../data/piwiz.ui.h:3
 msgid "_Cancel"
 msgstr "_Cancel"
 
-#: ../src/piwiz.c:863
+#: ../src/piwiz.c:1017
 msgid "_Reboot"
 msgstr "_Reboot"
 
-#: ../src/piwiz.c:868
+#: ../src/piwiz.c:1022
 msgid "_Done"
 msgstr "_Done"
 
-#: ../src/piwiz.c:922
+#: ../src/piwiz.c:1083
 msgid "Setting location - please wait..."
 msgstr "Setting location - please wait..."
 
-#: ../src/piwiz.c:934
+#: ../src/piwiz.c:1095
 msgid "The two passwords entered do not match."
 msgstr "The two passwords entered do not match."
 
-#: ../src/piwiz.c:953
+#: ../src/piwiz.c:1114
 #, c-format
 msgid "Enter the password for the WiFi network \"%s\"."
 msgstr "Enter the password for the WiFi network \"%s\"."
 
-#: ../src/piwiz.c:962 ../src/piwiz.c:973
+#: ../src/piwiz.c:1128 ../src/piwiz.c:1139
 msgid "Connecting to WiFi network - please wait..."
 msgstr "Connecting to WiFi network - please wait..."
 
-#: ../src/piwiz.c:965 ../src/piwiz.c:976
+#: ../src/piwiz.c:1131 ../src/piwiz.c:1142
 msgid "Could not connect to this network"
 msgstr "Could not connect to this network"
 
-#: ../src/piwiz.c:982
+#: ../src/piwiz.c:1148
 msgid "Checking for updates - please wait..."
 msgstr "Checking for updates - please wait..."
 
-#: ../src/piwiz.c:1121
+#: ../src/piwiz.c:1221
+msgid "<span font_desc=\"10.0\">IP : %s</span>"
+msgstr "<span font_desc=\"10.0\">IP : %s</span>"
+
+#: ../src/piwiz.c:1308
 msgid "Set the country in which you are using your Pi"
 msgstr "Set the country in which you are using your Pi"
 
-#: ../src/piwiz.c:1122
+#: ../src/piwiz.c:1309
 msgid "Set the language in which applications should appear"
 msgstr "Set the language in which applications should appear"
 
-#: ../src/piwiz.c:1123
+#: ../src/piwiz.c:1310
 msgid "Set the closest city to your location"
 msgstr "Set the closest city to your location"
 
@@ -261,10 +265,14 @@ msgstr ""
 "Press 'Next' to get started. "
 
 #: ../data/piwiz.ui.h:11
+msgid "<span font_desc=\"10.0\"> </span>"
+msgstr "<span font_desc=\"10.0\"> </span>"
+
+#: ../data/piwiz.ui.h:12
 msgid "<b>Set Country</b>"
 msgstr "<b>Set Country</b>"
 
-#: ../data/piwiz.ui.h:12
+#: ../data/piwiz.ui.h:13
 msgid ""
 "Enter the details of your location. This is used to set the language, time "
 "zone, keyboard and other international settings."
@@ -272,28 +280,38 @@ msgstr ""
 "Enter the details of your location. This is used to set the language, time "
 "zone, keyboard and other international settings."
 
-#: ../data/piwiz.ui.h:13
+#: ../data/piwiz.ui.h:14
 msgid "Country:"
 msgstr "Country:"
 
-#: ../data/piwiz.ui.h:14
+#: ../data/piwiz.ui.h:15
 msgid "Language:"
 msgstr "Language:"
 
-#: ../data/piwiz.ui.h:15
+#: ../data/piwiz.ui.h:16
 msgid "Timezone:"
 msgstr "Timezone:"
 
-#: ../data/piwiz.ui.h:16
-msgid "Press 'Next' when you have made your selection."
-msgstr "Press 'Next' when you have made your selection."
-
 #: ../data/piwiz.ui.h:17
-msgid "<b>Change Password</b>"
-msgstr "<b>Change Password</b>"
+msgid "Use US keyboard"
+msgstr "Use US keyboard"
 
 #: ../data/piwiz.ui.h:18
 msgid ""
+"Use the US keyboard layout instead of the default keyboard for this country"
+msgstr ""
+"Use the US keyboard layout instead of the default keyboard for this country"
+
+#: ../data/piwiz.ui.h:19
+msgid "Press 'Next' when you have made your selection."
+msgstr "Press 'Next' when you have made your selection."
+
+#: ../data/piwiz.ui.h:20
+msgid "<b>Change Password</b>"
+msgstr "<b>Change Password</b>"
+
+#: ../data/piwiz.ui.h:21
+msgid ""
 "The default 'pi' user account currently has the password 'raspberry'. It is "
 "strongly recommended that you change this to a different password that only "
 "you know."
@@ -302,75 +320,75 @@ msgstr ""
 "strongly recommended that you change this to a different password that only "
 "you know."
 
-#: ../data/piwiz.ui.h:19
+#: ../data/piwiz.ui.h:22
 msgid "Enter new password:"
 msgstr "Enter new password:"
 
-#: ../data/piwiz.ui.h:20
+#: ../data/piwiz.ui.h:23
 msgid "Confirm new password:"
 msgstr "Confirm new password:"
 
-#: ../data/piwiz.ui.h:21
+#: ../data/piwiz.ui.h:24
 msgid "Enter a new password"
 msgstr "Enter a new password"
 
-#: ../data/piwiz.ui.h:22
+#: ../data/piwiz.ui.h:25
 msgid "Enter the new password again"
 msgstr "Enter the new password again"
 
-#: ../data/piwiz.ui.h:23
-msgid "Hide Passwords"
-msgstr "Hide Passwords"
+#: ../data/piwiz.ui.h:26
+msgid "Hide passwords"
+msgstr "Hide passwords"
 
-#: ../data/piwiz.ui.h:24
-msgid "Show or hide the letters in your password"
-msgstr "Show or hide the letters in your password"
+#: ../data/piwiz.ui.h:27
+msgid "Show or hide the characters in your password"
+msgstr "Show or hide the characters in your password"
 
-#: ../data/piwiz.ui.h:25
+#: ../data/piwiz.ui.h:28
 msgid "Press 'Next' to activate your new password."
 msgstr "Press 'Next' to activate your new password."
 
-#: ../data/piwiz.ui.h:26
+#: ../data/piwiz.ui.h:29
 msgid "<b>Select WiFi Network</b>"
 msgstr "<b>Select WiFi Network</b>"
 
-#: ../data/piwiz.ui.h:27
+#: ../data/piwiz.ui.h:30
 msgid "Select your WiFi network from the list."
 msgstr "Select your WiFi network from the list."
 
-#: ../data/piwiz.ui.h:28
+#: ../data/piwiz.ui.h:31
 msgid "Click the name of your network to select it"
 msgstr "Click the name of your network to select it"
 
-#: ../data/piwiz.ui.h:29
+#: ../data/piwiz.ui.h:32
 msgid "Press 'Next' to connect, or 'Skip' to continue without connecting."
 msgstr "Press 'Next' to connect, or 'Skip' to continue without connecting."
 
-#: ../data/piwiz.ui.h:30
+#: ../data/piwiz.ui.h:33
 msgid "<b>Enter WiFi Password</b>"
 msgstr "<b>Enter WiFi Password</b>"
 
-#: ../data/piwiz.ui.h:31
+#: ../data/piwiz.ui.h:34
 msgid "Enter the password for your WiFi network."
 msgstr "Enter the password for your WiFi network."
 
-#: ../data/piwiz.ui.h:32
+#: ../data/piwiz.ui.h:35
 msgid "Password:"
 msgstr "Password:"
 
-#: ../data/piwiz.ui.h:33
+#: ../data/piwiz.ui.h:36
 msgid "Enter the password for your network"
 msgstr "Enter the password for your network"
 
-#: ../data/piwiz.ui.h:34
-msgid "Hide Password"
-msgstr "Hide Password"
+#: ../data/piwiz.ui.h:37
+msgid "Hide password"
+msgstr "Hide password"
 
-#: ../data/piwiz.ui.h:35
+#: ../data/piwiz.ui.h:38
 msgid "<b>Check For Updates</b>"
 msgstr "<b>Check For Updates</b>"
 
-#: ../data/piwiz.ui.h:36
+#: ../data/piwiz.ui.h:39
 msgid ""
 "Press 'Next' to check that Raspbian is up to date, or 'Skip' to continue "
 "without checking."
@@ -378,15 +396,15 @@ msgstr ""
 "Press 'Next' to check that Raspbian is up to date, or 'Skip' to continue "
 "without checking."
 
-#: ../data/piwiz.ui.h:37
+#: ../data/piwiz.ui.h:40
 msgid "<b>Setup Complete</b>"
 msgstr "<b>Setup Complete</b>"
 
-#: ../data/piwiz.ui.h:38
+#: ../data/piwiz.ui.h:41
 msgid "Your Raspberry Pi now is set up and ready to go."
 msgstr "Your Raspberry Pi now is set up and ready to go."
 
-#: ../data/piwiz.ui.h:39
+#: ../data/piwiz.ui.h:42
 msgid "Press 'Reboot' to reboot your Pi for the new settings to take effect."
 msgstr "Press 'Reboot' to reboot your Pi for the new settings to take effect."
 

@@ -1218,7 +1218,7 @@ static gboolean show_ip (void)
     ip = get_string ("ifconfig eth0 | grep inet[^6] | tr -s ' ' | cut -d ' ' -f 3");
     if (ip && strlen (ip))
     {
-        buf = g_strdup_printf ("<span font_desc=\"10.0\">IP : %s</span>", ip);
+        buf = g_strdup_printf (_("<span font_desc=\"10.0\">IP : %s</span>"), ip);
         gtk_label_set_markup (GTK_LABEL (ip_label), buf);
         g_free (buf);
         g_free (ip);
