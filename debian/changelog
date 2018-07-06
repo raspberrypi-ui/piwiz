@@ -1,3 +1,9 @@
+piwiz (0.2) stretch; urgency=medium
+
+  * Add keyboard database and US keyboard override option
+
+ -- Simon Long <simon@raspberrypi.org>  Fri, 06 Jul 2018 09:45:27 +0100
+
 piwiz (0.1) stretch; urgency=low
 
   * Initial release
