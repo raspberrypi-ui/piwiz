@@ -1310,7 +1310,7 @@ int main (int argc, char *argv[])
     timezone_cb = gtk_combo_box_new ();
     gtk_table_attach (GTK_TABLE (wid), GTK_WIDGET (country_cb), 1, 2, 0, 1, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 0);
     gtk_table_attach (GTK_TABLE (wid), GTK_WIDGET (language_cb), 1, 2, 1, 2, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 0);
-    gtk_table_attach (GTK_TABLE (wid), GTK_WIDGET (timezone_cb), 1, 2, 3, 4, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 0);
+    gtk_table_attach (GTK_TABLE (wid), GTK_WIDGET (timezone_cb), 1, 2, 2, 3, GTK_FILL | GTK_SHRINK, GTK_FILL | GTK_SHRINK, 0, 0);
     gtk_widget_set_tooltip_text (GTK_WIDGET (country_cb), _("Set the country in which you are using your Pi"));
     gtk_widget_set_tooltip_text (GTK_WIDGET (language_cb), _("Set the language in which applications should appear"));
     gtk_widget_set_tooltip_text (GTK_WIDGET (timezone_cb), _("Set the closest city to your location"));
