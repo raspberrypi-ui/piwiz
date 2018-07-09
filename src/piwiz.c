@@ -235,8 +235,8 @@ static void country_changed (GtkComboBox *cb, gpointer ptr);
 static gboolean match_country (GtkTreeModel *model, GtkTreeIter *iter, gpointer data);
 static void read_inits (void);
 static void set_init (GtkTreeModel *model, GtkWidget *cb, int pos, char *init);
-static void scans_add (char *str, int match, int secure, int signal);
-static int find_line (char **ssid, int *sec);
+static void scans_add (char *str, int match, int secure, int signal, int connected);
+static int find_line (char **lssid, int *secure, int *connected);
 void connect_success (void);
 static gint connect_failure (gpointer data);
 static gboolean select_ssid (char *lssid, const char *psk);
@@ -733,7 +733,7 @@ static void set_init (GtkTreeModel *model, GtkWidget *cb, int pos, char *init)
 
 /* WiFi */
 
-static void scans_add (char *str, int match, int secure, int signal)
+static void scans_add (char *str, int match, int secure, int signal, int connected)
 {
     GtkTreeIter iter;
     GdkPixbuf *sec_icon = NULL, *sig_icon = NULL;
@@ -755,13 +755,13 @@ static void scans_add (char *str, int match, int secure, int signal)
         sig_icon = gtk_icon_theme_load_icon (gtk_icon_theme_get_default(), icon, 16, 0, NULL);
         g_free (icon);
     }
-    gtk_list_store_set (ap_list, &iter, 0, str, 1, sec_icon, 2, sig_icon, 3, secure, -1);
+    gtk_list_store_set (ap_list, &iter, 0, str, 1, sec_icon, 2, sig_icon, 3, secure, 4, connected, -1);
 
     if (match)
         gtk_tree_selection_select_iter (gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv)), &iter);
 }
 
-static int find_line (char **lssid, int *sec)
+static int find_line (char **lssid, int *secure, int *connected)
 {
     GtkTreeModel *model;
     GtkTreeIter iter;
@@ -770,7 +770,7 @@ static int find_line (char **lssid, int *sec)
     sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv));
     if (sel && gtk_tree_selection_get_selected (sel, &model, &iter))
     {
-        gtk_tree_model_get (model, &iter, 0, lssid, 3, sec, -1);
+        gtk_tree_model_get (model, &iter, 0, lssid, 3, secure, 4, connected, -1);
         if (g_strcmp0 (*lssid, _("Searching for networks - please wait..."))) return 1;
     } 
     return 0;
@@ -834,10 +834,10 @@ void menu_update_scans (WI_SCAN *wi, DHCPCD_WI_SCAN *scans)
 {
     DHCPCD_WI_SCAN *s;
     char *lssid = NULL;
-    int active, sel;
+    int active, selected, connected;
 
-    // get the selected line in the list of SSIDs
-    sel = find_line (&lssid, &active);
+    // get the selected line in the list of SSIDs - values in active and connected are ignored here
+    selected = find_line (&lssid, &active, &connected);
 
     // erase the current list
     gtk_list_store_clear (ap_list);
@@ -853,10 +853,11 @@ void menu_update_scans (WI_SCAN *wi, DHCPCD_WI_SCAN *scans)
         else active = 0;
 
         // is this network already active? - potentially confusing; not convinced this is a good idea... !!!!
-        if (!sel && dhcpcd_wi_associated (wi->interface, s)) active = 1;
+        connected = dhcpcd_wi_associated (wi->interface, s);
+        if (!selected && connected) active = 1;
 
         // add this SSID to the new list
-        scans_add (s->ssid, active, (s->flags & WSF_SECURE) && (s->flags & WSF_PSK), s->strength.value);
+        scans_add (s->ssid, active, (s->flags & WSF_SECURE) && (s->flags & WSF_PSK), s->strength.value, connected);
     }
 
     if (lssid) g_free (lssid);
@@ -1027,7 +1028,7 @@ static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int page
                             {
                                 init_dhcpcd ();
                                 gtk_list_store_clear (ap_list);
-                                scans_add (_("Searching for networks - please wait..."), 0, 0, -1);
+                                scans_add (_("Searching for networks - please wait..."), 0, 0, -1, 0);
                             }
                             gtk_widget_set_visible (skip_btn, TRUE);
                             break;
@@ -1046,7 +1047,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
     GtkTreeIter iter;
     const char *psk, *pw1, *pw2;
     char *text;
-    int sec;
+    int secure, connected;
 
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
     {
@@ -1105,11 +1106,16 @@ static void next_page (GtkButton* btn, gpointer ptr)
 
         case PAGE_WIFIAP :  if (ssid) g_free (ssid);
                             ssid = NULL;
-                            if (!find_line (&ssid, &sec))
+                            if (!find_line (&ssid, &secure, &connected))
                                 gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
                             else
                             {
-                                if (sec)
+                                if (connected)
+                                {
+                                    gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
+                                    break;
+                                }
+                                if (secure)
                                 {
                                     text = g_strdup_printf (_("Enter the password for the WiFi network \"%s\"."), ssid);
                                     gtk_label_set_text (GTK_LABEL (psk_label), text);
@@ -1256,7 +1262,7 @@ int main (int argc, char *argv[])
     // create the master databases
     locale_list = gtk_list_store_new (5, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
     tz_list = gtk_list_store_new (3, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
-    ap_list = gtk_list_store_new (4, G_TYPE_STRING, GDK_TYPE_PIXBUF, GDK_TYPE_PIXBUF, G_TYPE_INT);
+    ap_list = gtk_list_store_new (5, G_TYPE_STRING, GDK_TYPE_PIXBUF, GDK_TYPE_PIXBUF, G_TYPE_INT, G_TYPE_INT);
 
     // build the UI
     builder = gtk_builder_new ();
