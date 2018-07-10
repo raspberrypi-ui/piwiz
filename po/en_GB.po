@@ -298,9 +298,9 @@ msgstr "Use US keyboard"
 
 #: ../data/piwiz.ui.h:18
 msgid ""
-"Use the US keyboard layout instead of the default keyboard for this country"
+"Use the US keyboard layout instead of the default keyboard for your country"
 msgstr ""
-"Use the US keyboard layout instead of the default keyboard for this country"
+"Use the US keyboard layout instead of the default keyboard for your country"
 
 #: ../data/piwiz.ui.h:19
 msgid "Press 'Next' when you have made your selection."
