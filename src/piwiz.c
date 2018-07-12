@@ -220,6 +220,7 @@ extern DHCPCD_CONNECTION *con;
 
 /* Local prototypes */
 
+static char *get_shell_string (char *cmd, gboolean all);
 static char *get_string (char *cmd);
 static char *get_quoted_param (char *path, char *fname, char *toseek);
 static int vsystem (const char *fmt, ...);
@@ -245,6 +246,8 @@ static char *find_psk_for_network (char *ssid);
 static void progress (PkProgress *progress, PkProgressType *type, gpointer data);
 static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data);
 static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data);
+static void install_lang_done (PkTask *task, GAsyncResult *res, gpointer data);
+static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data);
 static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data);
 static gpointer refresh_update_cache (gpointer data);
 static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int pagenum, gpointer data);
@@ -263,7 +266,7 @@ GtkWidget *gtk_box_new (GtkOrientation o, gint s)
 		return gtk_vbox_new (false, s);
 }
 
-static char *get_string (char *cmd)
+static char *get_shell_string (char *cmd, gboolean all)
 {
     char *line = NULL, *res = NULL;
     int len = 0;
@@ -272,13 +275,22 @@ static char *get_string (char *cmd)
     if (fp == NULL) return g_strdup ("");
     if (getline (&line, &len, fp) > 0)
     {
-        res = line;
-        while (*res++) if (g_ascii_isspace (*res)) *res = 0;
+        g_strdelimit (line, "\n\r", 0);
+        if (!all)
+        {
+            res = line;
+            while (*res++) if (g_ascii_isspace (*res)) *res = 0;
+        }
         res = g_strdup (line);
     }
     pclose (fp);
     g_free (line);
     return res ? res : g_strdup ("");
+}
+
+static char *get_string (char *cmd)
+{
+    return get_shell_string (cmd, FALSE);
 }
 
 static char *get_quoted_param (char *path, char *fname, char *toseek)
@@ -523,8 +535,6 @@ static gpointer set_locale (gpointer data)
 
     g_free (lay);
     g_free (var);
-    g_free (cc);
-    g_free (lc);
     g_free (city);
     g_free (ext);
 
@@ -941,6 +951,8 @@ static void progress (PkProgress *progress, PkProgressType *type, gpointer data)
                                             {
                                                 if (role == PK_ROLE_ENUM_UPDATE_PACKAGES)
                                                     message (_("Installing updates - please wait..."), 0, 0, pk_progress_get_percentage (progress), FALSE);
+                                                else if (role == PK_ROLE_ENUM_INSTALL_PACKAGES)
+                                                    message (_("Installing languages - please wait..."), 0, 0, pk_progress_get_percentage (progress), FALSE);
                                             }
                                             break;
 
@@ -982,7 +994,6 @@ static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
     }
 
     PkPackageSack *sack = pk_results_get_package_sack (results);
-    pk_package_sack_sort (sack, PK_PACKAGE_SACK_SORT_TYPE_NAME);
     GPtrArray *array = pk_package_sack_get_array (sack);
 
     if (array->len > 0)
@@ -994,10 +1005,60 @@ static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
     else message (_("System is up to date"), 1, PAGE_DONE, -1, FALSE);
 }
 
+static void install_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
+{
+    GError *error = NULL;
+    PkResults *results = pk_task_generic_finish (task, res, &error);
+
+    if (error != NULL)
+    {
+        char *buffer = g_strdup_printf (_("Error installing languages.\n%s"), error->message);
+        message (buffer, 1, PAGE_DONE, -1, FALSE);
+        g_free (buffer);
+        g_error_free (error);
+        return;
+    }
+
+    message (_("Comparing versions - please wait..."), 0, 0, -1, FALSE);
+    pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
+}
+
+static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
+{
+    GError *error = NULL;
+    PkResults *results = pk_task_generic_finish (task, res, &error);
+
+    if (error != NULL)
+    {
+        char *buffer = g_strdup_printf (_("Error finding languages.\n%s"), error->message);
+        message (buffer, 1, PAGE_DONE, -1, FALSE);
+        g_free (buffer);
+        g_error_free (error);
+        return;
+    }
+
+    PkPackageSack *sack = pk_results_get_package_sack (results);
+    GPtrArray *array = pk_package_sack_get_array (sack);
+
+    if (array->len > 0)
+    {
+        reboot = TRUE;
+        message (_("Installing languages - please wait..."), 0, 0, -1, FALSE);
+        pk_task_install_packages_async (task, pk_package_sack_get_ids (sack), NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) install_lang_done, NULL);
+    }
+    else
+    {
+        message (_("Comparing versions - please wait..."), 0, 0, -1, FALSE);
+        pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
+    }
+}
+
 static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data)
 {
     GError *error = NULL;
     PkResults *results = pk_task_generic_finish (task, res, &error);
+    gchar **pack_array;
+    gchar *lpack, *buf;
 
     if (error != NULL)
     {
@@ -1008,8 +1069,16 @@ static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data)
         return;
     }
 
-    message (_("Comparing versions - please wait..."), 0, 0, -1, FALSE);
-    pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
+    buf = g_strdup_printf ("check-language-support -l %s_%s", lc, cc);
+    lpack = get_shell_string (buf, TRUE);
+    pack_array = g_strsplit (lpack, " ", -1);
+
+    message (_("Finding languages - please wait..."), 0, 0, -1, FALSE);
+    pk_client_resolve_async (PK_CLIENT (task), 0, pack_array, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) resolve_lang_done, NULL);
+
+    g_free (buf);
+    g_free (lpack);
+    g_strfreev (pack_array);
 }
 
 static gpointer refresh_update_cache (gpointer data)
