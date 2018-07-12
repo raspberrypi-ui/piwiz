@@ -474,7 +474,7 @@ Press 'Next' to get started. </property>
                       <object class="GtkCheckButton" id="p2check">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="label" translatable="yes">Hide passwords</property>
+                        <property name="label" translatable="yes">Hide characters</property>
                         <property name="tooltip_text" translatable="yes">Show or hide the characters in your password</property>
                       </object>
                       <packing>
@@ -678,7 +678,7 @@ Press 'Next' to get started. </property>
                       <object class="GtkCheckButton" id="p4check">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="label" translatable="yes">Hide password</property>
+                        <property name="label" translatable="yes">Hide characters</property>
                         <property name="tooltip_text" translatable="yes">Show or hide the characters in your password</property>
                       </object>
                       <packing>

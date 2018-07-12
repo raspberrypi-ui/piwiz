@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: piwiz 1.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-12 12:20+0200\n"
+"POT-Creation-Date: 2018-07-12 14:56+0100\n"
 "PO-Revision-Date: 2018-06-05 14:19+0100\n"
 "Last-Translator: Simon Long <simon@raspberrypi.org>\n"
 "Language-Team: English (British)\n"
@@ -68,6 +68,7 @@ msgid "Getting updates - please wait..."
 msgstr "Getting updates - please wait..."
 
 #: ../src/piwiz.c:1015
+#, c-format
 msgid ""
 "Error installing languages.\n"
 "%s"
@@ -80,6 +81,7 @@ msgid "Comparing versions - please wait..."
 msgstr "Comparing versions - please wait..."
 
 #: ../src/piwiz.c:1033
+#, c-format
 msgid ""
 "Error finding languages.\n"
 "%s"
@@ -362,8 +364,8 @@ msgid "Enter the new password again"
 msgstr "Enter the new password again"
 
 #: ../data/piwiz.ui.h:26
-msgid "Hide passwords"
-msgstr "Hide passwords"
+msgid "Hide characters"
+msgstr "Hide characters"
 
 #: ../data/piwiz.ui.h:27
 msgid "Show or hide the characters in your password"
@@ -406,14 +408,10 @@ msgid "Enter the password for your network"
 msgstr "Enter the password for your network"
 
 #: ../data/piwiz.ui.h:37
-msgid "Hide password"
-msgstr "Hide password"
-
-#: ../data/piwiz.ui.h:38
 msgid "<b>Check For Updates</b>"
 msgstr "<b>Check For Updates</b>"
 
-#: ../data/piwiz.ui.h:39
+#: ../data/piwiz.ui.h:38
 msgid ""
 "Press 'Next' to check that Raspbian is up to date, or 'Skip' to continue "
 "without checking."
@@ -421,15 +419,15 @@ msgstr ""
 "Press 'Next' to check that Raspbian is up to date, or 'Skip' to continue "
 "without checking."
 
-#: ../data/piwiz.ui.h:40
+#: ../data/piwiz.ui.h:39
 msgid "<b>Setup Complete</b>"
 msgstr "<b>Setup Complete</b>"
 
-#: ../data/piwiz.ui.h:41
+#: ../data/piwiz.ui.h:40
 msgid "Your Raspberry Pi now is set up and ready to go."
 msgstr "Your Raspberry Pi now is set up and ready to go."
 
-#: ../data/piwiz.ui.h:42
+#: ../data/piwiz.ui.h:41
 msgid "Press 'Reboot' to reboot your Pi for the new settings to take effect."
 msgstr "Press 'Reboot' to reboot your Pi for the new settings to take effect."
 
