@@ -235,6 +235,7 @@ static void country_changed (GtkComboBox *cb, gpointer ptr);
 static gboolean match_country (GtkTreeModel *model, GtkTreeIter *iter, gpointer data);
 static void read_inits (void);
 static void set_init (GtkTreeModel *model, GtkWidget *cb, int pos, char *init);
+static void escape_passwd (const char *in, char **out);
 static void scans_add (char *str, int match, int secure, int signal, int connected);
 static int find_line (char **lssid, int *secure, int *connected);
 void connect_success (void);
@@ -731,6 +732,25 @@ static void set_init (GtkTreeModel *model, GtkWidget *cb, int pos, char *init)
     }
 }
 
+/* Password */
+
+static void escape_passwd (const char *in, char **out)
+{
+    const char *ip;
+    char *op;
+
+    ip = in;
+    *out = malloc (2 * strlen (in) + 1);    // allocate for worst case...
+    op = *out;
+    while (*ip)
+    {
+        if (*ip == '$' || *ip == '"' || *ip == '\\' || *ip == '`')
+            *op++ = '\\';
+        *op++ = *ip++;
+    }
+    *op = 0;
+}
+
 /* WiFi */
 
 static void scans_add (char *str, int match, int secure, int signal, int connected)
@@ -1045,7 +1065,8 @@ static void next_page (GtkButton* btn, gpointer ptr)
 {
     GtkTreeModel *model;
     GtkTreeIter iter;
-    const char *psk, *pw1, *pw2;
+    const char *psk;
+    char *pw1, *pw2;
     char *text;
     int secure, connected;
 
@@ -1087,8 +1108,8 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             else gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
                             break;
 
-        case PAGE_PASSWD :  pw1 = gtk_entry_get_text (GTK_ENTRY (pwd1_te));
-                            pw2 = gtk_entry_get_text (GTK_ENTRY (pwd2_te));
+        case PAGE_PASSWD :  escape_passwd (gtk_entry_get_text (GTK_ENTRY (pwd1_te)), &pw1);
+                            escape_passwd (gtk_entry_get_text (GTK_ENTRY (pwd2_te)), &pw2);
                             if (strlen (pw1) || strlen (pw2))
                             {
                                 if (g_strcmp0 (pw1, pw2))
@@ -1098,6 +1119,8 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                 }
                                 vsystem ("(echo \"%s\" ; echo \"%s\") | passwd $SUDO_USER", pw1, pw2);
                             }
+                            g_free (pw1);
+                            g_free (pw2);
                             if (!wifi_if[0])
                                 gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
                             else
