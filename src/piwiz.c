@@ -59,6 +59,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PAGE_UPDATE 5
 #define PAGE_DONE 6
 
+#define NEXT_BTN 0
+#define SKIP_BTN 1
+#define PREV_BTN 2
+
 #define LABEL_WIDTH(name, w) {GtkWidget *l = (GtkWidget *) gtk_builder_get_object (builder, name); gtk_widget_set_size_request (l, w, -1);}
 
 /* Controls */
@@ -87,6 +91,7 @@ char *cc, *lc, *city, *ext, *lay, *var;
 char *ssid;
 gint conn_timeout = 0, pulse_timer = 0;
 gboolean reboot;
+int last_btn = NEXT_BTN;
 
 /* Map from country code to keyboard */
 
@@ -404,6 +409,7 @@ static void message (char *msg, int wait, int dest_page, int prog, gboolean puls
         g_signal_connect (msg_btn, "clicked", G_CALLBACK (ok_clicked), (void *) dest_page);
         gtk_widget_set_visible (msg_pb, FALSE);
         gtk_widget_set_visible (msg_btn, TRUE);
+        gtk_widget_grab_focus (msg_btn);
     }
     else
     {
@@ -1128,6 +1134,11 @@ static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int page
         case PAGE_UPDATE :  gtk_widget_set_visible (skip_btn, TRUE);
                             break;
     }
+
+    // restore the keyboard focus
+    if (last_btn == PREV_BTN) gtk_widget_grab_focus (prev_btn);
+    else if (last_btn == SKIP_BTN && gtk_widget_get_visible (skip_btn)) gtk_widget_grab_focus (skip_btn);
+    else gtk_widget_grab_focus (next_btn);
 }
 
 static void next_page (GtkButton* btn, gpointer ptr)
@@ -1139,6 +1150,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
     char *text;
     int secure, connected;
 
+    last_btn = NEXT_BTN;
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
     {
         case PAGE_LOCALE :  // get the combo entries and look up relevant codes in database
@@ -1254,6 +1266,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
 
 static void prev_page (GtkButton* btn, gpointer ptr)
 {
+    last_btn = PREV_BTN;
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
     {
         case PAGE_UPDATE :  gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIAP);
@@ -1269,6 +1282,7 @@ static void prev_page (GtkButton* btn, gpointer ptr)
 
 static void skip_page (GtkButton* btn, gpointer ptr)
 {
+    last_btn = SKIP_BTN;
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
     {
         case PAGE_WIFIAP :  gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
