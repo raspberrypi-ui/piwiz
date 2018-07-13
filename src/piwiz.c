@@ -1077,14 +1077,21 @@ static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data)
 
     buf = g_strdup_printf ("check-language-support -l %s_%s", lc, cc);
     lpack = get_shell_string (buf, TRUE);
-    pack_array = g_strsplit (lpack, " ", -1);
+    if (strlen (lpack))
+    {
+        pack_array = g_strsplit (lpack, " ", -1);
 
-    message (_("Finding languages - please wait..."), 0, 0, -1, FALSE);
-    pk_client_resolve_async (PK_CLIENT (task), 0, pack_array, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) resolve_lang_done, NULL);
-
+        message (_("Finding languages - please wait..."), 0, 0, -1, FALSE);
+        pk_client_resolve_async (PK_CLIENT (task), 0, pack_array, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) resolve_lang_done, NULL);
+        g_strfreev (pack_array);
+    }
+    else
+    {
+        message (_("Comparing versions - please wait..."), 0, 0, -1, FALSE);
+        pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
+    }
     g_free (buf);
     g_free (lpack);
-    g_strfreev (pack_array);
 }
 
 static gpointer refresh_update_cache (gpointer data)
