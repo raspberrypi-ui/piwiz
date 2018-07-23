@@ -413,10 +413,10 @@ msgstr "<b>Check For Updates</b>"
 
 #: ../data/piwiz.ui.h:38
 msgid ""
-"Press 'Next' to check that Raspbian is up to date, or 'Skip' to continue "
+"Press 'Next' to check that all software is up to date, or 'Skip' to continue "
 "without checking."
 msgstr ""
-"Press 'Next' to check that Raspbian is up to date, or 'Skip' to continue "
+"Press 'Next' to check that all software is up to date, or 'Skip' to continue "
 "without checking."
 
 #: ../data/piwiz.ui.h:39
@@ -424,8 +424,8 @@ msgid "<b>Setup Complete</b>"
 msgstr "<b>Setup Complete</b>"
 
 #: ../data/piwiz.ui.h:40
-msgid "Your Raspberry Pi now is set up and ready to go."
-msgstr "Your Raspberry Pi now is set up and ready to go."
+msgid "Your Raspberry Pi is now set up and ready to go."
+msgstr "Your Raspberry Pi is now set up and ready to go."
 
 #: ../data/piwiz.ui.h:41
 msgid "Press 'Reboot' to reboot your Pi for the new settings to take effect."
