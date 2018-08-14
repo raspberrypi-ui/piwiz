@@ -211,7 +211,7 @@ update_online(DHCPCD_CONNECTION *con, bool showif)
 				ison = true;
 		}
 /*!!!!!!!!!!*/
-		if (i->wireless && i->state == DHS_CARRIER) connect_success ();
+		if (i->wireless && i->state == DHS_CARRIER && dhcpcd_status (con, NULL) == DHC_CONNECTED) connect_success ();
 /*!!!!!!!!!!*/
 		msg = dhcpcd_if_message(i, NULL);
 		if (msg) {
