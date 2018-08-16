@@ -1177,13 +1177,15 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             gtk_combo_box_get_active_iter (GTK_COMBO_BOX (timezone_cb), &iter);
                             gtk_tree_model_get (model, &iter, 0, &city, -1);
 
+                            lookup_keyboard (cc, lc, &lay, &var);
+
                             if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (us_key)))
                             {
                                 lay = g_strdup_printf("us,%s", g_strdup(lay));
                                 var = g_strdup ("");
                                 opt = g_strdup ("grp:alt_shift_toggle");
                             }
-                            else lookup_keyboard (cc, lc, &lay, &var);
+
 
                             // set wifi country - this is quick, so no need for warning
                             if (wifi_if[0])
