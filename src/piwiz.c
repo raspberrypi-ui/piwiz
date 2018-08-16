@@ -1179,7 +1179,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
 
                             if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (us_key)))
                             {
-                                lay = g_strdup_printf("us,%s", lay);
+                                lay = g_strdup_printf("us,%s", g_strdup(lay));
                                 var = g_strdup ("");
                                 opt = g_strdup ("grp:alt_shift_toggle");
                             }
