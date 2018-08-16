@@ -718,7 +718,7 @@ static void read_inits (void)
     init_tz = get_string ("cat /etc/timezone");
     init_kb = get_string ("grep XKBLAYOUT /etc/default/keyboard | cut -d = -f 2 | tr -d '\"\n'");
     init_var = get_string ("grep XKBVARIANT /etc/default/keyboard | cut -d = -f 2 | tr -d '\"\n'");
-    init_opt = get_string ("grep XKBVARIANT /etc/default/keyboard | cut -d = -f 2 | tr -d '\"\n'");
+    init_opt = get_string ("grep XKBOPTIONS /etc/default/keyboard | cut -d = -f 2 | tr -d '\"\n'");
     buffer = get_string ("grep LC_ALL /etc/default/locale | cut -d = -f 2");
     if (!buffer[0]) buffer = get_string ("grep LANGUAGE /etc/default/locale | cut -d = -f 2");
     if (!buffer[0]) buffer = get_string ("grep LANG /etc/default/locale | cut -d = -f 2");
