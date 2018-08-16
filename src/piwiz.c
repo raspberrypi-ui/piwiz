@@ -546,6 +546,7 @@ static gpointer set_locale (gpointer data)
 
     g_free (lay);
     g_free (var);
+    g_free (opt);
     g_free (city);
     g_free (ext);
 
