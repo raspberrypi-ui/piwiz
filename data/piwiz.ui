@@ -316,7 +316,7 @@ Press 'Next' to get started. </property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="label" translatable="yes">Use US keyboard</property>
-                            <property name="tooltip_text" translatable="yes">Use the US keyboard layout instead of the default keyboard for your country</property>
+                            <property name="tooltip_text" translatable="yes">Use the US keyboard layout with default keyboard for your country</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>

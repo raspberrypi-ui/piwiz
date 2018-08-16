@@ -86,8 +86,8 @@ GtkListStore *ap_list;
 
 /* Globals */
 
-char *wifi_if, *init_country, *init_lang, *init_kb, *init_var, *init_tz;
-char *cc, *lc, *city, *ext, *lay, *var;
+char *wifi_if, *init_country, *init_lang, *init_kb, *init_var, *init_opt, *init_tz;
+char *cc, *lc, *city, *ext, *lay, *var, *opt;
 char *ssid;
 gint conn_timeout = 0, pulse_timer = 0;
 gboolean reboot;
@@ -503,10 +503,10 @@ static gpointer set_locale (gpointer data)
         fp = fopen ("/etc/default/keyboard", "wb");
         if (fp)
         {
-            fprintf (fp, "XKBMODEL=pc105\nXKBLAYOUT=%s\nXKBVARIANT=%s\nXKBOPTIONS=\nBACKSPACE=guess", lay, var);
+            fprintf (fp, "XKBMODEL=pc105\nXKBLAYOUT=%s\nXKBVARIANT=%s\nXKBOPTIONS=%s\nBACKSPACE=guess", lay, var, opt);
             fclose (fp);
         }
-        vsystem ("setxkbmap -layout %s -variant \"%s\" -option \"\"", lay, var);
+        vsystem ("setxkbmap -layout %s -variant \"%s\" -option \"%s\"", lay, var, opt);
         if (init_kb)
         {
             g_free (init_kb);
@@ -516,6 +516,11 @@ static gpointer set_locale (gpointer data)
         {
             g_free (init_var);
             init_var = g_strdup (var);
+        }
+        if (init_opt)
+        {
+            g_free (init_opt);
+            init_opt = g_strdup (opt);
         }
     }
 
@@ -712,6 +717,7 @@ static void read_inits (void)
     init_tz = get_string ("cat /etc/timezone");
     init_kb = get_string ("grep XKBLAYOUT /etc/default/keyboard | cut -d = -f 2 | tr -d '\"\n'");
     init_var = get_string ("grep XKBVARIANT /etc/default/keyboard | cut -d = -f 2 | tr -d '\"\n'");
+    init_opt = get_string ("grep XKBVARIANT /etc/default/keyboard | cut -d = -f 2 | tr -d '\"\n'");
     buffer = get_string ("grep LC_ALL /etc/default/locale | cut -d = -f 2");
     if (!buffer[0]) buffer = get_string ("grep LANGUAGE /etc/default/locale | cut -d = -f 2");
     if (!buffer[0]) buffer = get_string ("grep LANG /etc/default/locale | cut -d = -f 2");
@@ -1173,8 +1179,9 @@ static void next_page (GtkButton* btn, gpointer ptr)
 
                             if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (us_key)))
                             {
-                                lay = g_strdup ("us");
+                                lay = g_strdup ("us,%s", lay);
                                 var = g_strdup ("");
+                                opt = g_strdup ("grp:alt_shift_toggle");
                             }
                             else lookup_keyboard (cc, lc, &lay, &var);
 
