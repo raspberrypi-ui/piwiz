@@ -1199,7 +1199,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                 || g_strcmp0 (init_lang, lc) || g_ascii_strcasecmp (init_kb, lay)
                                 || g_strcmp0 (init_var, var))
                             {
-                                opt = g_strdup("");
+                                opt = g_strdup(" ");
                                 message (_("Setting location - please wait..."), 0, 0, -1, TRUE);
                                 g_thread_new (NULL, set_locale, NULL);
                             }
