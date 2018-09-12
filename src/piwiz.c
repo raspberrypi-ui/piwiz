@@ -1443,6 +1443,11 @@ int main (int argc, char *argv[])
     set_init (GTK_TREE_MODEL (slang), language_cb, 0, init_lang ? init_lang : "en");
     set_init (GTK_TREE_MODEL (scity), timezone_cb, 0, init_tz[0] ? init_tz : "Europe/London");
 
+    // make an educated guess as to whether a US keyboard override was set
+    char *ilay = NULL, *ivar = NULL;
+    if (init_country && init_lang) lookup_keyboard (init_country, init_lang, &ilay, &ivar);
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (us_key), (!g_strcmp0 (init_kb, "us") && g_strcmp0 (ilay, "us")));
+
     gtk_widget_show_all (GTK_WIDGET (country_cb));
     gtk_widget_show_all (GTK_WIDGET (language_cb));
     gtk_widget_show_all (GTK_WIDGET (timezone_cb));
