@@ -218,6 +218,61 @@ static const char keyboard_map[][13] = {
 	"",	    "",	    "us",	    ""
 };
 
+#define MAX_KBS 15
+static const char kb_countries[MAX_KBS][3] = {
+    "GB",   // default if no Pi keyboard found
+    "GB",
+    "FR",
+    "ES",
+    "US",
+    "DE",
+    "IT",
+    "JP",
+    "PT",
+    "NO",
+    "SE",
+    "FI",
+    "RU",
+    "TR",
+    "IL"
+};
+
+static const char kb_langs[MAX_KBS][3] = {
+    "en",   // default if no Pi keyboard found
+    "en",
+    "fr",
+    "es",
+    "en",
+    "de",
+    "it",
+    "jp",
+    "pt",
+    "nn",
+    "se",
+    "fi",
+    "ru",
+    "tr",
+    "he"
+};
+
+static const char kb_tzs[MAX_KBS][20] = {
+    "Europe/London",    // default if no Pi keyboard found
+    "Europe/London",
+    "Europe/Paris",
+    "Europe/Madrid",
+    "America/New_York",
+    "Europe/Berlin",
+    "Europe/Rome",
+    "Asia/Tokyo",
+    "Europe/Lisbon",
+    "Europe/Oslo",
+    "Europe/Stockholm",
+    "Europe/Helsinki",
+    "Europe/Moscow",
+    "Europe/Istanbul",
+    "Europe/Jerusalem"
+};
+
 /* In dhcpcd-gtk/main.c */
 
 void init_dhcpcd (void);
@@ -260,6 +315,7 @@ static void next_page (GtkButton* btn, gpointer ptr);
 static void prev_page (GtkButton* btn, gpointer ptr);
 static void skip_page (GtkButton* btn, gpointer ptr);
 static gboolean show_ip (void);
+static int get_pi_keyboard (void);
 
 /* Helpers */
 
@@ -353,6 +409,22 @@ static int vsystem (const char *fmt, ...)
     g_free (cmdline);
     return res;
 }
+
+/* Keyboard detection */
+
+static int get_pi_keyboard (void)
+{
+    int val, ret = 0;
+
+    char *res = get_string ("lsusb -v -d 04d9:0006 | grep \"RPI Wired Keyboard\" | rev");
+    if (res)
+    {
+        if (sscanf (res, "%x", &val) == 1) ret = val;
+        g_free (res);
+    }
+    return ret;
+}
+
 
 /* Message boxes */
 
@@ -1354,7 +1426,7 @@ int main (int argc, char *argv[])
     GtkBuilder *builder;
     GtkWidget *wid;
     GtkCellRenderer *col;
-    int res;
+    int res, kbd;
 
 #ifdef ENABLE_NLS
     setlocale (LC_ALL, "");
@@ -1362,6 +1434,10 @@ int main (int argc, char *argv[])
     bind_textdomain_codeset ( GETTEXT_PACKAGE, "UTF-8" );
     textdomain ( GETTEXT_PACKAGE );
 #endif
+
+    // read country code from Pi keyboard, if any
+    kbd = get_pi_keyboard ();
+    if (kbd > MAX_KBS - 1) kbd = 0;
 
     reboot = FALSE;
     read_inits ();
@@ -1439,9 +1515,9 @@ int main (int argc, char *argv[])
 
     // initialise the country combo
     g_signal_connect (country_cb, "changed", G_CALLBACK (country_changed), NULL);
-    set_init (GTK_TREE_MODEL (fcount), country_cb, 1, init_country ? init_country : "GB");
-    set_init (GTK_TREE_MODEL (slang), language_cb, 0, init_lang ? init_lang : "en");
-    set_init (GTK_TREE_MODEL (scity), timezone_cb, 0, init_tz[0] ? init_tz : "Europe/London");
+    set_init (GTK_TREE_MODEL (fcount), country_cb, 1, init_country ? init_country : kb_countries[kbd]);
+    set_init (GTK_TREE_MODEL (slang), language_cb, 0, init_lang ? init_lang : kb_langs[kbd]);
+    set_init (GTK_TREE_MODEL (scity), timezone_cb, 0, init_tz[0] ? init_tz : kb_tzs[kbd]);
 
     // make an educated guess as to whether a US keyboard override was set
     char *ilay = NULL, *ivar = NULL;
