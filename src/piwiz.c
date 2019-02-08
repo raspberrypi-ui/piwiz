@@ -54,10 +54,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PAGE_INTRO 0
 #define PAGE_LOCALE 1
 #define PAGE_PASSWD 2
-#define PAGE_WIFIAP 3
-#define PAGE_WIFIPSK 4
-#define PAGE_UPDATE 5
-#define PAGE_DONE 6
+#define PAGE_OSCAN 3
+#define PAGE_WIFIAP 4
+#define PAGE_WIFIPSK 5
+#define PAGE_UPDATE 6
+#define PAGE_DONE 7
 
 #define NEXT_BTN 0
 #define SKIP_BTN 1
@@ -1281,6 +1282,10 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             }
                             g_free (pw1);
                             g_free (pw2);
+                            gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
+                            break;
+
+        case PAGE_OSCAN :   // do some stuff here to set the borders...
                             if (!wifi_if[0])
                                 gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
                             else
@@ -1348,7 +1353,10 @@ static void prev_page (GtkButton* btn, gpointer ptr)
     last_btn = PREV_BTN;
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
     {
-        case PAGE_UPDATE :  gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIAP);
+        case PAGE_UPDATE :  if (!wifi_if[0])
+                                gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
+                            else
+                                gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIAP);
                             break;
 
         case PAGE_INTRO :   gtk_dialog_response (GTK_DIALOG (main_dlg), GTK_RESPONSE_CANCEL);
