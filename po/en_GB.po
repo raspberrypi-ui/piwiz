@@ -1,14 +1,14 @@
 # English translations for piwiz package.
-# Copyright (C) 2018 Raspberry Pi Ltd
+# Copyright (C) 2019 Raspberry Pi Ltd
 # This file is distributed under the same license as the piwiz package.
-# Simon Long <simon@raspberrypi.org>, 2018.
+# Simon Long <simon@raspberrypi.org>, 2019.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: piwiz 1.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-02 14:50+0100\n"
-"PO-Revision-Date: 2018-06-05 14:19+0100\n"
+"POT-Creation-Date: 2019-02-11 10:04+0000\n"
+"PO-Revision-Date: 2019-02-11 10:05+0000\n"
 "Last-Translator: Simon Long <simon@raspberrypi.org>\n"
 "Language-Team: English (British)\n"
 "Language: en_GB\n"
@@ -17,31 +17,31 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../src/piwiz.c:810 ../src/piwiz.c:1133
+#: ../src/piwiz.c:905 ../src/piwiz.c:1228
 msgid "Searching for networks - please wait..."
 msgstr "Searching for networks - please wait..."
 
-#: ../src/piwiz.c:830
+#: ../src/piwiz.c:925
 msgid "Failed to connect to network."
 msgstr "Failed to connect to network."
 
-#: ../src/piwiz.c:950
+#: ../src/piwiz.c:1045
 msgid "Reading update list - please wait..."
 msgstr "Reading update list - please wait..."
 
-#: ../src/piwiz.c:952
+#: ../src/piwiz.c:1047
 msgid "Downloading updates - please wait..."
 msgstr "Downloading updates - please wait..."
 
-#: ../src/piwiz.c:959
+#: ../src/piwiz.c:1054
 msgid "Installing updates - please wait..."
 msgstr "Installing updates - please wait..."
 
-#: ../src/piwiz.c:961 ../src/piwiz.c:1052
+#: ../src/piwiz.c:1056 ../src/piwiz.c:1147
 msgid "Installing languages - please wait..."
 msgstr "Installing languages - please wait..."
 
-#: ../src/piwiz.c:978
+#: ../src/piwiz.c:1073
 #, c-format
 msgid ""
 "Error getting updates.\n"
@@ -50,11 +50,11 @@ msgstr ""
 "Error getting updates.\n"
 "%s"
 
-#: ../src/piwiz.c:985 ../src/piwiz.c:1011
+#: ../src/piwiz.c:1080 ../src/piwiz.c:1106
 msgid "System is up to date"
 msgstr "System is up to date"
 
-#: ../src/piwiz.c:995
+#: ../src/piwiz.c:1090
 #, c-format
 msgid ""
 "Error comparing versions.\n"
@@ -63,11 +63,11 @@ msgstr ""
 "Error comparing versions.\n"
 "%s"
 
-#: ../src/piwiz.c:1008
+#: ../src/piwiz.c:1103
 msgid "Getting updates - please wait..."
 msgstr "Getting updates - please wait..."
 
-#: ../src/piwiz.c:1021
+#: ../src/piwiz.c:1116
 #, c-format
 msgid ""
 "Error installing languages.\n"
@@ -76,11 +76,11 @@ msgstr ""
 "Error installing languages.\n"
 "%s"
 
-#: ../src/piwiz.c:1028 ../src/piwiz.c:1057 ../src/piwiz.c:1090
+#: ../src/piwiz.c:1123 ../src/piwiz.c:1152 ../src/piwiz.c:1185
 msgid "Comparing versions - please wait..."
 msgstr "Comparing versions - please wait..."
 
-#: ../src/piwiz.c:1039
+#: ../src/piwiz.c:1134
 #, c-format
 msgid ""
 "Error finding languages.\n"
@@ -89,7 +89,7 @@ msgstr ""
 "Error finding languages.\n"
 "%s"
 
-#: ../src/piwiz.c:1071
+#: ../src/piwiz.c:1166
 #, c-format
 msgid ""
 "Error checking for updates.\n"
@@ -98,69 +98,69 @@ msgstr ""
 "Error checking for updates.\n"
 "%s"
 
-#: ../src/piwiz.c:1084
+#: ../src/piwiz.c:1179
 msgid "Finding languages - please wait..."
 msgstr "Finding languages - please wait..."
 
-#: ../src/piwiz.c:1108 ../data/piwiz.ui.h:5
+#: ../src/piwiz.c:1203 ../data/piwiz.ui.h:5
 msgid "_Next"
 msgstr "_Next"
 
-#: ../src/piwiz.c:1109
+#: ../src/piwiz.c:1204
 msgid "_Back"
 msgstr "_Back"
 
-#: ../src/piwiz.c:1114 ../data/piwiz.ui.h:3
+#: ../src/piwiz.c:1209 ../data/piwiz.ui.h:3
 msgid "_Cancel"
 msgstr "_Cancel"
 
-#: ../src/piwiz.c:1120
+#: ../src/piwiz.c:1215
 msgid "_Reboot"
 msgstr "_Reboot"
 
-#: ../src/piwiz.c:1125
+#: ../src/piwiz.c:1220
 msgid "_Done"
 msgstr "_Done"
 
-#: ../src/piwiz.c:1193
+#: ../src/piwiz.c:1288
 msgid "Setting location - please wait..."
 msgstr "Setting location - please wait..."
 
-#: ../src/piwiz.c:1205
+#: ../src/piwiz.c:1300
 msgid "The two passwords entered do not match."
 msgstr "The two passwords entered do not match."
 
-#: ../src/piwiz.c:1231
+#: ../src/piwiz.c:1330
 #, c-format
 msgid "Enter the password for the WiFi network \"%s\"."
 msgstr "Enter the password for the WiFi network \"%s\"."
 
-#: ../src/piwiz.c:1245 ../src/piwiz.c:1256
+#: ../src/piwiz.c:1344 ../src/piwiz.c:1355
 msgid "Connecting to WiFi network - please wait..."
 msgstr "Connecting to WiFi network - please wait..."
 
-#: ../src/piwiz.c:1248 ../src/piwiz.c:1259
+#: ../src/piwiz.c:1347 ../src/piwiz.c:1358
 msgid "Could not connect to this network"
 msgstr "Could not connect to this network"
 
-#: ../src/piwiz.c:1265
+#: ../src/piwiz.c:1364
 msgid "Checking for updates - please wait..."
 msgstr "Checking for updates - please wait..."
 
-#: ../src/piwiz.c:1340
+#: ../src/piwiz.c:1447
 #, c-format
 msgid "<span font_desc=\"10.0\">IP : %s</span>"
 msgstr "<span font_desc=\"10.0\">IP : %s</span>"
 
-#: ../src/piwiz.c:1427
+#: ../src/piwiz.c:1543
 msgid "Set the country in which you are using your Pi"
 msgstr "Set the country in which you are using your Pi"
 
-#: ../src/piwiz.c:1428
+#: ../src/piwiz.c:1544
 msgid "Set the language in which applications should appear"
 msgstr "Set the language in which applications should appear"
 
-#: ../src/piwiz.c:1429
+#: ../src/piwiz.c:1545
 msgid "Set the closest city to your location"
 msgstr "Set the closest city to your location"
 
@@ -376,42 +376,80 @@ msgid "Press 'Next' to activate your new password."
 msgstr "Press 'Next' to activate your new password."
 
 #: ../data/piwiz.ui.h:29
+msgid "<b>Set Up Monitor</b>"
+msgstr "<b>Set Up Monitor</b>"
+
+#: ../data/piwiz.ui.h:30
+msgid ""
+"Some monitors show a black border around the edge of the desktop. Select the "
+"appropriate option below to fix this."
+msgstr ""
+"Some monitors show a black border around the edge of the desktop. Select the "
+"appropriate option below to fix this."
+
+#: ../data/piwiz.ui.h:31
+msgid "I can see a black border around my desktop"
+msgstr "I can see a black border around my desktop"
+
+#: ../data/piwiz.ui.h:32
+msgid "Select this option if you can see a black border"
+msgstr "Select this option if you can see a black border"
+
+#: ../data/piwiz.ui.h:33
+msgid "I cannot see a black border around my desktop"
+msgstr "I cannot see a black border around my desktop"
+
+#: ../data/piwiz.ui.h:34
+msgid "Select this option if you cannot see a black border"
+msgstr "Select this option if you cannot see a black border"
+
+#: ../data/piwiz.ui.h:35
+msgid ""
+"The change will take effect when you reboot.\n"
+"\n"
+"Press 'Next' to save your setting."
+msgstr ""
+"The change will take effect when you reboot.\n"
+"\n"
+"Press 'Next' to save your setting."
+
+#: ../data/piwiz.ui.h:38
 msgid "<b>Select WiFi Network</b>"
 msgstr "<b>Select WiFi Network</b>"
 
-#: ../data/piwiz.ui.h:30
+#: ../data/piwiz.ui.h:39
 msgid "Select your WiFi network from the list."
 msgstr "Select your WiFi network from the list."
 
-#: ../data/piwiz.ui.h:31
+#: ../data/piwiz.ui.h:40
 msgid "Click the name of your network to select it"
 msgstr "Click the name of your network to select it"
 
-#: ../data/piwiz.ui.h:32
+#: ../data/piwiz.ui.h:41
 msgid "Press 'Next' to connect, or 'Skip' to continue without connecting."
 msgstr "Press 'Next' to connect, or 'Skip' to continue without connecting."
 
-#: ../data/piwiz.ui.h:33
+#: ../data/piwiz.ui.h:42
 msgid "<b>Enter WiFi Password</b>"
 msgstr "<b>Enter WiFi Password</b>"
 
-#: ../data/piwiz.ui.h:34
+#: ../data/piwiz.ui.h:43
 msgid "Enter the password for your WiFi network."
 msgstr "Enter the password for your WiFi network."
 
-#: ../data/piwiz.ui.h:35
+#: ../data/piwiz.ui.h:44
 msgid "Password:"
 msgstr "Password:"
 
-#: ../data/piwiz.ui.h:36
+#: ../data/piwiz.ui.h:45
 msgid "Enter the password for your network"
 msgstr "Enter the password for your network"
 
-#: ../data/piwiz.ui.h:37
+#: ../data/piwiz.ui.h:46
 msgid "<b>Update Software</b>"
 msgstr "<b>Update Software</b>"
 
-#: ../data/piwiz.ui.h:38
+#: ../data/piwiz.ui.h:47
 msgid ""
 "The operating system and applications will now be checked and updated if "
 "necessary. This may involve a large download.\n"
@@ -425,15 +463,15 @@ msgstr ""
 "Press 'Next' to check and update software, or 'Skip' to continue without "
 "checking."
 
-#: ../data/piwiz.ui.h:41
+#: ../data/piwiz.ui.h:50
 msgid "<b>Setup Complete</b>"
 msgstr "<b>Setup Complete</b>"
 
-#: ../data/piwiz.ui.h:42
+#: ../data/piwiz.ui.h:51
 msgid "Your Raspberry Pi is now set up and ready to go."
 msgstr "Your Raspberry Pi is now set up and ready to go."
 
-#: ../data/piwiz.ui.h:43
+#: ../data/piwiz.ui.h:52
 msgid "Press 'Reboot' to reboot your Pi for the new settings to take effect."
 msgstr "Press 'Reboot' to reboot your Pi for the new settings to take effect."
 

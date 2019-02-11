@@ -73,7 +73,7 @@ static GtkWidget *wizard_nb, *next_btn, *prev_btn, *skip_btn;
 static GtkWidget *country_cb, *language_cb, *timezone_cb;
 static GtkWidget *ap_tv, *psk_label, *prompt, *ip_label;
 static GtkWidget *pwd1_te, *pwd2_te, *psk_te;
-static GtkWidget *pwd_hide, *psk_hide, *us_key;
+static GtkWidget *pwd_hide, *psk_hide, *us_key, *uscan_off, *uscan_on;
 
 /* Lists for localisation */
 
@@ -90,6 +90,7 @@ GtkListStore *ap_list;
 char *wifi_if, *init_country, *init_lang, *init_kb, *init_var, *init_tz;
 char *cc, *lc, *city, *ext, *lay, *var;
 char *ssid;
+int init_uscan;
 gint conn_timeout = 0, pulse_timer = 0;
 gboolean reboot;
 int last_btn = NEXT_BTN;
@@ -283,6 +284,7 @@ extern DHCPCD_CONNECTION *con;
 
 static char *get_shell_string (char *cmd, gboolean all);
 static char *get_string (char *cmd);
+static int get_status (char *cmd);
 static char *get_quoted_param (char *path, char *fname, char *toseek);
 static int vsystem (const char *fmt, ...);
 static void message (char *msg, int wait, int dest_page, int prog, gboolean pulse);
@@ -296,7 +298,7 @@ static gboolean unique_rows (GtkTreeModel *model, GtkTreeIter *iter, gpointer da
 static void country_changed (GtkComboBox *cb, gpointer ptr);
 static gboolean match_country (GtkTreeModel *model, GtkTreeIter *iter, gpointer data);
 static void read_inits (void);
-static void set_init (GtkTreeModel *model, GtkWidget *cb, int pos, char *init);
+static void set_init (GtkTreeModel *model, GtkWidget *cb, int pos, const char *init);
 static void escape_passwd (const char *in, char **out);
 static void scans_add (char *str, int match, int secure, int signal, int connected);
 static int find_line (char **lssid, int *secure, int *connected);
@@ -353,6 +355,25 @@ static char *get_shell_string (char *cmd, gboolean all)
 static char *get_string (char *cmd)
 {
     return get_shell_string (cmd, FALSE);
+}
+
+static int get_status (char *cmd)
+{
+    FILE *fp = popen (cmd, "r");
+    char *buf = NULL;
+    int res = 0, val = 0;
+
+    if (fp == NULL) return 0;
+    if (getline (&buf, &res, fp) > 0)
+    {
+        if (sscanf (buf, "%d", &res) == 1)
+        {
+            val = res;
+        }
+    }
+    pclose (fp);
+    g_free (buf);
+    return val;
 }
 
 static char *get_quoted_param (char *path, char *fname, char *toseek)
@@ -799,9 +820,10 @@ static void read_inits (void)
         }
         g_free (buffer);
     }
+    init_uscan = get_status ("raspi-config nonint get_overscan");
 }
 
-static void set_init (GtkTreeModel *model, GtkWidget *cb, int pos, char *init)
+static void set_init (GtkTreeModel *model, GtkWidget *cb, int pos, const char *init)
 {
     GtkTreeIter iter;
     char *val;
@@ -1285,7 +1307,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
                             break;
 
-        case PAGE_OSCAN :   // do some stuff here to set the borders...
+        case PAGE_OSCAN :   if (get_status ("raspi-config nonint get_overscan") != init_uscan) reboot = TRUE;
                             if (!wifi_if[0])
                                 gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
                             else
@@ -1409,6 +1431,11 @@ static void psk_toggle (GtkButton *btn, gpointer ptr)
     }
 }
 
+static void uscan_toggle (GtkButton *btn, gpointer ptr)
+{
+    vsystem ("raspi-config nonint do_overscan %d", gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (uscan_off)));
+}
+
 static gboolean show_ip (void)
 {
     char *ip, *buf;
@@ -1492,6 +1519,11 @@ int main (int argc, char *argv[])
     g_signal_connect (psk_hide, "toggled", G_CALLBACK (psk_toggle), NULL);
     us_key = (GtkWidget *) gtk_builder_get_object (builder, "p1check");
 
+    uscan_off = (GtkWidget *) gtk_builder_get_object (builder, "p7radio1");
+    uscan_on = (GtkWidget *) gtk_builder_get_object (builder, "p7radio2");
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (uscan_on), get_status ("raspi-config nonint get_overscan") ? 0 : 1);
+    g_signal_connect (uscan_off, "toggled", G_CALLBACK (uscan_toggle), NULL);
+
     gtk_entry_set_visibility (GTK_ENTRY (pwd1_te), FALSE);
     gtk_entry_set_visibility (GTK_ENTRY (pwd2_te), FALSE);
     gtk_entry_set_visibility (GTK_ENTRY (psk_te), FALSE);
@@ -1560,11 +1592,13 @@ int main (int argc, char *argv[])
     LABEL_WIDTH ("p4info", res);
     LABEL_WIDTH ("p5info", res);
     LABEL_WIDTH ("p6info", res);
+    LABEL_WIDTH ("p7info", res);
     LABEL_WIDTH ("p1prompt", res);
     LABEL_WIDTH ("p2prompt", res);
     LABEL_WIDTH ("p3prompt", res);
     LABEL_WIDTH ("p4prompt", res);
     LABEL_WIDTH ("p6prompt", res);
+    LABEL_WIDTH ("p7prompt", res);
 
     /* start timed event to detect IP address being available */
     g_timeout_add (1000, (GSourceFunc) show_ip, NULL);

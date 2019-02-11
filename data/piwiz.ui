@@ -542,7 +542,7 @@ Press 'Next' to get started. </property>
                     <property name="can_focus">False</property>
                     <property name="xalign">0</property>
                     <property name="yalign">0</property>
-                    <property name="label" translatable="yes">Some monitors will show a black border around the desktop. </property>
+                    <property name="label" translatable="yes">Some monitors show a black border around the edge of the desktop. Select the appropriate option below to fix this.</property>
                     <property name="wrap">True</property>
                   </object>
                   <packing>
@@ -555,7 +555,7 @@ Press 'Next' to get started. </property>
                   <object class="GtkRadioButton" id="p7radio1">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="label" translatable="yes">My monitor shows black borders</property>
+                    <property name="label" translatable="yes">I can see a black border around my desktop</property>
                     <property name="tooltip_text" translatable="yes">Select this option if you can see a black border</property>
                     <property name="receives_default">False</property>
                     <property name="active">True</property>
@@ -571,7 +571,7 @@ Press 'Next' to get started. </property>
                   <object class="GtkRadioButton" id="p7radio2">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="label" translatable="yes">My monitor does not show black borders</property>
+                    <property name="label" translatable="yes">I cannot see a black border around my desktop</property>
                     <property name="tooltip_text" translatable="yes">Select this option if you cannot see a black border</property>
                     <property name="receives_default">False</property>
                     <property name="active">True</property>
@@ -590,7 +590,9 @@ Press 'Next' to get started. </property>
                     <property name="can_focus">False</property>
                     <property name="xalign">0</property>
                     <property name="yalign">0</property>
-                    <property name="label" translatable="yes">Press 'Next' to set the borders.</property>
+                    <property name="label" translatable="yes">The change will take effect when you reboot.
+
+Press 'Next' to save your setting.</property>
                     <property name="wrap">True</property>
                   </object>
                   <packing>
