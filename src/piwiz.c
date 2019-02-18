@@ -73,7 +73,7 @@ static GtkWidget *wizard_nb, *next_btn, *prev_btn, *skip_btn;
 static GtkWidget *country_cb, *language_cb, *timezone_cb;
 static GtkWidget *ap_tv, *psk_label, *prompt, *ip_label;
 static GtkWidget *pwd1_te, *pwd2_te, *psk_te;
-static GtkWidget *pwd_hide, *psk_hide, *us_key, *uscan_off, *uscan_on;
+static GtkWidget *pwd_hide, *psk_hide, *us_key, *uscan_chk;
 
 /* Lists for localisation */
 
@@ -90,9 +90,8 @@ GtkListStore *ap_list;
 char *wifi_if, *init_country, *init_lang, *init_kb, *init_var, *init_tz;
 char *cc, *lc, *city, *ext, *lay, *var;
 char *ssid;
-int init_uscan;
 gint conn_timeout = 0, pulse_timer = 0;
-gboolean reboot;
+gboolean reboot, uscan;
 int last_btn = NEXT_BTN;
 
 /* Map from country code to keyboard */
@@ -820,7 +819,6 @@ static void read_inits (void)
         }
         g_free (buffer);
     }
-    init_uscan = get_status ("raspi-config nonint get_overscan");
 }
 
 static void set_init (GtkTreeModel *model, GtkWidget *cb, int pos, const char *init)
@@ -1209,10 +1207,10 @@ static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int page
         case PAGE_INTRO :   gtk_button_set_label (GTK_BUTTON (prev_btn), _("_Cancel"));
                             break;
 
-        case PAGE_DONE :    if (reboot)
+        case PAGE_DONE :    if (reboot || uscan)
                             {
                                 gtk_widget_show (prompt);
-                                gtk_button_set_label (GTK_BUTTON (next_btn), _("_Reboot"));
+                                gtk_button_set_label (GTK_BUTTON (next_btn), _("_Restart"));
                             }
                             else
                             {
@@ -1307,7 +1305,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
                             break;
 
-        case PAGE_OSCAN :   if (get_status ("raspi-config nonint get_overscan") != init_uscan) reboot = TRUE;
+        case PAGE_OSCAN :   uscan = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (uscan_chk));
                             if (!wifi_if[0])
                                 gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
                             else
@@ -1431,11 +1429,6 @@ static void psk_toggle (GtkButton *btn, gpointer ptr)
     }
 }
 
-static void uscan_toggle (GtkButton *btn, gpointer ptr)
-{
-    vsystem ("raspi-config nonint do_overscan %d", gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (uscan_off)));
-}
-
 static gboolean show_ip (void)
 {
     char *ip, *buf;
@@ -1475,6 +1468,7 @@ int main (int argc, char *argv[])
     if (kbd > MAX_KBS - 1) kbd = 0;
 
     reboot = FALSE;
+    uscan = FALSE;
     read_inits ();
 
     // GTK setup
@@ -1518,11 +1512,7 @@ int main (int argc, char *argv[])
     psk_hide = (GtkWidget *) gtk_builder_get_object (builder, "p4check");
     g_signal_connect (psk_hide, "toggled", G_CALLBACK (psk_toggle), NULL);
     us_key = (GtkWidget *) gtk_builder_get_object (builder, "p1check");
-
-    uscan_off = (GtkWidget *) gtk_builder_get_object (builder, "p7radio1");
-    uscan_on = (GtkWidget *) gtk_builder_get_object (builder, "p7radio2");
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (uscan_on), get_status ("raspi-config nonint get_overscan") ? 0 : 1);
-    g_signal_connect (uscan_off, "toggled", G_CALLBACK (uscan_toggle), NULL);
+    uscan_chk = (GtkWidget *) gtk_builder_get_object (builder, "p7check");
 
     gtk_entry_set_visibility (GTK_ENTRY (pwd1_te), FALSE);
     gtk_entry_set_visibility (GTK_ENTRY (pwd2_te), FALSE);
@@ -1613,7 +1603,11 @@ int main (int argc, char *argv[])
         vsystem ("rm /etc/xdg/autostart/piwiz.desktop");
     }
 
-    if (res == GTK_RESPONSE_OK && reboot) vsystem ("reboot");
+    if (res == GTK_RESPONSE_OK)
+    {
+        if (uscan) vsystem ("raspi-config nonint do_overscan 1");
+        if (reboot || uscan) vsystem ("reboot");
+    }
     return 0;
 }
 
