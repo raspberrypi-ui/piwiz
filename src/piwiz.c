@@ -1545,9 +1545,9 @@ int main (int argc, char *argv[])
 
     // initialise the country combo
     g_signal_connect (country_cb, "changed", G_CALLBACK (country_changed), NULL);
-    set_init (GTK_TREE_MODEL (fcount), country_cb, 1, init_country ? init_country : kb_countries[kbd]);
-    set_init (GTK_TREE_MODEL (slang), language_cb, 0, init_lang ? init_lang : kb_langs[kbd]);
-    set_init (GTK_TREE_MODEL (scity), timezone_cb, 0, init_tz[0] ? init_tz : kb_tzs[kbd]);
+    set_init (GTK_TREE_MODEL (fcount), country_cb, 1, kbd ? kb_countries[kbd] : init_country);
+    set_init (GTK_TREE_MODEL (slang), language_cb, 0, kbd ? kb_langs[kbd] : init_lang);
+    set_init (GTK_TREE_MODEL (scity), timezone_cb, 0, kbd ? kb_tzs[kbd] : init_tz);
 
     // make an educated guess as to whether a US keyboard override was set
     char *ilay = NULL, *ivar = NULL;
