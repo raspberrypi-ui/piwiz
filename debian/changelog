@@ -1,3 +1,9 @@
+piwiz (0.3) stretch; urgency=medium
+
+  * Add underscan screen; auto detect Pi keyboards
+
+ -- Simon Long <simon@raspberrypi.org>  Tue, 19 Feb 2019 08:40:06 +0000
+
 piwiz (0.2) stretch; urgency=medium
 
   * Add keyboard database and US keyboard override option
