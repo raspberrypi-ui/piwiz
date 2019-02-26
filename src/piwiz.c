@@ -69,6 +69,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* Controls */
 
 static GtkWidget *main_dlg, *msg_dlg, *msg_msg, *msg_pb, *msg_btn;
+static GtkWidget *err_dlg, *err_msg, *err_btn;
 static GtkWidget *wizard_nb, *next_btn, *prev_btn, *skip_btn;
 static GtkWidget *country_cb, *language_cb, *timezone_cb;
 static GtkWidget *ap_tv, *psk_label, *prompt, *ip_label;
@@ -286,6 +287,7 @@ static char *get_string (char *cmd);
 static int get_status (char *cmd);
 static char *get_quoted_param (char *path, char *fname, char *toseek);
 static int vsystem (const char *fmt, ...);
+static void error_box (char *msg);
 static void message (char *msg, int wait, int dest_page, int prog, gboolean pulse);
 static void hide_message (void);
 static gboolean ok_clicked (GtkButton *button, gpointer data);
@@ -459,6 +461,56 @@ static gboolean pulse_pb (gpointer data)
     else return FALSE;
 }
 
+static void error_box (char *msg)
+{
+    int dest_page = PAGE_DONE;
+
+    if (msg_dlg)
+    {
+        // clear any existing message box
+        gtk_widget_destroy (GTK_WIDGET (msg_dlg));
+        msg_dlg = NULL;
+    }
+
+    if (!err_dlg)
+    {
+        GtkBuilder *builder;
+        GtkWidget *wid;
+        GdkColor col;
+
+        builder = gtk_builder_new ();
+        gtk_builder_add_from_file (builder, PACKAGE_DATA_DIR "/piwiz.ui", NULL);
+
+        err_dlg = (GtkWidget *) gtk_builder_get_object (builder, "error");
+        gtk_window_set_modal (GTK_WINDOW (err_dlg), TRUE);
+        gtk_window_set_transient_for (GTK_WINDOW (err_dlg), GTK_WINDOW (main_dlg));
+        gtk_window_set_position (GTK_WINDOW (err_dlg), GTK_WIN_POS_CENTER_ON_PARENT);
+        gtk_window_set_destroy_with_parent (GTK_WINDOW (err_dlg), TRUE);
+        gtk_window_set_default_size (GTK_WINDOW (err_dlg), 400, 200);
+
+        gdk_color_parse ("#FFFFFF", &col);
+        wid = (GtkWidget *) gtk_builder_get_object (builder, "err_eb");
+        gtk_widget_modify_bg (wid, GTK_STATE_NORMAL, &col);
+        wid = (GtkWidget *) gtk_builder_get_object (builder, "err_sw");
+        gtk_widget_modify_bg (wid, GTK_STATE_NORMAL, &col);
+        wid = (GtkWidget *) gtk_builder_get_object (builder, "err_vp");
+        gtk_widget_modify_bg (wid, GTK_STATE_NORMAL, &col);
+
+        err_msg = (GtkWidget *) gtk_builder_get_object (builder, "err_lbl");
+        err_btn = (GtkWidget *) gtk_builder_get_object (builder, "err_btn");
+
+        gtk_label_set_text (GTK_LABEL (err_msg), msg);
+
+        gtk_button_set_label (GTK_BUTTON (err_btn), "_OK");
+        g_signal_connect (err_btn, "clicked", G_CALLBACK (ok_clicked), (void *) dest_page);
+
+        gtk_widget_show_all (err_dlg);
+        g_object_unref (builder);
+    }
+    else gtk_label_set_text (GTK_LABEL (err_msg), msg);
+}
+
+
 static void message (char *msg, int wait, int dest_page, int prog, gboolean pulse)
 {
     if (!msg_dlg)
@@ -475,6 +527,7 @@ static void message (char *msg, int wait, int dest_page, int prog, gboolean puls
         gtk_window_set_transient_for (GTK_WINDOW (msg_dlg), GTK_WINDOW (main_dlg));
         gtk_window_set_position (GTK_WINDOW (msg_dlg), GTK_WIN_POS_CENTER_ON_PARENT);
         gtk_window_set_destroy_with_parent (GTK_WINDOW (msg_dlg), TRUE);
+        gtk_window_set_default_size (GTK_WINDOW (msg_dlg), 340, 100);
 
         wid = (GtkWidget *) gtk_builder_get_object (builder, "msg_eb");
         gdk_color_parse ("#FFFFFF", &col);
@@ -526,8 +579,16 @@ static void message (char *msg, int wait, int dest_page, int prog, gboolean puls
 
 static void hide_message (void)
 {
-    gtk_widget_destroy (GTK_WIDGET (msg_dlg));
-    msg_dlg = NULL;
+    if (msg_dlg)
+    {
+        gtk_widget_destroy (GTK_WIDGET (msg_dlg));
+        msg_dlg = NULL;
+    }
+    if (err_dlg)
+    {
+        gtk_widget_destroy (GTK_WIDGET (err_dlg));
+        err_dlg = NULL;
+    }
     gtk_widget_set_sensitive (prev_btn, TRUE);
     gtk_widget_set_sensitive (next_btn, TRUE);
     gtk_widget_set_sensitive (skip_btn, TRUE);
@@ -1069,7 +1130,7 @@ static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
     if (error != NULL)
     {
         char *buffer = g_strdup_printf (_("Error getting updates.\n%s"), error->message);
-        message (buffer, 1, PAGE_DONE, -1, FALSE);
+        error_box (buffer);
         g_free (buffer);
         g_error_free (error);
         return;
@@ -1086,7 +1147,7 @@ static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
     if (error != NULL)
     {
         char *buffer = g_strdup_printf (_("Error comparing versions.\n%s"), error->message);
-        message (buffer, 1, PAGE_DONE, -1, FALSE);
+        error_box (buffer);
         g_free (buffer);
         g_error_free (error);
         return;
@@ -1112,7 +1173,7 @@ static void install_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
     if (error != NULL)
     {
         char *buffer = g_strdup_printf (_("Error installing languages.\n%s"), error->message);
-        message (buffer, 1, PAGE_DONE, -1, FALSE);
+        error_box (buffer);
         g_free (buffer);
         g_error_free (error);
         return;
@@ -1130,7 +1191,7 @@ static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
     if (error != NULL)
     {
         char *buffer = g_strdup_printf (_("Error finding languages.\n%s"), error->message);
-        message (buffer, 1, PAGE_DONE, -1, FALSE);
+        error_box (buffer);
         g_free (buffer);
         g_error_free (error);
         return;
@@ -1162,7 +1223,7 @@ static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data)
     if (error != NULL)
     {
         char *buffer = g_strdup_printf (_("Error checking for updates.\n%s"), error->message);
-        message (buffer, 1, PAGE_DONE, -1, FALSE);
+        error_box (buffer);
         g_free (buffer);
         g_error_free (error);
         return;
@@ -1487,6 +1548,7 @@ int main (int argc, char *argv[])
     gtk_builder_add_from_file (builder, PACKAGE_DATA_DIR "/piwiz.ui", NULL);
 
     msg_dlg = NULL;
+    err_dlg = NULL;
     main_dlg = (GtkWidget *) gtk_builder_get_object (builder, "wizard_dlg");
     wizard_nb = (GtkWidget *) gtk_builder_get_object (builder, "wizard_nb");
     g_signal_connect (wizard_nb, "switch-page", G_CALLBACK (page_changed), NULL);
