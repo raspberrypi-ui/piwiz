@@ -1495,9 +1495,19 @@ static gboolean show_ip (void)
     char *ip, *buf;
 
     // display the ip address on the first page
-    ip = get_string ("ifconfig eth0 | grep inet[^6] | tr -s ' ' | cut -d ' ' -f 3");
+    ip = get_string ("hostname -I | tr ' ' \\\\n | grep \\\\. | tr \\\\n ','");
     if (ip && strlen (ip))
     {
+        buf = ip;
+        do
+        {
+            if (*buf == ',')
+            {
+                if (*(buf + 1)) *buf = '\t';
+                else *buf = 0;
+            }
+        }
+        while (*buf++);
         buf = g_strdup_printf (_("<span font_desc=\"10.0\">IP : %s</span>"), ip);
         gtk_label_set_markup (GTK_LABEL (ip_label), buf);
         g_free (buf);
