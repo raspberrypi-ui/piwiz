@@ -1672,7 +1672,7 @@ int main (int argc, char *argv[])
     gdk_threads_leave ();
     if (res == GTK_RESPONSE_CANCEL || res == GTK_RESPONSE_OK)
     {
-        vsystem ("rm /etc/xdg/autostart/piwiz.desktop");
+        vsystem ("rm -f /etc/xdg/autostart/piwiz.desktop");
     }
 
     if (res == GTK_RESPONSE_OK)
