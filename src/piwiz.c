@@ -1359,7 +1359,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                     message (_("The two passwords entered do not match."), 1, 0, -1, FALSE);
                                     break;
                                 }
-                                vsystem ("(echo \"%s\" ; echo \"%s\") | passwd $SUDO_USER", pw1, pw2);
+                                vsystem ("echo \"$SUDO_USER:%s\" | chpasswd", pw1);
                             }
                             g_free (pw1);
                             g_free (pw2);
