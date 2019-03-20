@@ -1,5 +1,5 @@
 This is a wizard to make initial settings to a Raspberry Pi on first boot.
 
-To build, run autogen.sh, then ./configure and make.
+To build, run ./autogen.sh, then ./configure and make.
 
 To run again, run `sudo piwiz` from the command line
