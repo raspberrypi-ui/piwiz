@@ -1268,6 +1268,9 @@ static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int page
         case PAGE_INTRO :   gtk_button_set_label (GTK_BUTTON (prev_btn), _("_Cancel"));
                             break;
 
+        case PAGE_PASSWD :  gtk_widget_set_visible (skip_btn, TRUE);
+                            break;
+
         case PAGE_DONE :    if (reboot || uscan)
                             {
                                 gtk_widget_show (prompt);
