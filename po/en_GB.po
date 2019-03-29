@@ -471,7 +471,8 @@ msgstr "Your Raspberry Pi is now set up and ready to go."
 msgid ""
 "Press 'Restart' to restart your Pi so the new settings will take effect."
 msgstr ""
-"Press 'Restart' to restart your Pi so the new settings will take effect."
+"Press 'Restart' to restart your Pi now so the new settings will take effect, "
+"or press 'Later' to close the wizard and restart the Pi yourself."
 
 #: ../data/piwiz.desktop.in.h:1
 msgid "Raspberry Pi First-Run Wizard"

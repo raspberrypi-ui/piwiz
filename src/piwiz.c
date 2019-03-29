@@ -1261,6 +1261,7 @@ static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int page
 {
     gtk_button_set_label (GTK_BUTTON (next_btn), _("_Next"));
     gtk_button_set_label (GTK_BUTTON (prev_btn), _("_Back"));
+    gtk_button_set_label (GTK_BUTTON (skip_btn), _("_Skip"));
     gtk_widget_set_visible (skip_btn, FALSE);
 
     switch (pagenum)
@@ -1271,7 +1272,9 @@ static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int page
         case PAGE_DONE :    if (reboot || uscan)
                             {
                                 gtk_widget_show (prompt);
+                                gtk_button_set_label (GTK_BUTTON (skip_btn), _("_Later"));
                                 gtk_button_set_label (GTK_BUTTON (next_btn), _("_Restart"));
+                                gtk_widget_set_visible (skip_btn, TRUE);
                             }
                             else
                             {
@@ -1297,9 +1300,13 @@ static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int page
     }
 
     // restore the keyboard focus
-    if (last_btn == PREV_BTN) gtk_widget_grab_focus (prev_btn);
-    else if (last_btn == SKIP_BTN && gtk_widget_get_visible (skip_btn)) gtk_widget_grab_focus (skip_btn);
-    else gtk_widget_grab_focus (next_btn);
+    if (pagenum == PAGE_DONE) gtk_widget_grab_focus (next_btn);
+    else
+    {
+        if (last_btn == PREV_BTN) gtk_widget_grab_focus (prev_btn);
+        else if (last_btn == SKIP_BTN && gtk_widget_get_visible (skip_btn)) gtk_widget_grab_focus (skip_btn);
+        else gtk_widget_grab_focus (next_btn);
+    }
 }
 
 static void next_page (GtkButton* btn, gpointer ptr)
@@ -1457,6 +1464,9 @@ static void skip_page (GtkButton* btn, gpointer ptr)
                             break;
 
         case PAGE_UPDATE :  gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_DONE);
+                            break;
+
+        case PAGE_DONE :    gtk_dialog_response (GTK_DIALOG (main_dlg), GTK_RESPONSE_CLOSE);
                             break;
 
         default :           gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
@@ -1670,16 +1680,22 @@ int main (int argc, char *argv[])
     g_object_unref (builder);
     gtk_widget_destroy (main_dlg);
     gdk_threads_leave ();
-    if (res == GTK_RESPONSE_CANCEL || res == GTK_RESPONSE_OK)
+
+    if (res == GTK_RESPONSE_CANCEL || res == GTK_RESPONSE_OK || res == GTK_RESPONSE_CLOSE)
     {
         vsystem ("rm -f /etc/xdg/autostart/piwiz.desktop");
     }
 
-    if (res == GTK_RESPONSE_OK)
+    if (res == GTK_RESPONSE_OK || res == GTK_RESPONSE_CLOSE)
     {
         if (uscan) vsystem ("raspi-config nonint do_overscan 1");
+    }
+
+    if (res == GTK_RESPONSE_OK)
+    {
         if (reboot || uscan) vsystem ("reboot");
     }
+
     return 0;
 }
 
