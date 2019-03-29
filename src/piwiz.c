@@ -319,6 +319,7 @@ static void next_page (GtkButton* btn, gpointer ptr);
 static void prev_page (GtkButton* btn, gpointer ptr);
 static void skip_page (GtkButton* btn, gpointer ptr);
 static gboolean show_ip (void);
+static gboolean net_available (void);
 static int get_pi_keyboard (void);
 
 /* Helpers */
@@ -1427,8 +1428,11 @@ static void next_page (GtkButton* btn, gpointer ptr)
         case PAGE_DONE :    gtk_dialog_response (GTK_DIALOG (main_dlg), GTK_RESPONSE_OK);
                             break;
 
-        case PAGE_UPDATE :  message (_("Checking for updates - please wait..."), 0, 0, -1, FALSE);
-                            g_thread_new (NULL, refresh_update_cache, NULL);
+        case PAGE_UPDATE :  if (net_available ())
+                            {
+                                message (_("Checking for updates - please wait..."), 0, 0, -1, FALSE);
+                                g_thread_new (NULL, refresh_update_cache, NULL);
+                            } else message (_("No network connection found - unable to check for updates"), 1, PAGE_DONE, -1, FALSE);
                             break;
 
         default :           gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
@@ -1527,6 +1531,21 @@ static gboolean show_ip (void)
     g_free (ip);
     return TRUE;
 }
+
+static gboolean net_available (void)
+{
+    char *ip;
+    gboolean val = FALSE;
+
+    ip = get_string ("hostname -I | tr ' ' \\\\n | grep \\\\. | tr \\\\n ','");
+    if (ip)
+    {
+        if (strlen (ip)) val = TRUE;
+        g_free (ip);
+    }
+    return val;
+}
+
 
 /* The dialog... */
 
