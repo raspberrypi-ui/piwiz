@@ -406,7 +406,21 @@ Press 'Next' to get started. </property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkCheckButton" id="p1check">
+                          <object class="GtkCheckButton" id="p1check1">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="label" translatable="yes">Use English language</property>
+                            <property name="tooltip_text" translatable="yes">Use English instead of the default language for your country</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">False</property>
+                            <property name="position">0</property>
+                            <property name="pack-type">start</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkCheckButton" id="p1check2">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="label" translatable="yes">Use US keyboard</property>

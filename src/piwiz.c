@@ -74,7 +74,7 @@ static GtkWidget *wizard_nb, *next_btn, *prev_btn, *skip_btn;
 static GtkWidget *country_cb, *language_cb, *timezone_cb;
 static GtkWidget *ap_tv, *psk_label, *prompt, *ip_label;
 static GtkWidget *pwd1_te, *pwd2_te, *psk_te;
-static GtkWidget *pwd_hide, *psk_hide, *us_key, *uscan_chk;
+static GtkWidget *pwd_hide, *psk_hide, *eng_chk, *uskey_chk, *uscan_chk;
 
 /* Lists for localisation */
 
@@ -1323,17 +1323,26 @@ static void next_page (GtkButton* btn, gpointer ptr)
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
     {
         case PAGE_LOCALE :  // get the combo entries and look up relevant codes in database
-                            model = gtk_combo_box_get_model (GTK_COMBO_BOX (language_cb));
-                            gtk_combo_box_get_active_iter (GTK_COMBO_BOX (language_cb), &iter);
-                            gtk_tree_model_get (model, &iter, 0, &lc, -1);
-                            gtk_tree_model_get (model, &iter, 1, &cc, -1);
-                            gtk_tree_model_get (model, &iter, 4, &ext, -1);
+                            if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (eng_chk)))
+                            {
+                                lc = g_strdup ("en");
+                                cc = g_strdup ("US");
+                                ext = g_strdup (".UTF-8");
+                            }
+                            else
+                            {
+                                model = gtk_combo_box_get_model (GTK_COMBO_BOX (language_cb));
+                                gtk_combo_box_get_active_iter (GTK_COMBO_BOX (language_cb), &iter);
+                                gtk_tree_model_get (model, &iter, 0, &lc, -1);
+                                gtk_tree_model_get (model, &iter, 1, &cc, -1);
+                                gtk_tree_model_get (model, &iter, 4, &ext, -1);
+                            }
 
                             model = gtk_combo_box_get_model (GTK_COMBO_BOX (timezone_cb));
                             gtk_combo_box_get_active_iter (GTK_COMBO_BOX (timezone_cb), &iter);
                             gtk_tree_model_get (model, &iter, 0, &city, -1);
 
-                            if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (us_key)))
+                            if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (uskey_chk)))
                             {
                                 lay = g_strdup ("us");
                                 var = g_strdup ("");
@@ -1612,7 +1621,8 @@ int main (int argc, char *argv[])
     g_signal_connect (pwd_hide, "toggled", G_CALLBACK (pwd_toggle), NULL);
     psk_hide = (GtkWidget *) gtk_builder_get_object (builder, "p4check");
     g_signal_connect (psk_hide, "toggled", G_CALLBACK (psk_toggle), NULL);
-    us_key = (GtkWidget *) gtk_builder_get_object (builder, "p1check");
+    eng_chk = (GtkWidget *) gtk_builder_get_object (builder, "p1check1");
+    uskey_chk = (GtkWidget *) gtk_builder_get_object (builder, "p1check2");
     uscan_chk = (GtkWidget *) gtk_builder_get_object (builder, "p7check");
 
     gtk_entry_set_visibility (GTK_ENTRY (pwd1_te), FALSE);
@@ -1620,7 +1630,8 @@ int main (int argc, char *argv[])
     gtk_entry_set_visibility (GTK_ENTRY (psk_te), FALSE);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pwd_hide), TRUE);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (psk_hide), TRUE);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (us_key), FALSE);
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (eng_chk), FALSE);
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (uskey_chk), FALSE);
 
     // set up the locale combo boxes
     read_locales ();
@@ -1653,7 +1664,7 @@ int main (int argc, char *argv[])
     // make an educated guess as to whether a US keyboard override was set
     char *ilay = NULL, *ivar = NULL;
     if (init_country && init_lang) lookup_keyboard (init_country, init_lang, &ilay, &ivar);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (us_key), (!g_strcmp0 (init_kb, "us") && g_strcmp0 (ilay, "us")));
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (uskey_chk), (!g_strcmp0 (init_kb, "us") && g_strcmp0 (ilay, "us")));
 
     gtk_widget_show_all (GTK_WIDGET (country_cb));
     gtk_widget_show_all (GTK_WIDGET (language_cb));
