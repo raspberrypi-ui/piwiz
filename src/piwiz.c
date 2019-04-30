@@ -1315,7 +1315,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
     GtkTreeModel *model;
     GtkTreeIter iter;
     const char *psk;
-    char *pw1, *pw2;
+    char *pw1, *pw2, *wc;
     char *text;
     int secure, connected;
 
@@ -1323,19 +1323,21 @@ static void next_page (GtkButton* btn, gpointer ptr)
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
     {
         case PAGE_LOCALE :  // get the combo entries and look up relevant codes in database
+                            model = gtk_combo_box_get_model (GTK_COMBO_BOX (language_cb));
+                            gtk_combo_box_get_active_iter (GTK_COMBO_BOX (language_cb), &iter);
+                            gtk_tree_model_get (model, &iter, 0, &lc, -1);
+                            gtk_tree_model_get (model, &iter, 1, &cc, -1);
+                            gtk_tree_model_get (model, &iter, 4, &ext, -1);
+                            wc = g_strdup (cc);
                             if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (eng_chk)))
                             {
+                                // override language setting
+                                g_free (lc);
+                                g_free (cc);
+                                g_free (ext);
                                 lc = g_strdup ("en");
                                 cc = g_strdup ("US");
                                 ext = g_strdup (".UTF-8");
-                            }
-                            else
-                            {
-                                model = gtk_combo_box_get_model (GTK_COMBO_BOX (language_cb));
-                                gtk_combo_box_get_active_iter (GTK_COMBO_BOX (language_cb), &iter);
-                                gtk_tree_model_get (model, &iter, 0, &lc, -1);
-                                gtk_tree_model_get (model, &iter, 1, &cc, -1);
-                                gtk_tree_model_get (model, &iter, 4, &ext, -1);
                             }
 
                             model = gtk_combo_box_get_model (GTK_COMBO_BOX (timezone_cb));
@@ -1352,10 +1354,9 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             // set wifi country - this is quick, so no need for warning
                             if (wifi_if[0])
                             {
-                                vsystem ("wpa_cli -i %s set country %s >> /dev/null", wifi_if, cc);
-                                vsystem ("iw reg set %s", cc);
-                                vsystem ("wpa_cli -i %s save_config >> /dev/null", wifi_if);
+                                vsystem ("raspi-config nonint do_wifi_country %s", wc);
                             }
+                            g_free (wc);
 
                             if (g_strcmp0 (init_tz, city) || g_strcmp0 (init_country, cc)
                                 || g_strcmp0 (init_lang, lc) || g_ascii_strcasecmp (init_kb, lay)
