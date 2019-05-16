@@ -1,3 +1,9 @@
+piwiz (0.5) unstable; urgency=medium
+
+  * Don't offer overscan page when using GL driver
+
+ -- Simon Long <simon@raspberrypi.org>  Thu, 16 May 2019 08:09:46 +0100
+
 piwiz (0.4) unstable; urgency=medium
 
   * Use raspi-config to set wifi country; prevent language override from changing wifi country

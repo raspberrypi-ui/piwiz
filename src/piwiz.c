@@ -434,6 +434,16 @@ static int vsystem (const char *fmt, ...)
     return res;
 }
 
+static gboolean can_overscan (void)
+{
+#ifdef __arm__
+    if (vsystem ("raspi-config nonint is_fkms")) return TRUE;
+    else return FALSE;
+#else
+    return FALSE;
+#endif
+}
+
 /* Keyboard detection */
 
 static int get_pi_keyboard (void)
@@ -1381,14 +1391,14 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             }
                             g_free (pw1);
                             g_free (pw2);
-#ifdef __arm__
-                            gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
-#else
-                            if (!wifi_if[0])
-                                gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
+                            if (can_overscan ()) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
                             else
-                                gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIAP);
-#endif
+                            {
+                                if (!wifi_if[0])
+                                    gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
+                                else
+                                    gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIAP);
+                            }
                             break;
 
         case PAGE_OSCAN :   uscan = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (uscan_chk));
@@ -1462,25 +1472,23 @@ static void prev_page (GtkButton* btn, gpointer ptr)
     last_btn = PREV_BTN;
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
     {
-        case PAGE_UPDATE :  if (!wifi_if[0])
-#ifdef __arm__
-                                gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
-#else
-                                gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
-#endif
+        case PAGE_UPDATE :  if (wifi_if[0]) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIAP);
                             else
-                                gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIAP);
+                            {
+                                if (can_overscan ())
+                                    gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
+                                else
+                                    gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
+                            }
                             break;
 
         case PAGE_INTRO :   gtk_dialog_response (GTK_DIALOG (main_dlg), GTK_RESPONSE_CANCEL);
                             break;
 
-        case PAGE_WIFIAP :
-#ifdef __arm__
-                            gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
-#else
-                            gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
-#endif
+        case PAGE_WIFIAP :  if (can_overscan ())
+                                gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
+                            else
+                                gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
                             break;
 
         default :           gtk_notebook_prev_page (GTK_NOTEBOOK (wizard_nb));
