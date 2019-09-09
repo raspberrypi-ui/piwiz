@@ -1,3 +1,9 @@
+piwiz (0.6) buster; urgency=medium
+
+  * Fix parsing of LANGUAGE string in /etc/default/locale
+
+ -- Simon Long <simon@raspberrypi.org>  Mon, 09 Sep 2019 13:28:38 +0100
+
 piwiz (0.5) unstable; urgency=medium
 
   * Don't offer overscan page when using GL driver

@@ -883,7 +883,7 @@ static void read_inits (void)
     if (buffer[0])
     {
         lc = strtok (buffer, "_");
-        cc = strtok (NULL, ". ");
+        cc = strtok (NULL, ":. ");
         if (lc && cc)
         {
             init_country = g_strdup (cc);
