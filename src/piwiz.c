@@ -437,8 +437,7 @@ static int vsystem (const char *fmt, ...)
 static gboolean can_overscan (void)
 {
 #ifdef __arm__
-    if (vsystem ("raspi-config nonint is_fkms")) return TRUE;
-    else return FALSE;
+    return TRUE;
 #else
     return FALSE;
 #endif

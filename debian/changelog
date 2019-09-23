@@ -1,3 +1,9 @@
+piwiz (0.7) buster; urgency=medium
+
+  * Show overscan page when using FKMS
+
+ -- Simon Long <simon@raspberrypi.org>  Mon, 23 Sep 2019 09:43:48 +0100
+
 piwiz (0.6) buster; urgency=medium
 
   * Fix parsing of LANGUAGE string in /etc/default/locale
