@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: piwiz 1.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-05 16:02+0200\n"
+"POT-Creation-Date: 2019-10-25 11:12+0100\n"
 "PO-Revision-Date: 2019-02-18 15:13+0000\n"
 "Last-Translator: Simon Long <simon@raspberrypi.org>\n"
 "Language-Team: English (British)\n"
@@ -17,31 +17,31 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../src/piwiz.c:965 ../src/piwiz.c:1291
+#: ../src/piwiz.c:975 ../src/piwiz.c:1313
 msgid "Searching for networks - please wait..."
 msgstr "Searching for networks - please wait..."
 
-#: ../src/piwiz.c:985
+#: ../src/piwiz.c:995
 msgid "Failed to connect to network."
 msgstr "Failed to connect to network."
 
-#: ../src/piwiz.c:1105
+#: ../src/piwiz.c:1115
 msgid "Reading update list - please wait..."
 msgstr "Reading update list - please wait..."
 
-#: ../src/piwiz.c:1107
+#: ../src/piwiz.c:1117
 msgid "Downloading updates - please wait..."
 msgstr "Downloading updates - please wait..."
 
-#: ../src/piwiz.c:1114
+#: ../src/piwiz.c:1124
 msgid "Installing updates - please wait..."
 msgstr "Installing updates - please wait..."
 
-#: ../src/piwiz.c:1116 ../src/piwiz.c:1207
+#: ../src/piwiz.c:1126 ../src/piwiz.c:1217
 msgid "Installing languages - please wait..."
 msgstr "Installing languages - please wait..."
 
-#: ../src/piwiz.c:1133
+#: ../src/piwiz.c:1143
 #, c-format
 msgid ""
 "Error getting updates.\n"
@@ -50,11 +50,11 @@ msgstr ""
 "Error getting updates.\n"
 "%s"
 
-#: ../src/piwiz.c:1140 ../src/piwiz.c:1166
+#: ../src/piwiz.c:1150 ../src/piwiz.c:1176
 msgid "System is up to date"
 msgstr "System is up to date"
 
-#: ../src/piwiz.c:1150
+#: ../src/piwiz.c:1160
 #, c-format
 msgid ""
 "Error comparing versions.\n"
@@ -63,11 +63,11 @@ msgstr ""
 "Error comparing versions.\n"
 "%s"
 
-#: ../src/piwiz.c:1163
+#: ../src/piwiz.c:1173
 msgid "Getting updates - please wait..."
 msgstr "Getting updates - please wait..."
 
-#: ../src/piwiz.c:1176
+#: ../src/piwiz.c:1186
 #, c-format
 msgid ""
 "Error installing languages.\n"
@@ -76,11 +76,11 @@ msgstr ""
 "Error installing languages.\n"
 "%s"
 
-#: ../src/piwiz.c:1183 ../src/piwiz.c:1212 ../src/piwiz.c:1245
+#: ../src/piwiz.c:1193 ../src/piwiz.c:1222 ../src/piwiz.c:1255
 msgid "Comparing versions - please wait..."
 msgstr "Comparing versions - please wait..."
 
-#: ../src/piwiz.c:1194
+#: ../src/piwiz.c:1204
 #, c-format
 msgid ""
 "Error finding languages.\n"
@@ -89,7 +89,7 @@ msgstr ""
 "Error finding languages.\n"
 "%s"
 
-#: ../src/piwiz.c:1226
+#: ../src/piwiz.c:1236
 #, c-format
 msgid ""
 "Error checking for updates.\n"
@@ -98,81 +98,89 @@ msgstr ""
 "Error checking for updates.\n"
 "%s"
 
-#: ../src/piwiz.c:1239
+#: ../src/piwiz.c:1249
 msgid "Finding languages - please wait..."
 msgstr "Finding languages - please wait..."
 
-#: ../src/piwiz.c:1263 ../data/piwiz.ui.h:5
+#: ../src/piwiz.c:1273
+msgid "Checking for updates - please wait..."
+msgstr "Checking for updates - please wait..."
+
+#: ../src/piwiz.c:1276
+msgid "Could not sync time - unable to check for updates"
+msgstr "Could not sync time - unable to check for updates"
+
+#: ../src/piwiz.c:1285 ../data/piwiz.ui.h:5
 msgid "_Next"
 msgstr "_Next"
 
-#: ../src/piwiz.c:1264
+#: ../src/piwiz.c:1286
 msgid "_Back"
 msgstr "_Back"
 
-#: ../src/piwiz.c:1265 ../data/piwiz.ui.h:4
+#: ../src/piwiz.c:1287 ../data/piwiz.ui.h:4
 msgid "_Skip"
 msgstr "_Skip"
 
-#: ../src/piwiz.c:1270 ../data/piwiz.ui.h:3
+#: ../src/piwiz.c:1292 ../data/piwiz.ui.h:3
 msgid "_Cancel"
 msgstr "_Cancel"
 
-#: ../src/piwiz.c:1276
+#: ../src/piwiz.c:1298
 msgid "_Later"
 msgstr "_Later"
 
-#: ../src/piwiz.c:1277
+#: ../src/piwiz.c:1299
 msgid "_Restart"
 msgstr "_Restart"
 
-#: ../src/piwiz.c:1283
+#: ../src/piwiz.c:1305
 msgid "_Done"
 msgstr "_Done"
 
-#: ../src/piwiz.c:1364
+#: ../src/piwiz.c:1387
 msgid "Setting location - please wait..."
 msgstr "Setting location - please wait..."
 
-#: ../src/piwiz.c:1376
+#: ../src/piwiz.c:1399
 msgid "The two passwords entered do not match."
 msgstr "The two passwords entered do not match."
 
-#: ../src/piwiz.c:1406
+#: ../src/piwiz.c:1436
 #, c-format
 msgid "Enter the password for the WiFi network \"%s\"."
 msgstr "Enter the password for the WiFi network \"%s\"."
 
-#: ../src/piwiz.c:1420 ../src/piwiz.c:1431
+#: ../src/piwiz.c:1450 ../src/piwiz.c:1461
 msgid "Connecting to WiFi network - please wait..."
 msgstr "Connecting to WiFi network - please wait..."
 
-#: ../src/piwiz.c:1423 ../src/piwiz.c:1434
+#: ../src/piwiz.c:1453 ../src/piwiz.c:1464
 msgid "Could not connect to this network"
 msgstr "Could not connect to this network"
 
-#: ../src/piwiz.c:1442
-msgid "Checking for updates - please wait..."
-msgstr "Checking for updates - please wait..."
+#: ../src/piwiz.c:1472
+msgid "Synchronising clock - please wait..."
+msgstr "Synchronising clock - please wait..."
 
-#: ../src/piwiz.c:1444
+#: ../src/piwiz.c:1474
 msgid "No network connection found - unable to check for updates"
 msgstr "No network connection found - unable to check for updates"
 
-#: ../src/piwiz.c:1534
+#: ../src/piwiz.c:1574
 #, c-format
 msgid "<span font_desc=\"10.0\">IP : %s</span>"
 msgstr "<span font_desc=\"10.0\">IP : %s</span>"
 
-#: ../src/piwiz.c:1645
+#: ../src/piwiz.c:1685
 msgid "Set the country in which you are using your Pi"
 msgstr "Set the country in which you are using your Pi"
 
-#: ../src/piwiz.c:1646
+#: ../src/piwiz.c:1686
 msgid "Set the language in which applications should appear"
 msgstr "Set the language in which applications should appear"
 
-#: ../src/piwiz.c:1647
+#: ../src/piwiz.c:1687
 msgid "Set the closest city to your location"
 msgstr "Set the closest city to your location"
 

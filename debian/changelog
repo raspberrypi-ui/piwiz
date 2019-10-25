@@ -1,3 +1,9 @@
+piwiz (0.8) buster; urgency=medium
+
+  * Check that clock is synced before attempting update
+
+ -- Simon Long <simon@raspberrypi.org>  Fri, 25 Oct 2019 11:14:30 +0100
+
 piwiz (0.7) buster; urgency=medium
 
   * Show overscan page when using FKMS

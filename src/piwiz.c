@@ -94,6 +94,7 @@ char *ssid;
 gint conn_timeout = 0, pulse_timer = 0;
 gboolean reboot, uscan;
 int last_btn = NEXT_BTN;
+int calls;
 
 /* Map from country code to keyboard */
 
@@ -314,6 +315,7 @@ static void install_lang_done (PkTask *task, GAsyncResult *res, gpointer data);
 static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data);
 static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data);
 static gpointer refresh_update_cache (gpointer data);
+gboolean ntp_check (gpointer data);
 static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int pagenum, gpointer data);
 static void next_page (GtkButton* btn, gpointer ptr);
 static void prev_page (GtkButton* btn, gpointer ptr);
@@ -1265,6 +1267,26 @@ static gpointer refresh_update_cache (gpointer data)
     return NULL;
 }
 
+gboolean ntp_check (gpointer data)
+{
+    if (system ("timedatectl status | grep -q \"synchronized: yes\"") == 0)
+    {
+        message (_("Checking for updates - please wait..."), 0, 0, -1, FALSE);
+        g_thread_new (NULL, refresh_update_cache, NULL);
+        return FALSE;
+    }
+    if (calls++ > 120)
+    {
+        message (_("Could not sync time - unable to check for updates"), 1, PAGE_DONE, -1, FALSE);
+        return FALSE;
+    }
+
+    // trigger a resync
+    system ("systemctl -q stop systemd-timesyncd 2> /dev/null");
+    system ("systemctl -q start systemd-timesyncd 2> /dev/null");
+    return TRUE;
+}
+
 /* Page management */
 
 static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int pagenum, gpointer data)
@@ -1456,8 +1478,9 @@ static void next_page (GtkButton* btn, gpointer ptr)
 
         case PAGE_UPDATE :  if (net_available ())
                             {
-                                message (_("Checking for updates - please wait..."), 0, 0, -1, FALSE);
-                                g_thread_new (NULL, refresh_update_cache, NULL);
+                                message (_("Synchronising clock - please wait..."), 0, 0, -1, TRUE);
+                                calls = 0;
+                                g_timeout_add_seconds (1, ntp_check, NULL);
                             } else message (_("No network connection found - unable to check for updates"), 1, PAGE_DONE, -1, FALSE);
                             break;
 
