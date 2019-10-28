@@ -315,7 +315,8 @@ static void install_lang_done (PkTask *task, GAsyncResult *res, gpointer data);
 static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data);
 static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data);
 static gpointer refresh_update_cache (gpointer data);
-gboolean ntp_check (gpointer data);
+static gboolean clock_synced (void);
+static gboolean ntp_check (gpointer data);
 static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int pagenum, gpointer data);
 static void next_page (GtkButton* btn, gpointer ptr);
 static void prev_page (GtkButton* btn, gpointer ptr);
@@ -1267,9 +1268,15 @@ static gpointer refresh_update_cache (gpointer data)
     return NULL;
 }
 
-gboolean ntp_check (gpointer data)
+static gboolean clock_synced (void)
 {
-    if (system ("timedatectl status | grep -q \"synchronized: yes\"") == 0)
+    if (system ("timedatectl status | grep -q \"synchronized: yes\"") == 0) return TRUE;
+    return FALSE;
+}
+
+static gboolean ntp_check (gpointer data)
+{
+    if (clock_synced ())
     {
         message (_("Checking for updates - please wait..."), 0, 0, -1, FALSE);
         g_thread_new (NULL, refresh_update_cache, NULL);
@@ -1282,8 +1289,7 @@ gboolean ntp_check (gpointer data)
     }
 
     // trigger a resync
-    system ("systemctl -q stop systemd-timesyncd 2> /dev/null");
-    system ("systemctl -q start systemd-timesyncd 2> /dev/null");
+    system ("systemctl -q stop systemd-timesyncd 2> /dev/null; systemctl -q start systemd-timesyncd 2> /dev/null");
     return TRUE;
 }
 
@@ -1478,10 +1484,19 @@ static void next_page (GtkButton* btn, gpointer ptr)
 
         case PAGE_UPDATE :  if (net_available ())
                             {
-                                message (_("Synchronising clock - please wait..."), 0, 0, -1, TRUE);
-                                calls = 0;
-                                g_timeout_add_seconds (1, ntp_check, NULL);
-                            } else message (_("No network connection found - unable to check for updates"), 1, PAGE_DONE, -1, FALSE);
+                                if (clock_synced ())
+                                {
+                                    message (_("Checking for updates - please wait..."), 0, 0, -1, FALSE);
+                                    g_thread_new (NULL, refresh_update_cache, NULL);
+                                }
+                                else
+                                {
+                                    message (_("Synchronising clock - please wait..."), 0, 0, -1, TRUE);
+                                    calls = 0;
+                                    g_timeout_add_seconds (1, ntp_check, NULL);
+                                }
+                            }
+                            else message (_("No network connection found - unable to check for updates"), 1, PAGE_DONE, -1, FALSE);
                             break;
 
         default :           gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
