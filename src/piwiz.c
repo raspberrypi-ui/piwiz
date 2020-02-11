@@ -316,6 +316,7 @@ static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data);
 static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data);
 static gpointer refresh_update_cache (gpointer data);
 static gboolean clock_synced (void);
+static void resync (void);
 static gboolean ntp_check (gpointer data);
 static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int pagenum, gpointer data);
 static void next_page (GtkButton* btn, gpointer ptr);
@@ -1270,8 +1271,27 @@ static gpointer refresh_update_cache (gpointer data)
 
 static gboolean clock_synced (void)
 {
-    if (system ("timedatectl status | grep -q \"synchronized: yes\"") == 0) return TRUE;
+    if (system ("test -e /usr/sbin/ntpd") == 0)
+    {
+        if (system ("ntpq -p | grep -q ^\\*") == 0) return TRUE;
+    }
+    else
+    {
+        if (system ("timedatectl status | grep -q \"synchronized: yes\"") == 0) return TRUE;
+    }
     return FALSE;
+}
+
+static void resync (void)
+{
+    if (system ("test -e /usr/sbin/ntpd") == 0)
+    {
+        system ("/etc/init.d/ntp stop; ntpd -gq; /etc/init.d/ntp start");
+    }
+    else
+    {
+        system ("systemctl -q stop systemd-timesyncd 2> /dev/null; systemctl -q start systemd-timesyncd 2> /dev/null");
+    }
 }
 
 static gboolean ntp_check (gpointer data)
@@ -1282,14 +1302,15 @@ static gboolean ntp_check (gpointer data)
         g_thread_new (NULL, refresh_update_cache, NULL);
         return FALSE;
     }
+    // trigger a resync
+    if (calls == 0) resync ();
+
     if (calls++ > 120)
     {
         message (_("Could not sync time - unable to check for updates"), 1, PAGE_DONE, -1, FALSE);
         return FALSE;
     }
 
-    // trigger a resync
-    system ("systemctl -q stop systemd-timesyncd 2> /dev/null; systemctl -q start systemd-timesyncd 2> /dev/null");
     return TRUE;
 }
 
