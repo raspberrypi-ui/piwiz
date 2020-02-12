@@ -1,3 +1,9 @@
+piwiz (0.9) buster; urgency=medium
+
+  * Add compatibility with ntpd for x86
+
+ -- Simon Long <simon@raspberrypi.org>  Tue, 11 Feb 2020 15:26:02 +0000
+
 piwiz (0.8) buster; urgency=medium
 
   * Check that clock is synced before attempting update
