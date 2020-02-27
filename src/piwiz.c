@@ -440,11 +440,10 @@ static int vsystem (const char *fmt, ...)
 
 static gboolean can_overscan (void)
 {
-#ifdef __arm__
-    return TRUE;
-#else
-    return FALSE;
-#endif
+    if (!vsystem ("raspi-config nonint is_pi"))
+        return TRUE;
+    else
+        return FALSE;
 }
 
 /* Keyboard detection */

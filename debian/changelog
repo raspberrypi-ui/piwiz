@@ -1,3 +1,9 @@
+piwiz (0.10) buster; urgency=medium
+
+  * Detect Pi or x86 at runtime rather than compilation
+
+ -- Simon Long <simon@raspberrypi.org>  Thu, 27 Feb 2020 07:53:31 +0000
+
 piwiz (0.9) buster; urgency=medium
 
   * Add compatibility with ntpd for x86
