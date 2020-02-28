@@ -339,7 +339,7 @@ GtkWidget *gtk_box_new (GtkOrientation o, gint s)
 static char *get_shell_string (char *cmd, gboolean all)
 {
     char *line = NULL, *res = NULL;
-    int len = 0;
+    size_t len = 0;
     FILE *fp = popen (cmd, "r");
 
     if (fp == NULL) return g_strdup ("");
@@ -367,7 +367,8 @@ static int get_status (char *cmd)
 {
     FILE *fp = popen (cmd, "r");
     char *buf = NULL;
-    int res = 0, val = 0;
+    size_t res = 0;
+    int val = 0;
 
     if (fp == NULL) return 0;
     if (getline (&buf, &res, fp) > 0)
@@ -385,7 +386,7 @@ static int get_status (char *cmd)
 static char *get_quoted_param (char *path, char *fname, char *toseek)
 {
     char *pathname, *linebuf, *cptr, *dptr, *res;
-    int len;
+    size_t len;
 
     pathname = g_strdup_printf ("%s/%s", path, fname);
     FILE *fp = fopen (pathname, "rb");
@@ -721,7 +722,8 @@ static void read_locales (void)
     GtkTreeModelSort *scount;
     GtkTreeIter iter;
     FILE *fp;
-    int len, ext;
+    size_t len;
+    int ext;
 
     // populate the locale database
     buffer = NULL;
@@ -1072,7 +1074,8 @@ static char *find_psk_for_network (char *ssid)
 {
     FILE *fp;
     char *line = NULL, *seek, *res, *ret = NULL;
-    int len = 0, state = 0;
+    size_t len = 0;
+    int state = 0;
 
     seek = g_strdup_printf ("ssid=\"%s\"", ssid);
     fp = fopen ("/etc/wpa_supplicant/wpa_supplicant.conf", "rb");
