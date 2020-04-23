@@ -1629,6 +1629,14 @@ static gboolean show_ip (void)
     return TRUE;
 }
 
+static void set_marketing_serial (void)
+{
+    if (system ("grep -q \"^Revision\\s*:\\s*[ 123][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]11[0-9a-fA-F]$\" /proc/cpuinfo") == 0)
+        vsystem ("sed -i /usr/lib/chromium-browser/master_preferences -e s/0123456789ABCDEF/`vcgencmd otp_dump | grep ^6[45] | sha256sum | cut -d ' ' -f 1`/");
+    else
+        vsystem ("sed -i /usr/lib/chromium-browser/master_preferences -e s/0123456789ABCDEF/`cat /proc/cpuinfo | grep Serial | sha256sum | cut -d ' ' -f 1`/");
+}
+
 static gboolean net_available (void)
 {
     char *ip;
@@ -1667,6 +1675,8 @@ int main (int argc, char *argv[])
     reboot = FALSE;
     uscan = FALSE;
     read_inits ();
+
+    set_marketing_serial ();
 
     // GTK setup
     gdk_threads_init ();
