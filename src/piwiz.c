@@ -288,6 +288,7 @@ static char *get_string (char *cmd);
 static int get_status (char *cmd);
 static char *get_quoted_param (char *path, char *fname, char *toseek);
 static int vsystem (const char *fmt, ...);
+static gboolean is_pi (void);
 static void error_box (char *msg);
 static void message (char *msg, int wait, int dest_page, int prog, gboolean pulse);
 static void hide_message (void);
@@ -323,6 +324,7 @@ static void next_page (GtkButton* btn, gpointer ptr);
 static void prev_page (GtkButton* btn, gpointer ptr);
 static void skip_page (GtkButton* btn, gpointer ptr);
 static gboolean show_ip (void);
+static void set_marketing_serial (void);
 static gboolean net_available (void);
 static int get_pi_keyboard (void);
 
@@ -439,7 +441,7 @@ static int vsystem (const char *fmt, ...)
     return res;
 }
 
-static gboolean can_overscan (void)
+static gboolean is_pi (void)
 {
     if (!vsystem ("raspi-config nonint is_pi"))
         return TRUE;
@@ -1441,7 +1443,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             }
                             g_free (pw1);
                             g_free (pw2);
-                            if (can_overscan ()) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
+                            if (is_pi ()) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
                             else
                             {
                                 if (!wifi_if[0])
@@ -1535,7 +1537,7 @@ static void prev_page (GtkButton* btn, gpointer ptr)
         case PAGE_UPDATE :  if (wifi_if[0]) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIAP);
                             else
                             {
-                                if (can_overscan ())
+                                if (is_pi ())
                                     gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
                                 else
                                     gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
@@ -1545,7 +1547,7 @@ static void prev_page (GtkButton* btn, gpointer ptr)
         case PAGE_INTRO :   gtk_dialog_response (GTK_DIALOG (main_dlg), GTK_RESPONSE_CANCEL);
                             break;
 
-        case PAGE_WIFIAP :  if (can_overscan ())
+        case PAGE_WIFIAP :  if (is_pi ())
                                 gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
                             else
                                 gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
@@ -1631,10 +1633,13 @@ static gboolean show_ip (void)
 
 static void set_marketing_serial (void)
 {
-    if (system ("grep -q \"^Revision\\s*:\\s*[ 123][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]11[0-9a-fA-F]$\" /proc/cpuinfo") == 0)
-        vsystem ("sed -i /usr/lib/chromium-browser/master_preferences -e s/0123456789ABCDEF/`vcgencmd otp_dump | grep ^6[45] | sha256sum | cut -d ' ' -f 1`/");
-    else
-        vsystem ("sed -i /usr/lib/chromium-browser/master_preferences -e s/0123456789ABCDEF/`cat /proc/cpuinfo | grep Serial | sha256sum | cut -d ' ' -f 1`/");
+    if (is_pi ())
+    {
+        if (system ("grep -q \"^Revision\\s*:\\s*[ 123][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]11[0-9a-fA-F]$\" /proc/cpuinfo") == 0)
+            vsystem ("sed -i /usr/lib/chromium-browser/master_preferences -e s/0123456789ABCDEF/`vcgencmd otp_dump | grep ^6[45] | sha256sum | cut -d ' ' -f 1`/");
+        else
+            vsystem ("sed -i /usr/lib/chromium-browser/master_preferences -e s/0123456789ABCDEF/`cat /proc/cpuinfo | grep Serial | sha256sum | cut -d ' ' -f 1`/");
+    }
 }
 
 static gboolean net_available (void)
