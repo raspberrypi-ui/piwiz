@@ -451,7 +451,7 @@ msgstr "Press 'Next' to connect, or 'Skip' to continue without connecting."
 
 #: ../data/piwiz.ui.h:43
 msgid "<b>Enter WiFi Password</b>"
-msgstr "<b>Enter Wireless Password</b>"
+msgstr "<b>Enter Wireless Network Password</b>"
 
 #: ../data/piwiz.ui.h:44
 msgid "Enter the password for your WiFi network."
