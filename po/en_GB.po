@@ -149,11 +149,11 @@ msgstr "The two passwords entered do not match."
 #: ../src/piwiz.c:1436
 #, c-format
 msgid "Enter the password for the WiFi network \"%s\"."
-msgstr "Enter the password for the WiFi network \"%s\"."
+msgstr "Enter the password for the wireless network \"%s\"."
 
 #: ../src/piwiz.c:1450 ../src/piwiz.c:1461
 msgid "Connecting to WiFi network - please wait..."
-msgstr "Connecting to WiFi network - please wait..."
+msgstr "Connecting to wireless network - please wait..."
 
 #: ../src/piwiz.c:1453 ../src/piwiz.c:1464
 msgid "Could not connect to this network"
@@ -435,11 +435,11 @@ msgstr ""
 
 #: ../data/piwiz.ui.h:39
 msgid "<b>Select WiFi Network</b>"
-msgstr "<b>Select WiFi Network</b>"
+msgstr "<b>Select Wireless Network</b>"
 
 #: ../data/piwiz.ui.h:40
 msgid "Select your WiFi network from the list."
-msgstr "Select your WiFi network from the list."
+msgstr "Select your wireless network from the list."
 
 #: ../data/piwiz.ui.h:41
 msgid "Click the name of your network to select it"
@@ -451,11 +451,11 @@ msgstr "Press 'Next' to connect, or 'Skip' to continue without connecting."
 
 #: ../data/piwiz.ui.h:43
 msgid "<b>Enter WiFi Password</b>"
-msgstr "<b>Enter WiFi Password</b>"
+msgstr "<b>Enter Wireless Password</b>"
 
 #: ../data/piwiz.ui.h:44
 msgid "Enter the password for your WiFi network."
-msgstr "Enter the password for your WiFi network."
+msgstr "Enter the password for your wireless network."
 
 #: ../data/piwiz.ui.h:45
 msgid "Password:"
