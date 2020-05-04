@@ -1636,9 +1636,9 @@ static void set_marketing_serial (void)
     if (is_pi ())
     {
         if (system ("grep -q \"^Revision\\s*:\\s*[ 123][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]11[0-9a-fA-F]$\" /proc/cpuinfo") == 0)
-            vsystem ("sed -i /usr/lib/chromium-browser/master_preferences -e s/0123456789ABCDEF/`vcgencmd otp_dump | grep ^6[45] | sha256sum | cut -d ' ' -f 1`/");
+            vsystem ("sed -i /usr/lib/chromium-browser/master_preferences -e s/UNIDENTIFIED/`vcgencmd otp_dump | grep ^6[45] | sha256sum | cut -d ' ' -f 1`/");
         else
-            vsystem ("sed -i /usr/lib/chromium-browser/master_preferences -e s/0123456789ABCDEF/`cat /proc/cpuinfo | grep Serial | sha256sum | cut -d ' ' -f 1`/");
+            vsystem ("sed -i /usr/lib/chromium-browser/master_preferences -e s/UNIDENTIFIED/`cat /proc/cpuinfo | grep Serial | sha256sum | cut -d ' ' -f 1`/");
     }
 }
 
