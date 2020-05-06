@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: piwiz 1.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-25 11:12+0100\n"
+"POT-Creation-Date: 2020-05-06 19:08+0100\n"
 "PO-Revision-Date: 2019-02-18 15:13+0000\n"
 "Last-Translator: Simon Long <simon@raspberrypi.org>\n"
 "Language-Team: English (British)\n"
@@ -17,31 +17,31 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../src/piwiz.c:975 ../src/piwiz.c:1313
+#: ../src/piwiz.c:981 ../src/piwiz.c:1353
 msgid "Searching for networks - please wait..."
 msgstr "Searching for networks - please wait..."
 
-#: ../src/piwiz.c:995
+#: ../src/piwiz.c:1001
 msgid "Failed to connect to network."
 msgstr "Failed to connect to network."
 
-#: ../src/piwiz.c:1115
+#: ../src/piwiz.c:1122
 msgid "Reading update list - please wait..."
 msgstr "Reading update list - please wait..."
 
-#: ../src/piwiz.c:1117
+#: ../src/piwiz.c:1124
 msgid "Downloading updates - please wait..."
 msgstr "Downloading updates - please wait..."
 
-#: ../src/piwiz.c:1124
+#: ../src/piwiz.c:1131
 msgid "Installing updates - please wait..."
 msgstr "Installing updates - please wait..."
 
-#: ../src/piwiz.c:1126 ../src/piwiz.c:1217
+#: ../src/piwiz.c:1133 ../src/piwiz.c:1224
 msgid "Installing languages - please wait..."
 msgstr "Installing languages - please wait..."
 
-#: ../src/piwiz.c:1143
+#: ../src/piwiz.c:1150
 #, c-format
 msgid ""
 "Error getting updates.\n"
@@ -50,11 +50,11 @@ msgstr ""
 "Error getting updates.\n"
 "%s"
 
-#: ../src/piwiz.c:1150 ../src/piwiz.c:1176
+#: ../src/piwiz.c:1157 ../src/piwiz.c:1183
 msgid "System is up to date"
 msgstr "System is up to date"
 
-#: ../src/piwiz.c:1160
+#: ../src/piwiz.c:1167
 #, c-format
 msgid ""
 "Error comparing versions.\n"
@@ -63,11 +63,11 @@ msgstr ""
 "Error comparing versions.\n"
 "%s"
 
-#: ../src/piwiz.c:1173
+#: ../src/piwiz.c:1180
 msgid "Getting updates - please wait..."
 msgstr "Getting updates - please wait..."
 
-#: ../src/piwiz.c:1186
+#: ../src/piwiz.c:1193
 #, c-format
 msgid ""
 "Error installing languages.\n"
@@ -76,11 +76,11 @@ msgstr ""
 "Error installing languages.\n"
 "%s"
 
-#: ../src/piwiz.c:1193 ../src/piwiz.c:1222 ../src/piwiz.c:1255
+#: ../src/piwiz.c:1200 ../src/piwiz.c:1229 ../src/piwiz.c:1262
 msgid "Comparing versions - please wait..."
 msgstr "Comparing versions - please wait..."
 
-#: ../src/piwiz.c:1204
+#: ../src/piwiz.c:1211
 #, c-format
 msgid ""
 "Error finding languages.\n"
@@ -89,7 +89,7 @@ msgstr ""
 "Error finding languages.\n"
 "%s"
 
-#: ../src/piwiz.c:1236
+#: ../src/piwiz.c:1243
 #, c-format
 msgid ""
 "Error checking for updates.\n"
@@ -98,89 +98,89 @@ msgstr ""
 "Error checking for updates.\n"
 "%s"
 
-#: ../src/piwiz.c:1249
+#: ../src/piwiz.c:1256
 msgid "Finding languages - please wait..."
 msgstr "Finding languages - please wait..."
 
-#: ../src/piwiz.c:1273
+#: ../src/piwiz.c:1305 ../src/piwiz.c:1514
 msgid "Checking for updates - please wait..."
 msgstr "Checking for updates - please wait..."
 
-#: ../src/piwiz.c:1276
+#: ../src/piwiz.c:1314
 msgid "Could not sync time - unable to check for updates"
 msgstr "Could not sync time - unable to check for updates"
 
-#: ../src/piwiz.c:1285 ../data/piwiz.ui.h:5
+#: ../src/piwiz.c:1325 ../data/piwiz.ui.h:5
 msgid "_Next"
 msgstr "_Next"
 
-#: ../src/piwiz.c:1286
+#: ../src/piwiz.c:1326
 msgid "_Back"
 msgstr "_Back"
 
-#: ../src/piwiz.c:1287 ../data/piwiz.ui.h:4
+#: ../src/piwiz.c:1327 ../data/piwiz.ui.h:4
 msgid "_Skip"
 msgstr "_Skip"
 
-#: ../src/piwiz.c:1292 ../data/piwiz.ui.h:3
+#: ../src/piwiz.c:1332 ../data/piwiz.ui.h:3
 msgid "_Cancel"
 msgstr "_Cancel"
 
-#: ../src/piwiz.c:1298
+#: ../src/piwiz.c:1338
 msgid "_Later"
 msgstr "_Later"
 
-#: ../src/piwiz.c:1299
+#: ../src/piwiz.c:1339
 msgid "_Restart"
 msgstr "_Restart"
 
-#: ../src/piwiz.c:1305
+#: ../src/piwiz.c:1345
 msgid "_Done"
 msgstr "_Done"
 
-#: ../src/piwiz.c:1387
+#: ../src/piwiz.c:1427
 msgid "Setting location - please wait..."
 msgstr "Setting location - please wait..."
 
-#: ../src/piwiz.c:1399
+#: ../src/piwiz.c:1439
 msgid "The two passwords entered do not match."
 msgstr "The two passwords entered do not match."
 
-#: ../src/piwiz.c:1436
+#: ../src/piwiz.c:1476
 #, c-format
 msgid "Enter the password for the WiFi network \"%s\"."
 msgstr "Enter the password for the wireless network \"%s\"."
 
-#: ../src/piwiz.c:1450 ../src/piwiz.c:1461
+#: ../src/piwiz.c:1490 ../src/piwiz.c:1501
 msgid "Connecting to WiFi network - please wait..."
 msgstr "Connecting to wireless network - please wait..."
 
-#: ../src/piwiz.c:1453 ../src/piwiz.c:1464
+#: ../src/piwiz.c:1493 ../src/piwiz.c:1504
 msgid "Could not connect to this network"
 msgstr "Could not connect to this network"
 
-#: ../src/piwiz.c:1472
+#: ../src/piwiz.c:1519
 msgid "Synchronising clock - please wait..."
 msgstr "Synchronising clock - please wait..."
 
-#: ../src/piwiz.c:1474
+#: ../src/piwiz.c:1524
 msgid "No network connection found - unable to check for updates"
 msgstr "No network connection found - unable to check for updates"
 
-#: ../src/piwiz.c:1574
+#: ../src/piwiz.c:1624
 #, c-format
 msgid "<span font_desc=\"10.0\">IP : %s</span>"
 msgstr "<span font_desc=\"10.0\">IP : %s</span>"
 
-#: ../src/piwiz.c:1685
+#: ../src/piwiz.c:1748
 msgid "Set the country in which you are using your Pi"
 msgstr "Set the country in which you are using your Pi"
 
-#: ../src/piwiz.c:1686
+#: ../src/piwiz.c:1749
 msgid "Set the language in which applications should appear"
 msgstr "Set the language in which applications should appear"
 
-#: ../src/piwiz.c:1687
+#: ../src/piwiz.c:1750
 msgid "Set the closest city to your location"
 msgstr "Set the closest city to your location"
 
@@ -492,6 +492,14 @@ msgid "Your Raspberry Pi is now set up and ready to go."
 msgstr "Your Raspberry Pi is now set up and ready to go."
 
 #: ../data/piwiz.ui.h:53
+msgid ""
+"To run applications, click the raspberry icon in the top left corner of the "
+"screen to open the menu."
+msgstr ""
+"To run applications, click the raspberry icon in the top left corner of the "
+"screen to open the menu."
+
+#: ../data/piwiz.ui.h:54
 msgid ""
 "Press 'Restart' to restart your Pi so the new settings will take effect."
 msgstr ""
