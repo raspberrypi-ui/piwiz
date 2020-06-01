@@ -1,3 +1,9 @@
+piwiz (0.13) buster; urgency=medium
+
+  * Check multiple locations for Chromium preferences
+
+ -- Simon Long <simon@raspberrypi.com>  Mon, 01 Jun 2020 12:22:55 +0100
+
 piwiz (0.12) buster; urgency=medium
 
   * Set serial number in marketing page for Chromium.
