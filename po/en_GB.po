@@ -503,8 +503,8 @@ msgstr ""
 msgid ""
 "Press 'Restart' to restart your Pi so the new settings will take effect."
 msgstr ""
-"Press 'Restart' to restart your Pi now so the new settings will take effect, "
-"or press 'Later' to close the wizard and restart the Pi yourself."
+"Press 'Restart' to restart your Raspberry Pi to load the new settings, "
+"or press 'Later' to close this window and restart manually later."
 
 #: ../data/piwiz.desktop.in.h:1
 msgid "Raspberry Pi First-Run Wizard"
