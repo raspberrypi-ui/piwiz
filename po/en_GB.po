@@ -431,7 +431,7 @@ msgid ""
 msgstr ""
 "Press 'Next' to save your setting.\n"
 "\n"
-"The change will take effect when the Pi is restarted."
+"The change will take effect when the Raspberry Pi is restarted."
 
 #: ../data/piwiz.ui.h:39
 msgid "<b>Select WiFi Network</b>"
