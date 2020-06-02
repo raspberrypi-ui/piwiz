@@ -174,7 +174,7 @@ msgstr "<span font_desc=\"10.0\">IP : %s</span>"
 
 #: ../src/piwiz.c:1748
 msgid "Set the country in which you are using your Pi"
-msgstr "Set the country in which you are using your Pi"
+msgstr "Set the country in which you are using your Raspberry Pi"
 
 #: ../src/piwiz.c:1749
 msgid "Set the language in which applications should appear"
