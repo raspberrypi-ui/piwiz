@@ -1,3 +1,9 @@
+piwiz (0.15) buster; urgency=medium
+
+  * When installing language packages, ignore armhf version if there is arm64 version
+
+ -- Simon Long <simon@raspberrypi.com>  Wed, 03 Jun 2020 22:29:18 +0800
+
 piwiz (0.14) buster; urgency=medium
 
   * Text tweak
