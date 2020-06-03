@@ -1205,6 +1205,9 @@ static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
 {
     GError *error = NULL;
     PkResults *results = pk_task_generic_finish (task, res, &error);
+    PkPackage *item;
+    gchar *package_id, *arch;
+    int i;
 
     if (error != NULL)
     {
@@ -1218,7 +1221,23 @@ static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
     PkPackageSack *sack = pk_results_get_package_sack (results);
     GPtrArray *array = pk_package_sack_get_array (sack);
 
-    if (array->len > 0)
+    // remove armhf packages for which there is an arm64 equivalent...
+    for (i = 0; i < array->len; i++)
+    {
+        item = g_ptr_array_index (array, i);
+        g_object_get (item, "package-id", &package_id, NULL);
+        if (arch = strstr (package_id, "arm64"))
+        {
+            *(arch + 3) = 'h';
+            *(arch + 4) = 'f';
+            item = pk_package_sack_find_by_id_name_arch (sack, package_id);
+            if (item) pk_package_sack_remove_package (sack, item);
+        }
+        g_free (package_id);
+    }
+    g_ptr_array_unref (array);
+
+    if (pk_package_sack_get_size (sack) > 0)
     {
         reboot = TRUE;
         message (_("Installing languages - please wait..."), 0, 0, -1, FALSE);
