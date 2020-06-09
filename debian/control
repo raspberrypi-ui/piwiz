@@ -18,7 +18,7 @@ Description: Raspberry Pi first-run wizard
 
 Package: piwiz-hs
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, packagekit, pi-language-support, raspi-config
+Depends: ${shlibs:Depends}, ${misc:Depends}, packagekit, pi-language-support, raspi-config, dnsfilter
 Conflicts: piwiz
 Description: Raspberry Pi first-run wizard for home-school programme
  Wizard which performs initial configuration of Raspberry Pi system settings
