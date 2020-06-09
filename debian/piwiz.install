@@ -1,0 +1,7 @@
+#!/usr/bin/dh-exec
+src/piwiz => /usr/bin/piwiz
+po/en_GB.gmo => /usr/share/locale/en_GB/LC_MESSAGES/piwiz.mo
+data/piwiz.desktop etc/xdg/autostart
+data/piwiz.ui usr/share/piwiz
+data/raspberry-pi-logo.png usr/share/piwiz
+data/corner.png usr/share/piwiz

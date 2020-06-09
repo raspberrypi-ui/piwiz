@@ -1,3 +1,9 @@
+piwiz (0.16) buster; urgency=medium
+
+  * Create separate standard and homeschool packages
+
+ -- Simon Long <simon@raspberrypi.com>  Tue, 09 Jun 2020 17:13:14 +0100
+
 piwiz (0.15) buster; urgency=medium
 
   * When installing language packages, ignore armhf version if there is arm64 version

@@ -3,7 +3,7 @@ Section: admin
 Priority: optional
 Maintainer: Simon Long <simon@raspberrypi.org>
 Build-Depends: debhelper (>= 9), dh-autoreconf, libglib2.0-dev, libgtk2.0-dev,
- libx11-dev, intltool, libpackagekit-glib2-dev
+ libx11-dev, intltool, libpackagekit-glib2-dev, dh-exec
 Standards-Version: 3.9.6
 Homepage: https://github.com/raspberrypi-ui/piwiz
 Vcs-Git: git://git@github.com:raspberrypi-ui/piwiz.git
@@ -12,5 +12,13 @@ Vcs-Browser: https://github.com/raspberrypi-ui/piwiz
 Package: piwiz
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, packagekit, pi-language-support, raspi-config
+Conflicts: piwiz-hs
 Description: Raspberry Pi first-run wizard
+ Wizard which performs initial configuration of Raspberry Pi system settings
+
+Package: piwiz-hs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, packagekit, pi-language-support, raspi-config
+Conflicts: piwiz
+Description: Raspberry Pi first-run wizard for home-school programme
  Wizard which performs initial configuration of Raspberry Pi system settings
