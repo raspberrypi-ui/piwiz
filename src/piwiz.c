@@ -1707,7 +1707,7 @@ int main (int argc, char *argv[])
     if (kbd > MAX_KBS - 1) kbd = 0;
 
 #ifdef HOMESCHOOL
-    vsystem ("dnsfilter on");
+    vsystem ("familyshield on");
     reboot = TRUE;
 #else
     reboot = FALSE;
