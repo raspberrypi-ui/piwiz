@@ -42,3 +42,4 @@ debian/debhelper-build-stamp
 debian/.debhelper/
 debian/piwiz/
 piwiz
+piwizhs
