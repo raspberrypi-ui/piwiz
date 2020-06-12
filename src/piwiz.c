@@ -1853,6 +1853,7 @@ int main (int argc, char *argv[])
 #ifdef HOMESCHOOL
         vsystem ("cp /usr/share/applications/chromium-browser.desktop /etc/xdg/autostart/");
         vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Raspberry Pi Resources\nIcon=rpi\nURL=/usr/share/applications/chromium-browser.desktop\" > /home/pi/Desktop/chromium-browser.desktop");
+        vsystem ("echo \"[Desktop Entry]\nType=Application\nName=Microsoft Teams\nComment=Microsoft Teams\nExec=/usr/bin/chromium-browser --app=\"https://teams.microsoft.com/_#/\" --user-agent=\"Mozilla/5.0 \\(X11\\; CrOS x86_64 12871.34.0\\) AppleWebKit/537.36 \\(KHTML, like Gecko\\) Chrome/81.0.4044.42 Safari/537.36\"\nCategories=Network;\nTerminal=false\nStartupNotify=true\nIcon=chromium-browser\" > /usr/share/raspi-ui-overrides/applications/msteams.desktop");
 #endif
         vsystem ("rm -f /etc/xdg/autostart/piwiz.desktop");
     }
