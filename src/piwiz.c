@@ -234,7 +234,7 @@ static const char kb_countries[MAX_KBS][3] = {
     "PT",
     "NO",
     "SE",
-    "FI",
+    "DK",
     "RU",
     "TR",
     "IL"
@@ -454,8 +454,17 @@ static gboolean is_pi (void)
 static int get_pi_keyboard (void)
 {
     int val, ret = 0;
+    char *res;
 
-    char *res = get_string ("lsusb -v -d 04d9:0006 | grep \"RPI Wired Keyboard\" | rev");
+    res = get_string ("hexdump -n 1 -e '1/1 \"%d\"' /proc/device-tree/chosen/rpi-country-code 2> /dev/null");
+    if (res)
+    {
+        if (sscanf (res, "%x", &val) == 1) ret = val;
+        g_free (res);
+        if (ret) return ret;
+    }
+
+    res = get_string ("lsusb -v -d 04d9:0006 | grep \"RPI Wired Keyboard\" | rev");
     if (res)
     {
         if (sscanf (res, "%x", &val) == 1) ret = val;
