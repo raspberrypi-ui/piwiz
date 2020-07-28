@@ -92,7 +92,7 @@ char *wifi_if, *init_country, *init_lang, *init_kb, *init_var, *init_tz;
 char *cc, *lc, *city, *ext, *lay, *var;
 char *ssid;
 gint conn_timeout = 0, pulse_timer = 0;
-gboolean reboot, uscan;
+gboolean reboot, uscan, is_pi = TRUE;
 int last_btn = NEXT_BTN;
 int calls;
 
@@ -288,7 +288,6 @@ static char *get_string (char *cmd);
 static int get_status (char *cmd);
 static char *get_quoted_param (char *path, char *fname, char *toseek);
 static int vsystem (const char *fmt, ...);
-static gboolean is_pi (void);
 static void error_box (char *msg);
 static void message (char *msg, int wait, int dest_page, int prog, gboolean pulse);
 static void hide_message (void);
@@ -311,6 +310,7 @@ static gboolean select_ssid (char *lssid, const char *psk);
 static char *find_psk_for_network (char *ssid);
 static void progress (PkProgress *progress, PkProgressType *type, gpointer data);
 static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data);
+static gboolean filter_fn (PkPackage *package, gpointer user_data);
 static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data);
 static void install_lang_done (PkTask *task, GAsyncResult *res, gpointer data);
 static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data);
@@ -439,14 +439,6 @@ static int vsystem (const char *fmt, ...)
     res = system (cmdline);
     g_free (cmdline);
     return res;
-}
-
-static gboolean is_pi (void)
-{
-    if (!vsystem ("raspi-config nonint is_pi"))
-        return TRUE;
-    else
-        return FALSE;
 }
 
 /* Keyboard detection */
@@ -1166,10 +1158,18 @@ static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
     message (_("System is up to date"), 1, PAGE_DONE, -1, FALSE);
 }
 
+static gboolean filter_fn (PkPackage *package, gpointer user_data)
+{
+    if (is_pi) return TRUE;
+    if (strstr (pk_package_get_arch (package), "amd64")) return FALSE;
+    return TRUE;
+}
+
 static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
 {
     GError *error = NULL;
     PkResults *results = pk_task_generic_finish (task, res, &error);
+    gchar **ids;
 
     if (error != NULL)
     {
@@ -1181,15 +1181,23 @@ static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
     }
 
     PkPackageSack *sack = pk_results_get_package_sack (results);
-    GPtrArray *array = pk_package_sack_get_array (sack);
+    PkPackageSack *fsack = pk_package_sack_filter (sack, filter_fn, NULL);
+    GPtrArray *array = pk_package_sack_get_array (fsack);
 
     if (array->len > 0)
     {
         reboot = TRUE;
         message (_("Getting updates - please wait..."), 0, 0, -1, FALSE);
-        pk_task_update_packages_async (task, pk_package_sack_get_ids (sack), NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) do_updates_done, NULL);
+
+        ids = pk_package_sack_get_ids (fsack);
+        pk_task_update_packages_async (task, ids, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) do_updates_done, NULL);
+        g_strfreev (ids);
     }
     else message (_("System is up to date"), 1, PAGE_DONE, -1, FALSE);
+
+    g_ptr_array_unref (array);
+    g_object_unref (sack);
+    g_object_unref (fsack);
 }
 
 static void install_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
@@ -1216,6 +1224,7 @@ static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
     PkResults *results = pk_task_generic_finish (task, res, &error);
     PkPackage *item;
     gchar *package_id, *arch;
+    gchar **ids;
     int i;
 
     if (error != NULL)
@@ -1228,7 +1237,8 @@ static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
     }
 
     PkPackageSack *sack = pk_results_get_package_sack (results);
-    GPtrArray *array = pk_package_sack_get_array (sack);
+    PkPackageSack *fsack = pk_package_sack_filter (sack, filter_fn, NULL);
+    GPtrArray *array = pk_package_sack_get_array (fsack);
 
     // remove armhf packages for which there is an arm64 equivalent...
     for (i = 0; i < array->len; i++)
@@ -1239,24 +1249,30 @@ static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
         {
             *(arch + 3) = 'h';
             *(arch + 4) = 'f';
-            item = pk_package_sack_find_by_id_name_arch (sack, package_id);
-            if (item) pk_package_sack_remove_package (sack, item);
+            item = pk_package_sack_find_by_id_name_arch (fsack, package_id);
+            if (item) pk_package_sack_remove_package (fsack, item);
         }
         g_free (package_id);
     }
     g_ptr_array_unref (array);
 
-    if (pk_package_sack_get_size (sack) > 0)
+    if (pk_package_sack_get_size (fsack) > 0)
     {
         reboot = TRUE;
         message (_("Installing languages - please wait..."), 0, 0, -1, FALSE);
-        pk_task_install_packages_async (task, pk_package_sack_get_ids (sack), NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) install_lang_done, NULL);
+
+        ids = pk_package_sack_get_ids (fsack);
+        pk_task_install_packages_async (task, ids, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) install_lang_done, NULL);
+        g_strfreev (ids);
     }
     else
     {
         message (_("Comparing versions - please wait..."), 0, 0, -1, FALSE);
         pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
     }
+
+    g_object_unref (sack);
+    g_object_unref (fsack);
 }
 
 static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data)
@@ -1471,7 +1487,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             }
                             g_free (pw1);
                             g_free (pw2);
-                            if (is_pi ()) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
+                            if (is_pi) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
                             else
                             {
                                 if (!wifi_if[0])
@@ -1565,7 +1581,7 @@ static void prev_page (GtkButton* btn, gpointer ptr)
         case PAGE_UPDATE :  if (wifi_if[0]) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIAP);
                             else
                             {
-                                if (is_pi ())
+                                if (is_pi)
                                     gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
                                 else
                                     gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
@@ -1575,7 +1591,7 @@ static void prev_page (GtkButton* btn, gpointer ptr)
         case PAGE_INTRO :   gtk_dialog_response (GTK_DIALOG (main_dlg), GTK_RESPONSE_CANCEL);
                             break;
 
-        case PAGE_WIFIAP :  if (is_pi ())
+        case PAGE_WIFIAP :  if (is_pi)
                                 gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
                             else
                                 gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
@@ -1661,7 +1677,7 @@ static gboolean show_ip (void)
 
 static void set_marketing_serial (void)
 {
-    if (is_pi ())
+    if (is_pi)
     {
         if (access ("/usr/lib/chromium-browser/master_preferences", F_OK) != -1)
         {
@@ -1710,6 +1726,8 @@ int main (int argc, char *argv[])
     bind_textdomain_codeset ( GETTEXT_PACKAGE, "UTF-8" );
     textdomain ( GETTEXT_PACKAGE );
 #endif
+
+    if (system ("raspi-config nonint is_pi")) is_pi = FALSE;
 
     // read country code from Pi keyboard, if any
     kbd = get_pi_keyboard ();
