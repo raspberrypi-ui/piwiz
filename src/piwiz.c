@@ -1182,9 +1182,8 @@ static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
 
     PkPackageSack *sack = pk_results_get_package_sack (results);
     PkPackageSack *fsack = pk_package_sack_filter (sack, filter_fn, NULL);
-    GPtrArray *array = pk_package_sack_get_array (fsack);
 
-    if (array->len > 0)
+    if (pk_package_sack_get_size (fsack) > 0)
     {
         reboot = TRUE;
         message (_("Getting updates - please wait..."), 0, 0, -1, FALSE);
@@ -1195,7 +1194,6 @@ static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
     }
     else message (_("System is up to date"), 1, PAGE_DONE, -1, FALSE);
 
-    g_ptr_array_unref (array);
     g_object_unref (sack);
     g_object_unref (fsack);
 }
