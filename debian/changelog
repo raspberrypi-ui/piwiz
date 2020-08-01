@@ -1,3 +1,9 @@
+piwiz (0.18) buster; urgency=medium
+
+  * Re-set marketing serial number in Chromium preferences after update
+
+ -- Simon Long <simon@raspberrypi.com>  Sat, 01 Aug 2020 11:52:19 +0100
+
 piwiz (0.17) buster; urgency=medium
 
   * Filter out 64-bit packages on x86; fix some leaked memory

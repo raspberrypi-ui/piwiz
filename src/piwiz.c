@@ -1155,6 +1155,8 @@ static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
         return;
     }
 
+    // re-set the serial number in case a Chromium update was installed
+    set_marketing_serial ();
     message (_("System is up to date"), 1, PAGE_DONE, -1, FALSE);
 }
 
