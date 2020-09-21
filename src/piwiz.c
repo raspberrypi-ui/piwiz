@@ -66,6 +66,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define LABEL_WIDTH(name, w) {GtkWidget *l = (GtkWidget *) gtk_builder_get_object (builder, name); gtk_widget_set_size_request (l, w, -1);}
 
+#define FLAGFILE "/tmp/.wlflag"
+
 /* Controls */
 
 static GtkWidget *main_dlg, *msg_dlg, *msg_msg, *msg_pb, *msg_btn;
@@ -632,10 +634,18 @@ static gboolean loc_done (gpointer data)
         putenv (language);
         putenv (lcall);
 
+#ifdef HOMESCHOOL
+        execl ("/usr/bin/sudo", "sudo", "piwizhs", "--langset", NULL);
+#else
         execl ("/usr/bin/sudo", "sudo", "piwiz", "--langset", NULL);
+#endif
         exit (0);
     }
-    else exit (0);
+    else
+    {
+        while (access (FLAGFILE, F_OK) == -1);
+        exit (0);
+    }
     return FALSE;
 }
 
@@ -1883,7 +1893,14 @@ int main (int argc, char *argv[])
     g_timeout_add (1000, (GSourceFunc) show_ip, NULL);
 
     /* if restarting after language set, skip to password page */
-    if (argc == 2 && !g_strcmp0 (argv[1], "--langset")) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
+    if (argc == 2 && !g_strcmp0 (argv[1], "--langset"))
+    {
+        gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
+
+        /* touch the flag file to close the old window on restart */
+        fclose (fopen (FLAGFILE, "wb"));
+    }
+    remove (FLAGFILE);
 
     res = gtk_dialog_run (GTK_DIALOG (main_dlg));
 
