@@ -620,8 +620,22 @@ static gboolean ok_clicked (GtkButton *button, gpointer data)
 
 static gboolean loc_done (gpointer data)
 {
-    hide_message ();
-    gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
+    char *lang, *language, *lcall;
+
+    if (fork () == 0)
+    {
+        // new child process - set the new locale environment variables and then restart the wizard
+        lang = g_strdup_printf ("LANG=%s_%s%s", lc, cc, ext);
+        language = g_strdup_printf ("LANGUAGE=%s_%s%s", lc, cc, ext);
+        lcall = g_strdup_printf ("LC_ALL=%s_%s%s", lc, cc, ext);
+        putenv (lang);
+        putenv (language);
+        putenv (lcall);
+
+        execl ("/usr/bin/sudo", "sudo", "piwiz", "--langset", NULL);
+        exit (0);
+    }
+    else exit (0);
     return FALSE;
 }
 
@@ -713,7 +727,6 @@ static gpointer set_locale (gpointer data)
     g_free (lay);
     g_free (var);
     g_free (city);
-    g_free (ext);
 
     g_idle_add (loc_done, NULL);
     return NULL;
@@ -875,7 +888,7 @@ static gboolean match_country (GtkTreeModel *model, GtkTreeIter *iter, gpointer 
 
 static void read_inits (void)
 {
-    char *buffer, *lc, *cc;
+    char *buffer, *llc, *lcc;
 
     init_country = NULL;
     init_lang = NULL;
@@ -889,12 +902,12 @@ static void read_inits (void)
     if (!buffer[0]) buffer = get_string ("grep LANG /etc/default/locale | cut -d = -f 2");
     if (buffer[0])
     {
-        lc = strtok (buffer, "_");
-        cc = strtok (NULL, ":. ");
-        if (lc && cc)
+        llc = strtok (buffer, "_");
+        lcc = strtok (NULL, ":. ");
+        if (llc && lcc)
         {
-            init_country = g_strdup (cc);
-            init_lang = g_strdup (lc);
+            init_country = g_strdup (lcc);
+            init_lang = g_strdup (llc);
         }
         g_free (buffer);
     }
@@ -1868,6 +1881,9 @@ int main (int argc, char *argv[])
 
     /* start timed event to detect IP address being available */
     g_timeout_add (1000, (GSourceFunc) show_ip, NULL);
+
+    /* if restarting after language set, skip to password page */
+    if (argc == 2 && !g_strcmp0 (argv[1], "--langset")) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
 
     res = gtk_dialog_run (GTK_DIALOG (main_dlg));
 
