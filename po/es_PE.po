@@ -429,7 +429,7 @@ msgid ""
 "\n"
 "The change will take effect when the Pi is restarted."
 msgstr ""
-"Presione "Siguiente" para guardar su configuración.\n"
+"Presione \"Siguiente\" para guardar su configuración.\n"
 "\n"
 "Los cambios surtirán efecto cuando se reinicie la Raspberry Pi."
 
@@ -447,7 +447,7 @@ msgstr "Haga 'click' en el nombre de su red para seleccionarla"
 
 #: ../data/piwiz.ui.h:42
 msgid "Press 'Next' to connect, or 'Skip' to continue without connecting."
-msgstr "Presione 'Siguiente' para conectarse, u "Omitir" para continuar sin conectarse."
+msgstr "Presione 'Siguiente' para conectarse, u \"Omitir\" para continuar sin conectarse."
 
 #: ../data/piwiz.ui.h:43
 msgid "<b>Enter WiFi Password</b>"
