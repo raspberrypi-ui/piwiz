@@ -622,7 +622,8 @@ static gboolean ok_clicked (GtkButton *button, gpointer data)
 
 static gboolean loc_done (gpointer data)
 {
-    char *lang, *language, *lcall;
+    char *lang, *language, *lcall, *loc;
+    gint x, y;
 
     if (fork () == 0)
     {
@@ -634,11 +635,15 @@ static gboolean loc_done (gpointer data)
         putenv (language);
         putenv (lcall);
 
+        gtk_window_get_position (GTK_WINDOW (main_dlg), &x, &y);
+        loc = g_strdup_printf ("%d:%d", x, y);
+
 #ifdef HOMESCHOOL
-        execl ("/usr/bin/sudo", "sudo", "piwizhs", "--langset", NULL);
+        execl ("/usr/bin/sudo", "sudo", "piwizhs", "--langset", loc, NULL);
 #else
-        execl ("/usr/bin/sudo", "sudo", "piwiz", "--langset", NULL);
+        execl ("/usr/bin/sudo", "sudo", "piwiz", "--langset", loc, NULL);
 #endif
+        g_free (loc);
         exit (0);
     }
     else
@@ -1893,8 +1898,12 @@ int main (int argc, char *argv[])
     g_timeout_add (1000, (GSourceFunc) show_ip, NULL);
 
     /* if restarting after language set, skip to password page */
-    if (argc == 2 && !g_strcmp0 (argv[1], "--langset"))
+    if (argc == 3 && !g_strcmp0 (argv[1], "--langset"))
     {
+        gint x, y;
+        sscanf (argv[2], "%d:%d", &x, &y);
+        gtk_window_move (GTK_WINDOW (main_dlg), x, y);
+
         gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
 
         /* touch the flag file to close the old window on restart */
