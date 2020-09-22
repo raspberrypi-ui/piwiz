@@ -625,6 +625,9 @@ static gboolean loc_done (gpointer data)
     char *lang, *language, *lcall, *loc;
     gint x, y;
 
+    remove (FLAGFILE);
+    sync ();
+
     if (fork () == 0)
     {
         // new child process - set the new locale environment variables and then restart the wizard
@@ -1909,7 +1912,6 @@ int main (int argc, char *argv[])
         /* touch the flag file to close the old window on restart */
         fclose (fopen (FLAGFILE, "wb"));
     }
-    remove (FLAGFILE);
 
     res = gtk_dialog_run (GTK_DIALOG (main_dlg));
 
