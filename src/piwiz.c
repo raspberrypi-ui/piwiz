@@ -642,9 +642,9 @@ static gboolean loc_done (gpointer data)
         loc = g_strdup_printf ("%d:%d", x, y);
 
 #ifdef HOMESCHOOL
-        execl ("/usr/bin/sudo", "sudo", "piwizhs", "--langset", loc, NULL);
+        execl ("/usr/bin/sudo", "sudo", "-AE", "piwizhs", "--langset", loc, NULL);
 #else
-        execl ("/usr/bin/sudo", "sudo", "piwiz", "--langset", loc, NULL);
+        execl ("/usr/bin/sudo", "sudo", "-AE", "piwiz", "--langset", loc, NULL);
 #endif
         g_free (loc);
         exit (0);
