@@ -1741,6 +1741,23 @@ static gboolean net_available (void)
     return val;
 }
 
+static gboolean srprompt (gpointer data)
+{
+    if (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)) == PAGE_INTRO)
+    {
+        if (net_available () && clock_synced ())
+        {
+            char *buf = g_strdup_printf ("aplay %s/srprompt.wav", PACKAGE_DATA_DIR);
+            system (buf);
+            g_free (buf);
+        }
+        return TRUE;
+    }
+    return FALSE;
+}
+
+
+
 
 /* The dialog... */
 
@@ -1899,6 +1916,10 @@ int main (int argc, char *argv[])
 
     /* start timed event to detect IP address being available */
     g_timeout_add (1000, (GSourceFunc) show_ip, NULL);
+
+    /* start timed event to prompt for screen reader install if not already installed */
+    res = system ("dpkg -l orca | grep -q ii");
+    if (res) g_timeout_add_seconds (15, srprompt, NULL);
 
     /* if restarting after language set, skip to password page */
     if (argc == 3 && !g_strcmp0 (argv[1], "--langset"))
