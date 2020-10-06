@@ -11,14 +11,14 @@ Vcs-Browser: https://github.com/raspberrypi-ui/piwiz
 
 Package: piwiz
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, packagekit, pi-language-support, raspi-config
+Depends: ${shlibs:Depends}, ${misc:Depends}, packagekit, pi-language-support, raspi-config, alsa-utils
 Conflicts: piwiz-hs
 Description: Raspberry Pi first-run wizard
  Wizard which performs initial configuration of Raspberry Pi system settings
 
 Package: piwiz-hs
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, packagekit, pi-language-support, raspi-config, familyshield
+Depends: ${shlibs:Depends}, ${misc:Depends}, packagekit, pi-language-support, raspi-config, familyshield, alsa-utils
 Conflicts: piwiz
 Description: Raspberry Pi first-run wizard for home-school programme
  Wizard which performs initial configuration of Raspberry Pi system settings

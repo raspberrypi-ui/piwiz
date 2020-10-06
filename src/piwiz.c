@@ -329,6 +329,7 @@ static gboolean show_ip (void);
 static void set_marketing_serial (void);
 static gboolean net_available (void);
 static int get_pi_keyboard (void);
+static gboolean srprompt (gpointer data);
 
 /* Helpers */
 
@@ -1755,8 +1756,6 @@ static gboolean srprompt (gpointer data)
     }
     return FALSE;
 }
-
-
 
 
 /* The dialog... */
