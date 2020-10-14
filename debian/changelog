@@ -4,7 +4,7 @@ piwiz (0.19) buster; urgency=medium
   * Add environment preservation flag to enable screen reader support
   * Add screen reader install voice prompt
 
- -- Simon Long <simon@raspberrypi.com>  Tue, 29 Sep 2020 15:23:27 +0100
+ -- Simon Long <simon@raspberrypi.com>  Wed, 14 Oct 2020 15:23:27 +0100
 
 piwiz (0.18) buster; urgency=medium
 
