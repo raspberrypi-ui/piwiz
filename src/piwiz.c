@@ -64,6 +64,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define SKIP_BTN 1
 #define PREV_BTN 2
 
+#define LL_LCODE 0
+#define LL_CCODE 1
+#define LL_LNAME 2
+#define LL_CNAME 3
+#define LL_CHARS 4
+
+#define TL_ZONE  0
+#define TL_CCODE 1
+#define TL_CITY  2
+
 #define LABEL_WIDTH(name, w) {GtkWidget *l = (GtkWidget *) gtk_builder_get_object (builder, name); gtk_widget_set_size_request (l, w, -1);}
 
 #define FLAGFILE "/tmp/.wlflag"
@@ -301,6 +311,7 @@ static void read_locales (void);
 static gboolean unique_rows (GtkTreeModel *model, GtkTreeIter *iter, gpointer data);
 static void country_changed (GtkComboBox *cb, gpointer ptr);
 static gboolean match_country (GtkTreeModel *model, GtkTreeIter *iter, gpointer data);
+static gboolean match_tz_country (GtkTreeModel *model, GtkTreeIter *iter, gpointer data);
 static void read_inits (void);
 static void set_init (GtkTreeModel *model, GtkWidget *cb, int pos, const char *init);
 static void escape_passwd (const char *in, char **out);
@@ -791,7 +802,7 @@ static void read_locales (void)
                     lname[0] = g_ascii_toupper (lname[0]);
 
                     gtk_list_store_append (locale_list, &iter);
-                    gtk_list_store_set (locale_list, &iter, 0, cptr1, 1, cptr2, 2, lname, 3, cname, 4, ext ? ".UTF-8" : "", -1);
+                    gtk_list_store_set (locale_list, &iter, LL_LCODE, cptr1, LL_CCODE, cptr2, LL_LNAME, lname, LL_CNAME, cname, LL_CHARS, ext ? ".UTF-8" : "", -1);
                     g_free (cname);
                     g_free (lname);
                 }
@@ -803,7 +814,7 @@ static void read_locales (void)
 
     // sort and filter the database to produce the list for the country combo
     scount = GTK_TREE_MODEL_SORT (gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (locale_list)));
-    gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (scount), 3, GTK_SORT_ASCENDING);
+    gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (scount), LL_CNAME, GTK_SORT_ASCENDING);
     fcount = GTK_TREE_MODEL_FILTER (gtk_tree_model_filter_new (GTK_TREE_MODEL (scount), NULL));
     gtk_tree_model_filter_set_visible_func (fcount, (GtkTreeModelFilterVisibleFunc) unique_rows, NULL, NULL);
 
@@ -832,7 +843,7 @@ static void read_locales (void)
                     while (*cptr++) if (*cptr == '_') *cptr = ' ';
 
                     gtk_list_store_append (tz_list, &iter);
-                    gtk_list_store_set (tz_list, &iter, 0, cptr2, 1, cptr1, 2, cname, -1);
+                    gtk_list_store_set (tz_list, &iter, TL_ZONE, cptr2, TL_CCODE, cptr1, TL_CITY, cname, -1);
                     g_free (cname);
                 }
             }
@@ -849,8 +860,8 @@ static gboolean unique_rows (GtkTreeModel *model, GtkTreeIter *iter, gpointer da
     gboolean res;
 
     if (!gtk_tree_model_iter_next (model, &next)) return TRUE;
-    gtk_tree_model_get (model, iter, 1, &str1, -1);
-    gtk_tree_model_get (model, &next, 1, &str2, -1);
+    gtk_tree_model_get (model, iter, LL_CCODE, &str1, -1);
+    gtk_tree_model_get (model, &next, LL_CCODE, &str2, -1);
     if (!g_strcmp0 (str1, str2)) res = FALSE;
     else res = TRUE;
     g_free (str1);
@@ -868,13 +879,13 @@ static void country_changed (GtkComboBox *cb, gpointer ptr)
     // get the current country code from the combo box
     model = gtk_combo_box_get_model (GTK_COMBO_BOX (country_cb));
     gtk_combo_box_get_active_iter (GTK_COMBO_BOX (country_cb), &iter);
-    gtk_tree_model_get (model, &iter, 1, &str, -1);
+    gtk_tree_model_get (model, &iter, LL_CCODE, &str, -1);
 
     // filter and sort the master database for entries matching this code
     flang = GTK_TREE_MODEL_FILTER (gtk_tree_model_filter_new (GTK_TREE_MODEL (locale_list), NULL));
     gtk_tree_model_filter_set_visible_func (flang, (GtkTreeModelFilterVisibleFunc) match_country, str, NULL);
     slang = GTK_TREE_MODEL_SORT (gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (flang)));
-    gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (slang), 2, GTK_SORT_ASCENDING);
+    gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (slang), LL_LNAME, GTK_SORT_ASCENDING);
 
     // set up the combo box from the sorted and filtered list
     gtk_combo_box_set_model (GTK_COMBO_BOX (language_cb), GTK_TREE_MODEL (slang));
@@ -882,9 +893,9 @@ static void country_changed (GtkComboBox *cb, gpointer ptr)
 
     // set the timezones for the country
     fcity = GTK_TREE_MODEL_FILTER (gtk_tree_model_filter_new (GTK_TREE_MODEL (tz_list), NULL));
-    gtk_tree_model_filter_set_visible_func (fcity, (GtkTreeModelFilterVisibleFunc) match_country, str, NULL);
+    gtk_tree_model_filter_set_visible_func (fcity, (GtkTreeModelFilterVisibleFunc) match_tz_country, str, NULL);
     scity = GTK_TREE_MODEL_SORT (gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (fcity)));
-    gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (scity), 2, GTK_SORT_ASCENDING);
+    gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (scity), TL_CITY, GTK_SORT_ASCENDING);
 
     // set up the combo box from the sorted and filtered list
     gtk_combo_box_set_model (GTK_COMBO_BOX (timezone_cb), GTK_TREE_MODEL (scity));
@@ -898,7 +909,19 @@ static gboolean match_country (GtkTreeModel *model, GtkTreeIter *iter, gpointer 
     char *str;
     gboolean res;
 
-    gtk_tree_model_get (model, iter, 1, &str, -1);
+    gtk_tree_model_get (model, iter, LL_CCODE, &str, -1);
+    if (!g_strcmp0 (str, (char *) data)) res = TRUE;
+    else res = FALSE;
+    g_free (str);
+    return res;
+}
+
+static gboolean match_tz_country (GtkTreeModel *model, GtkTreeIter *iter, gpointer data)
+{
+    char *str;
+    gboolean res;
+
+    gtk_tree_model_get (model, iter, TL_CCODE, &str, -1);
     if (!g_strcmp0 (str, (char *) data)) res = TRUE;
     else res = FALSE;
     g_free (str);
@@ -1463,9 +1486,9 @@ static void next_page (GtkButton* btn, gpointer ptr)
         case PAGE_LOCALE :  // get the combo entries and look up relevant codes in database
                             model = gtk_combo_box_get_model (GTK_COMBO_BOX (language_cb));
                             gtk_combo_box_get_active_iter (GTK_COMBO_BOX (language_cb), &iter);
-                            gtk_tree_model_get (model, &iter, 0, &lc, -1);
-                            gtk_tree_model_get (model, &iter, 1, &cc, -1);
-                            gtk_tree_model_get (model, &iter, 4, &ext, -1);
+                            gtk_tree_model_get (model, &iter, LL_LCODE, &lc, -1);
+                            gtk_tree_model_get (model, &iter, LL_CCODE, &cc, -1);
+                            gtk_tree_model_get (model, &iter, LL_CHARS, &ext, -1);
                             wc = g_strdup (cc);
                             if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (eng_chk)))
                             {
@@ -1480,7 +1503,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
 
                             model = gtk_combo_box_get_model (GTK_COMBO_BOX (timezone_cb));
                             gtk_combo_box_get_active_iter (GTK_COMBO_BOX (timezone_cb), &iter);
-                            gtk_tree_model_get (model, &iter, 0, &city, -1);
+                            gtk_tree_model_get (model, &iter, TL_ZONE, &city, -1);
 
                             if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (uskey_chk)))
                             {
@@ -1850,22 +1873,22 @@ int main (int argc, char *argv[])
     country_cb = (GtkWidget *) gtk_builder_get_object (builder, "p1comb1");
     language_cb = (GtkWidget *) gtk_builder_get_object (builder, "p1comb2");
     timezone_cb = (GtkWidget *) gtk_builder_get_object (builder, "p1comb3");
-    gtk_combo_box_set_model (GTK_WIDGET (country_cb), GTK_TREE_MODEL (fcount));
+    gtk_combo_box_set_model (GTK_COMBO_BOX (country_cb), GTK_TREE_MODEL (fcount));
 
     // set up cell renderers to associate list columns with combo boxes
     col = gtk_cell_renderer_text_new ();
     gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (country_cb), col, FALSE);
-    gtk_cell_layout_add_attribute (GTK_CELL_LAYOUT (country_cb), col, "text", 3);
+    gtk_cell_layout_add_attribute (GTK_CELL_LAYOUT (country_cb), col, "text", LL_CNAME);
     gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (language_cb), col, FALSE);
-    gtk_cell_layout_add_attribute (GTK_CELL_LAYOUT (language_cb), col, "text", 2);
+    gtk_cell_layout_add_attribute (GTK_CELL_LAYOUT (language_cb), col, "text", LL_LNAME);
     gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (timezone_cb), col, FALSE);
-    gtk_cell_layout_add_attribute (GTK_CELL_LAYOUT (timezone_cb), col, "text", 2);
+    gtk_cell_layout_add_attribute (GTK_CELL_LAYOUT (timezone_cb), col, "text", TL_CITY);
 
     // initialise the country combo
     g_signal_connect (country_cb, "changed", G_CALLBACK (country_changed), NULL);
-    set_init (GTK_TREE_MODEL (fcount), country_cb, 1, kbd ? kb_countries[kbd] : init_country);
-    set_init (GTK_TREE_MODEL (slang), language_cb, 0, kbd ? kb_langs[kbd] : init_lang);
-    set_init (GTK_TREE_MODEL (scity), timezone_cb, 0, kbd ? kb_tzs[kbd] : init_tz);
+    set_init (GTK_TREE_MODEL (fcount), country_cb, LL_CCODE, kbd ? kb_countries[kbd] : init_country);
+    set_init (GTK_TREE_MODEL (slang), language_cb, LL_LCODE, kbd ? kb_langs[kbd] : init_lang);
+    set_init (GTK_TREE_MODEL (scity), timezone_cb, TL_ZONE, kbd ? kb_tzs[kbd] : init_tz);
 
     // make an educated guess as to whether a US keyboard override was set
     char *ilay = NULL, *ivar = NULL;
