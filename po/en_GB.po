@@ -463,7 +463,7 @@ msgstr "Password:"
 
 #: ../data/piwiz.ui.h:46
 msgid "Enter the password for your network"
-msgstr "Enter the password for your network"
+msgstr "Enter the password for your wireless network"
 
 #: ../data/piwiz.ui.h:47
 msgid "<b>Update Software</b>"
