@@ -64,17 +64,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define SKIP_BTN 1
 #define PREV_BTN 2
 
+// columns in localisation list stores
+
+#define CL_CNAME 0
+#define CL_CCODE 1
+
 #define LL_LNAME 0
 #define LL_LCODE 1
 #define LL_CCODE 2
 #define LL_CHARS 3
 
-#define CL_CNAME 0
-#define CL_CCODE 1
-
 #define TL_CITY  0
 #define TL_ZONE  1
-#define TL_CCODE 2
+#define TL_CCODE 2  // must be the same as LL_CCODE to allow match_country to be used for both
 
 #define LABEL_WIDTH(name, w) {GtkWidget *l = (GtkWidget *) gtk_builder_get_object (builder, name); gtk_widget_set_size_request (l, w, -1);}
 
@@ -92,7 +94,7 @@ static GtkWidget *pwd_hide, *psk_hide, *eng_chk, *uskey_chk, *uscan_chk;
 
 /* Lists for localisation */
 
-GtkListStore *locale_list, *country_list, *tz_list;
+GtkListStore *country_list, *locale_list, *tz_list;
 GtkTreeModelSort *slang, *scity;
 GtkTreeModelFilter *fcount;
 
@@ -313,7 +315,6 @@ static void read_locales (void);
 static gboolean unique_rows (GtkTreeModel *model, GtkTreeIter *iter, gpointer data);
 static void country_changed (GtkComboBox *cb, gpointer ptr);
 static gboolean match_country (GtkTreeModel *model, GtkTreeIter *iter, gpointer data);
-static gboolean match_tz_country (GtkTreeModel *model, GtkTreeIter *iter, gpointer data);
 static void read_inits (void);
 static void set_init (GtkTreeModel *model, GtkWidget *cb, int pos, const char *init);
 static void escape_passwd (const char *in, char **out);
@@ -897,7 +898,7 @@ static void country_changed (GtkComboBox *cb, gpointer ptr)
 
     // set the timezones for the country
     fcity = GTK_TREE_MODEL_FILTER (gtk_tree_model_filter_new (GTK_TREE_MODEL (tz_list), NULL));
-    gtk_tree_model_filter_set_visible_func (fcity, (GtkTreeModelFilterVisibleFunc) match_tz_country, str, NULL);
+    gtk_tree_model_filter_set_visible_func (fcity, (GtkTreeModelFilterVisibleFunc) match_country, str, NULL);
     scity = GTK_TREE_MODEL_SORT (gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (fcity)));
     gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (scity), TL_CITY, GTK_SORT_ASCENDING);
 
@@ -914,18 +915,6 @@ static gboolean match_country (GtkTreeModel *model, GtkTreeIter *iter, gpointer 
     gboolean res;
 
     gtk_tree_model_get (model, iter, LL_CCODE, &str, -1);
-    if (!g_strcmp0 (str, (char *) data)) res = TRUE;
-    else res = FALSE;
-    g_free (str);
-    return res;
-}
-
-static gboolean match_tz_country (GtkTreeModel *model, GtkTreeIter *iter, gpointer data)
-{
-    char *str;
-    gboolean res;
-
-    gtk_tree_model_get (model, iter, TL_CCODE, &str, -1);
     if (!g_strcmp0 (str, (char *) data)) res = TRUE;
     else res = FALSE;
     g_free (str);
