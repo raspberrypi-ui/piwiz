@@ -64,15 +64,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define SKIP_BTN 1
 #define PREV_BTN 2
 
-#define LL_LCODE 0
-#define LL_CCODE 1
-#define LL_LNAME 2
-#define LL_CNAME 3
-#define LL_CHARS 4
+#define LL_LNAME 0
+#define LL_LCODE 1
+#define LL_CCODE 2
+#define LL_CHARS 3
 
-#define TL_ZONE  0
-#define TL_CCODE 1
-#define TL_CITY  2
+#define CL_CNAME 0
+#define CL_CCODE 1
+
+#define TL_CITY  0
+#define TL_ZONE  1
+#define TL_CCODE 2
 
 #define LABEL_WIDTH(name, w) {GtkWidget *l = (GtkWidget *) gtk_builder_get_object (builder, name); gtk_widget_set_size_request (l, w, -1);}
 
@@ -90,7 +92,7 @@ static GtkWidget *pwd_hide, *psk_hide, *eng_chk, *uskey_chk, *uscan_chk;
 
 /* Lists for localisation */
 
-GtkListStore *locale_list, *tz_list;
+GtkListStore *locale_list, *country_list, *tz_list;
 GtkTreeModelSort *slang, *scity;
 GtkTreeModelFilter *fcount;
 
@@ -802,7 +804,9 @@ static void read_locales (void)
                     lname[0] = g_ascii_toupper (lname[0]);
 
                     gtk_list_store_append (locale_list, &iter);
-                    gtk_list_store_set (locale_list, &iter, LL_LCODE, cptr1, LL_CCODE, cptr2, LL_LNAME, lname, LL_CNAME, cname, LL_CHARS, ext ? ".UTF-8" : "", -1);
+                    gtk_list_store_set (locale_list, &iter, LL_LCODE, cptr1, LL_CCODE, cptr2, LL_LNAME, lname, LL_CHARS, ext ? ".UTF-8" : "", -1);
+                    gtk_list_store_append (country_list, &iter);
+                    gtk_list_store_set (country_list, &iter, CL_CNAME, cname, CL_CCODE, cptr2, -1);
                     g_free (cname);
                     g_free (lname);
                 }
@@ -813,8 +817,8 @@ static void read_locales (void)
     }
 
     // sort and filter the database to produce the list for the country combo
-    scount = GTK_TREE_MODEL_SORT (gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (locale_list)));
-    gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (scount), LL_CNAME, GTK_SORT_ASCENDING);
+    scount = GTK_TREE_MODEL_SORT (gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (country_list)));
+    gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (scount), CL_CNAME, GTK_SORT_ASCENDING);
     fcount = GTK_TREE_MODEL_FILTER (gtk_tree_model_filter_new (GTK_TREE_MODEL (scount), NULL));
     gtk_tree_model_filter_set_visible_func (fcount, (GtkTreeModelFilterVisibleFunc) unique_rows, NULL, NULL);
 
@@ -860,8 +864,8 @@ static gboolean unique_rows (GtkTreeModel *model, GtkTreeIter *iter, gpointer da
     gboolean res;
 
     if (!gtk_tree_model_iter_next (model, &next)) return TRUE;
-    gtk_tree_model_get (model, iter, LL_CCODE, &str1, -1);
-    gtk_tree_model_get (model, &next, LL_CCODE, &str2, -1);
+    gtk_tree_model_get (model, iter, CL_CCODE, &str1, -1);
+    gtk_tree_model_get (model, &next, CL_CCODE, &str2, -1);
     if (!g_strcmp0 (str1, str2)) res = FALSE;
     else res = TRUE;
     g_free (str1);
@@ -879,7 +883,7 @@ static void country_changed (GtkComboBox *cb, gpointer ptr)
     // get the current country code from the combo box
     model = gtk_combo_box_get_model (GTK_COMBO_BOX (country_cb));
     gtk_combo_box_get_active_iter (GTK_COMBO_BOX (country_cb), &iter);
-    gtk_tree_model_get (model, &iter, LL_CCODE, &str, -1);
+    gtk_tree_model_get (model, &iter, CL_CCODE, &str, -1);
 
     // filter and sort the master database for entries matching this code
     flang = GTK_TREE_MODEL_FILTER (gtk_tree_model_filter_new (GTK_TREE_MODEL (locale_list), NULL));
@@ -1821,7 +1825,8 @@ int main (int argc, char *argv[])
     gtk_icon_theme_prepend_search_path (gtk_icon_theme_get_default(), PACKAGE_DATA_DIR);
 
     // create the master databases
-    locale_list = gtk_list_store_new (5, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
+    locale_list = gtk_list_store_new (4, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
+    country_list = gtk_list_store_new (2, G_TYPE_STRING, G_TYPE_STRING);
     tz_list = gtk_list_store_new (3, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
     ap_list = gtk_list_store_new (5, G_TYPE_STRING, GDK_TYPE_PIXBUF, GDK_TYPE_PIXBUF, G_TYPE_INT, G_TYPE_INT);
 
@@ -1878,7 +1883,7 @@ int main (int argc, char *argv[])
     // set up cell renderers to associate list columns with combo boxes
     col = gtk_cell_renderer_text_new ();
     gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (country_cb), col, FALSE);
-    gtk_cell_layout_add_attribute (GTK_CELL_LAYOUT (country_cb), col, "text", LL_CNAME);
+    gtk_cell_layout_add_attribute (GTK_CELL_LAYOUT (country_cb), col, "text", CL_CNAME);
     gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (language_cb), col, FALSE);
     gtk_cell_layout_add_attribute (GTK_CELL_LAYOUT (language_cb), col, "text", LL_LNAME);
     gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (timezone_cb), col, FALSE);
@@ -1886,7 +1891,7 @@ int main (int argc, char *argv[])
 
     // initialise the country combo
     g_signal_connect (country_cb, "changed", G_CALLBACK (country_changed), NULL);
-    set_init (GTK_TREE_MODEL (fcount), country_cb, LL_CCODE, kbd ? kb_countries[kbd] : init_country);
+    set_init (GTK_TREE_MODEL (fcount), country_cb, CL_CCODE, kbd ? kb_countries[kbd] : init_country);
     set_init (GTK_TREE_MODEL (slang), language_cb, LL_LCODE, kbd ? kb_langs[kbd] : init_lang);
     set_init (GTK_TREE_MODEL (scity), timezone_cb, TL_ZONE, kbd ? kb_tzs[kbd] : init_tz);
 
