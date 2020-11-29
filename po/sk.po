@@ -1,0 +1,495 @@
+# Slovak translations for piwiz package.
+# Copyright (C) 2019 Raspberry Pi Ltd
+# This file is distributed under the same license as the piwiz package.
+# Jose Riha <jose1711 gmail com>, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: piwiz 1.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-05-06 19:08+0100\n"
+"PO-Revision-Date: 2020-11-29 19:43+0100\n"
+"Last-Translator: Jose Riha <jose1711@gmail.com>\n"
+"Language-Team: Slovak\n"
+"Language: sk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.4.1\n"
+
+#: ../src/piwiz.c:981 ../src/piwiz.c:1353
+msgid "Searching for networks - please wait..."
+msgstr "Hľadajú sa siete - čakajte prosím..."
+
+#: ../src/piwiz.c:1001
+msgid "Failed to connect to network."
+msgstr "Nepodarilo sa pripojiť k sieti."
+
+#: ../src/piwiz.c:1122
+msgid "Reading update list - please wait..."
+msgstr "Čítanie zoznamu aktualizácií - čakajte prosím..."
+
+#: ../src/piwiz.c:1124
+msgid "Downloading updates - please wait..."
+msgstr "Sťahovanie aktualizacií - čakajte prosím..."
+
+#: ../src/piwiz.c:1131
+msgid "Installing updates - please wait..."
+msgstr "Inštalácia aktualizácií - čakajte prosím..."
+
+#: ../src/piwiz.c:1133 ../src/piwiz.c:1224
+msgid "Installing languages - please wait..."
+msgstr "Inštalácia jazykov - čakajte prosím..."
+
+#: ../src/piwiz.c:1150
+#, c-format
+msgid ""
+"Error getting updates.\n"
+"%s"
+msgstr ""
+"Chyba pri získavaní aktualizácií.\n"
+"%s"
+
+#: ../src/piwiz.c:1157 ../src/piwiz.c:1183
+msgid "System is up to date"
+msgstr "System je aktuálny"
+
+#: ../src/piwiz.c:1167
+#, c-format
+msgid ""
+"Error comparing versions.\n"
+"%s"
+msgstr ""
+"Chyba pri porovnávaní verzií.\n"
+"%s"
+
+#: ../src/piwiz.c:1180
+msgid "Getting updates - please wait..."
+msgstr "Získavanie aktualizácií - čakajte prosím..."
+
+#: ../src/piwiz.c:1193
+#, c-format
+msgid ""
+"Error installing languages.\n"
+"%s"
+msgstr ""
+"Chyba počas inštalácie jazykov.\n"
+"%s"
+
+#: ../src/piwiz.c:1200 ../src/piwiz.c:1229 ../src/piwiz.c:1262
+msgid "Comparing versions - please wait..."
+msgstr "Porovnávajú sa verzie - čakajte prosím..."
+
+#: ../src/piwiz.c:1211
+#, c-format
+msgid ""
+"Error finding languages.\n"
+"%s"
+msgstr ""
+"Chyba počas hľadania jazykov.\n"
+"%s"
+
+#: ../src/piwiz.c:1243
+#, c-format
+msgid ""
+"Error checking for updates.\n"
+"%s"
+msgstr ""
+"Chyba pri zisťovaní aktualizácií.\n"
+"%s"
+
+#: ../src/piwiz.c:1256
+msgid "Finding languages - please wait..."
+msgstr "Hľadajú sa jazyky - čakajte prosím..."
+
+#: ../src/piwiz.c:1305 ../src/piwiz.c:1514
+msgid "Checking for updates - please wait..."
+msgstr "Kontrolujú sa aktualizácie - čakajte prosím..."
+
+#: ../src/piwiz.c:1314
+msgid "Could not sync time - unable to check for updates"
+msgstr "Chyba pri synchronizácii času - nie je možné vykonať kontrolu aktualizácií"
+
+#: ../src/piwiz.c:1325 ../data/piwiz.ui.h:5
+msgid "_Next"
+msgstr "Ď_alej"
+
+#: ../src/piwiz.c:1326
+msgid "_Back"
+msgstr "_Späť"
+
+#: ../src/piwiz.c:1327 ../data/piwiz.ui.h:4
+msgid "_Skip"
+msgstr "_Preskočiť"
+
+#: ../src/piwiz.c:1332 ../data/piwiz.ui.h:3
+msgid "_Cancel"
+msgstr "_Zrušiť"
+
+#: ../src/piwiz.c:1338
+msgid "_Later"
+msgstr "_Neskôr"
+
+#: ../src/piwiz.c:1339
+msgid "_Restart"
+msgstr "_Reštartovať"
+
+#: ../src/piwiz.c:1345
+msgid "_Done"
+msgstr "_Hotovo"
+
+#: ../src/piwiz.c:1427
+msgid "Setting location - please wait..."
+msgstr "Nastavujem polohu - čakajte prosím..."
+
+#: ../src/piwiz.c:1439
+msgid "The two passwords entered do not match."
+msgstr "Zadané heslá nie sú rovnaké."
+
+#: ../src/piwiz.c:1476
+#, c-format
+msgid "Enter the password for the WiFi network \"%s\"."
+msgstr "Zadajte heslo bezdrátovej (WiFi) siete \"%s\"."
+
+#: ../src/piwiz.c:1490 ../src/piwiz.c:1501
+msgid "Connecting to WiFi network - please wait..."
+msgstr "Pripájanie k bezdrátovej sieti - čakajte prosím..."
+
+#: ../src/piwiz.c:1493 ../src/piwiz.c:1504
+msgid "Could not connect to this network"
+msgstr "Chyba pri pripájaní k sieti"
+
+#: ../src/piwiz.c:1519
+msgid "Synchronising clock - please wait..."
+msgstr "Prebieha synchronizácia času - čakajte prosím..."
+
+#: ../src/piwiz.c:1524
+msgid "No network connection found - unable to check for updates"
+msgstr "Nenašlo sa žiadne pripojenie k sieti - nie je možné skontrolovať aktualizácie"
+
+#: ../src/piwiz.c:1624
+#, c-format
+msgid "<span font_desc=\"10.0\">IP : %s</span>"
+msgstr "<span font_desc=\"10.0\">IP: %s</span>"
+
+#: ../src/piwiz.c:1748
+msgid "Set the country in which you are using your Pi"
+msgstr "Zadajte krajinu, v ktorej sa nachádza Vaše Raspberry Pi"
+
+#: ../src/piwiz.c:1749
+msgid "Set the language in which applications should appear"
+msgstr "Nastavte jazyk, ktorý majú aplikácie používať"
+
+#: ../src/piwiz.c:1750
+msgid "Set the closest city to your location"
+msgstr "Nastavte mesto, ktoré je najbližšie k Vašej polohe"
+
+#: ../src/dhcpcd-gtk/main.c:375
+msgid "Error creating new GIO Channel\n"
+msgstr "Chyba pri vytváraní nového kanála GIO\n"
+
+#: ../src/dhcpcd-gtk/main.c:380
+msgid "Error creating watch\n"
+msgstr "Chyba pri vytváraní watch kanála GIO\n"
+
+#: ../src/dhcpcd-gtk/main.c:387
+msgid "g_try_malloc\n"
+msgstr "g_try_malloc\n"
+
+#: ../src/dhcpcd-gtk/main.c:415
+msgid "Connection to dhcpcd lost"
+msgstr "Spojenie ku dhcpcd zmizlo"
+
+#: ../src/dhcpcd-gtk/main.c:437
+#, c-format
+msgid "Connected to %s-%s"
+msgstr "Pripojené k %s-%s"
+
+#: ../src/dhcpcd-gtk/main.c:455
+msgid "dhcpcd connection lost"
+msgstr "dhcpcd spojenie zmizlo"
+
+#: ../src/dhcpcd-gtk/main.c:520
+msgid "Network event"
+msgstr "Sieťová udalosť"
+
+#: ../src/dhcpcd-gtk/main.c:561
+#, c-format
+msgid "dhcpcd WPA connection lost: %s"
+msgstr "dhcpcd WPA spojenie zmizlo: %s"
+
+#: ../src/dhcpcd-gtk/main.c:617
+#, c-format
+msgid "%s: Received scan results"
+msgstr "%s: Nájdených výsledkov hľadania"
+
+#: ../src/dhcpcd-gtk/main.c:640
+msgid "New Access Point"
+msgstr "Nový prístupový bod (AP)"
+
+#: ../src/dhcpcd-gtk/main.c:649
+msgid "New Access Points"
+msgstr "Nové prístupové body (AP)"
+
+#: ../src/dhcpcd-gtk/main.c:738
+msgid "Connecting to dhcpcd ..."
+msgstr "Pripájanie k dhcpcd ..."
+
+#: ../src/dhcpcd-gtk/main.c:746 ../src/dhcpcd-gtk/main.c:777
+msgid "Connecting ..."
+msgstr "Pripájanie ..."
+
+#: ../src/dhcpcd-gtk/wpa.c:76
+msgid "Failed to disconnect."
+msgstr "Nepodarilo sa zrušiť pripojenie."
+
+#: ../src/dhcpcd-gtk/wpa.c:79
+msgid "Faile to reconfigure."
+msgstr "Nepodarilo sa zmeniť nastavenie."
+
+#: ../src/dhcpcd-gtk/wpa.c:82
+msgid "Failed to set key management."
+msgstr "Nepodarilo sa nastaviť správu kľúčov."
+
+#: ../src/dhcpcd-gtk/wpa.c:85
+msgid "Failed to set password, probably too short."
+msgstr "Nepodarilo sa nastaviť heslo, pravdepodobne je príliš krátke."
+
+#: ../src/dhcpcd-gtk/wpa.c:88
+msgid "Failed to enable the network."
+msgstr "Nepodarilo sa zapnúť sieť."
+
+#: ../src/dhcpcd-gtk/wpa.c:91
+msgid "Failed to select the network."
+msgstr "Chyba pri výbere siete."
+
+#: ../src/dhcpcd-gtk/wpa.c:94
+msgid "Failed to start association."
+msgstr "Nepodarilo sa spustiť asociáciu."
+
+#: ../src/dhcpcd-gtk/wpa.c:97
+msgid ""
+"Failed to save wpa_supplicant configuration.\n"
+"\n"
+"You should add update_config=1 to /etc/wpa_supplicant.conf."
+msgstr ""
+"Chyba pri ukladaní nastavení wpa_supplicant.\n"
+"\n"
+"Do /etc/wpa_supplicant.conf by ste mali pridať update_config=1.conf."
+
+#: ../src/dhcpcd-gtk/wpa.c:103
+msgid "Error enabling network"
+msgstr "Chyba pri aktivovaní siete"
+
+#: ../src/dhcpcd-gtk/wpa.c:141
+msgid "Pre Shared Key:"
+msgstr "Pre Shared Key (PSK kľúč):"
+
+#: ../data/piwiz.ui.h:1
+msgid "_OK"
+msgstr "_OK"
+
+#: ../data/piwiz.ui.h:2
+msgid "Welcome to Raspberry Pi"
+msgstr "Víta Vás Raspberry Pi"
+
+#: ../data/piwiz.ui.h:6
+msgid ""
+"Welcome to the Raspberry Pi Desktop!\n"
+"\n"
+"Before you start using it, there are a few things to set up.\n"
+"\n"
+"Press 'Next' to get started. "
+msgstr ""
+"Víta Vás grafické prostredie Raspberry Pi!\n"
+"\n"
+"Pred tým, ako ho začnete používať, je potrebné nastaviť zopár vecí.\n"
+"\n"
+"Pokračujte kliknutím na tlačidlo 'Ďalej'. "
+
+#: ../data/piwiz.ui.h:11
+msgid "<span font_desc=\"10.0\"> </span>"
+msgstr "<span font_desc=\"10.0\"> </span>"
+
+#: ../data/piwiz.ui.h:12
+msgid "<b>Set Country</b>"
+msgstr "<b>Nastaviť krajinu</b>"
+
+#: ../data/piwiz.ui.h:13
+msgid "Enter the details of your location. This is used to set the language, time zone, keyboard and other international settings."
+msgstr ""
+"Zadajte podrobnosti o mieste, kde sa nachádzate. Použijú sa pre nastavenie jazyka, časového pásma, klávesnice a iných miestnych zvyklostí."
+
+#: ../data/piwiz.ui.h:14
+msgid "Country:"
+msgstr "Krajina:"
+
+#: ../data/piwiz.ui.h:15
+msgid "Language:"
+msgstr "Jazyk:"
+
+#: ../data/piwiz.ui.h:16
+msgid "Timezone:"
+msgstr "Časové pásmo:"
+
+#: ../data/piwiz.ui.h:17
+msgid "Use English language"
+msgstr "Použiť angličtinu"
+
+#: ../data/piwiz.ui.h:18
+msgid "Use English instead of the default language for your country"
+msgstr "Miesto jazyka Vašej krajiny používať angličtinu"
+
+#: ../data/piwiz.ui.h:19
+msgid "Use US keyboard"
+msgstr "Použiť americkú (US) klávesnicu"
+
+#: ../data/piwiz.ui.h:20
+msgid "Use the US keyboard layout instead of the default keyboard for your country"
+msgstr "Miesto predvoleného rozloženia klávesnice vo Vašej krajine používať rozloženie pre americkú (US) klávesnicu"
+
+#: ../data/piwiz.ui.h:21
+msgid "Press 'Next' when you have made your selection."
+msgstr "Kliknite na 'Ďalej' po tom, ako ste vykonali potrebné nastavenia."
+
+#: ../data/piwiz.ui.h:22
+msgid "<b>Change Password</b>"
+msgstr "<b>Zmeniť heslo</b>"
+
+#: ../data/piwiz.ui.h:23
+msgid ""
+"The default 'pi' user account currently has the password 'raspberry'. It is strongly recommended that you change this to a different password "
+"that only you know."
+msgstr ""
+"Predvolený účet používateľa 'pi' má aktuálne nastavené heslo 'raspberry'. Silno Vám odporúčame, aby ste ho zmenili na také heslo, aké poznáte "
+"iba Vy."
+
+#: ../data/piwiz.ui.h:24
+msgid "Enter new password:"
+msgstr "Zadajte nové heslo:"
+
+#: ../data/piwiz.ui.h:25
+msgid "Confirm new password:"
+msgstr "Potvrďte nové heslo:"
+
+#: ../data/piwiz.ui.h:26
+msgid "Enter a new password"
+msgstr "Zadajte nové heslo"
+
+#: ../data/piwiz.ui.h:27
+msgid "Enter the new password again"
+msgstr "Zadajte nové heslo ešte raz"
+
+#: ../data/piwiz.ui.h:28
+msgid "Hide characters"
+msgstr "Skryť znaky"
+
+#: ../data/piwiz.ui.h:29
+msgid "Show or hide the characters in your password"
+msgstr "Zobraziť alebo skryť heslo"
+
+#: ../data/piwiz.ui.h:30
+msgid "Press 'Next' to activate your new password."
+msgstr "Pre aktiváciu Vášho nového hesla kliknite na 'Ďalej'."
+
+#: ../data/piwiz.ui.h:31
+msgid "<b>Set Up Screen</b>"
+msgstr "<b>Nastavenie obrazovky</b>"
+
+#: ../data/piwiz.ui.h:32
+msgid ""
+"The desktop should fill the entire screen.\n"
+"Tick the box below if your screen has a black border at the edges."
+msgstr ""
+"Plocha by mala pokrývať celú obrazovku.\n"
+"Zaškrnite políčko nižšie, ak pri okrajoch obrazovky vidíte čierne pásy."
+
+#: ../data/piwiz.ui.h:34
+msgid "This screen shows a black border around the desktop"
+msgstr "Tento monitor má čierne okraje okolo plochy"
+
+#: ../data/piwiz.ui.h:35
+msgid "Tick this box if you can see a black border between the edges of the screen and the desktop"
+msgstr "Zaškrnite políčko nižšie, ak sa medzi plochou a okrajmi obrazovky nachádzajú čierne pásy"
+
+#: ../data/piwiz.ui.h:36
+msgid ""
+"Press 'Next' to save your setting.\n"
+"\n"
+"The change will take effect when the Pi is restarted."
+msgstr ""
+"Kliknutím na 'Ďalej' nastavenia uložíte.\n"
+"\n"
+"Zmeny sa prejavia po reštartovaní Raspberry Pi."
+
+#: ../data/piwiz.ui.h:39
+msgid "<b>Select WiFi Network</b>"
+msgstr "<b>Vybrať bezdrátovú (WiFi) sieť</b>"
+
+#: ../data/piwiz.ui.h:40
+msgid "Select your WiFi network from the list."
+msgstr "Vyberte si zo zoznamu Vašu sieť WiFi."
+
+#: ../data/piwiz.ui.h:41
+msgid "Click the name of your network to select it"
+msgstr "Pre výber Vašej siete kliknite na jej meno"
+
+#: ../data/piwiz.ui.h:42
+msgid "Press 'Next' to connect, or 'Skip' to continue without connecting."
+msgstr "Pre pripojenie kliknite na 'Ďalej' alebo kliknite na 'Preskočiť', ak chcete pokračovať bez pripojenia."
+
+#: ../data/piwiz.ui.h:43
+msgid "<b>Enter WiFi Password</b>"
+msgstr "<b>Zadajte heslo pre sieť WiFi</b>"
+
+#: ../data/piwiz.ui.h:44
+msgid "Enter the password for your WiFi network."
+msgstr "Zadajte heslo Vašej siete WiFi."
+
+#: ../data/piwiz.ui.h:45
+msgid "Password:"
+msgstr "Heslo:"
+
+#: ../data/piwiz.ui.h:46
+msgid "Enter the password for your network"
+msgstr "Zadajte heslo Vašej siete"
+
+#: ../data/piwiz.ui.h:47
+msgid "<b>Update Software</b>"
+msgstr "<b>Aktualizovať softvér</b>"
+
+#: ../data/piwiz.ui.h:48
+msgid ""
+"The operating system and applications will now be checked and updated if necessary. This may involve a large download.\n"
+"\n"
+"Press 'Next' to check and update software, or 'Skip' to continue without checking."
+msgstr ""
+"Teraz sa skontroluje stav operačného systému a programov a ak je to potrebné, spustí sa aktualizácia. To môže vyžadovať stiahnutie veľkého "
+"objemu dát.\n"
+"\n"
+"Pre kontrolu a spustenie aktualizácie kliknite na 'Ďalej' alebo kliknite na 'Preskočiť', ak chcete pokračovať bez aktualizácie."
+
+#: ../data/piwiz.ui.h:51
+msgid "<b>Setup Complete</b>"
+msgstr "<b>Nastavenie dokončené</b>"
+
+#: ../data/piwiz.ui.h:52
+msgid "Your Raspberry Pi is now set up and ready to go."
+msgstr "Vaše Raspberry Pi je teraz nastavené a môžete ho začať používať."
+
+#: ../data/piwiz.ui.h:53
+msgid "To run applications, click the raspberry icon in the top left corner of the screen to open the menu."
+msgstr "Programy spustíte pomocou ponuky dostupnej po kliknutí na ikonu maliny v ľavom hornom rohu obrazovky."
+
+#: ../data/piwiz.ui.h:54
+msgid "Press 'Restart' to restart your Pi so the new settings will take effect."
+msgstr "Kliknutím na 'Reštartovať' reštartujte Raspberry Pi, čím sa načítajú nové nastavenia."
+
+#: ../data/piwiz.desktop.in.h:1
+msgid "Raspberry Pi First-Run Wizard"
+msgstr "Sprievodca prvým spustením Raspberry Pi"
+
+#: ../data/piwiz.desktop.in.h:2
+msgid "Configure Raspberry Pi system on first run"
+msgstr "Nastavte systém Raspberry Pi pri prvom spustení"
