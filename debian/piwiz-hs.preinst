@@ -2,7 +2,7 @@
 
 case "${1}" in
   install)
-    tee -a /etc/xdg/autostart/piwiz.desktop << EOF
+    cat << EOF > /etc/xdg/autostart/piwiz.desktop
 [Desktop Entry]
 Type=Application
 Name=Raspberry Pi First-Run Wizard
