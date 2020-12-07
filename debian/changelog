@@ -1,3 +1,10 @@
+piwiz (0.20) buster; urgency=medium
+
+  * Update translations
+  * Only install autostart file on new installation
+
+ -- Simon Long <simon@raspberrypi.com>  Mon, 07 Dec 2020 08:43:39 +0000
+
 piwiz (0.19) buster; urgency=medium
 
   * Add relaunch after localisation has been set to load translations

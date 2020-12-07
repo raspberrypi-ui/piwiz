@@ -1,0 +1,25 @@
+#!/bin/sh -e
+
+case "${1}" in
+  install)
+    tee -a /etc/xdg/autostart/piwiz.desktop << EOF
+[Desktop Entry]
+Type=Application
+Name=Raspberry Pi First-Run Wizard
+Exec=sudo -AE piwiz
+StartupNotify=true
+EOF
+    ;;
+
+  abort-upgrade|upgrade)
+    ;;
+
+  *)
+    echo "preinst called with unknown argument \`${1}'" >&2
+    exit 1
+    ;;
+esac
+
+#DEBHELPER#
+
+exit 0
