@@ -1,3 +1,9 @@
+piwiz (0.21) buster; urgency=medium
+
+  * Fix incorrect user for respawned process after locale change
+
+ -- Simon Long <simon@raspberrypi.com>  Wed, 09 Dec 2020 18:00:17 +0000
+
 piwiz (0.20) buster; urgency=medium
 
   * Update translations
