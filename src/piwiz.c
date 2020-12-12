@@ -1,4 +1,4 @@
-/*
+d/*
 Copyright (c) 2018 Raspberry Pi (Trading) Ltd.
 All rights reserved.
 
@@ -1929,7 +1929,7 @@ int main (int argc, char *argv[])
     g_timeout_add (1000, (GSourceFunc) show_ip, NULL);
 
     /* start timed event to prompt for screen reader install if not already installed */
-    res = system ("dpkg -l orca | grep -q ii");
+    res = system ("dpkg -l orca 2> /dev/null | grep -q ii");
     if (res) g_timeout_add_seconds (15, srprompt, NULL);
 
     /* if restarting after language set, skip to password page */
