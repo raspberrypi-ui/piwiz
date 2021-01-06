@@ -1,3 +1,9 @@
+piwiz (0.22) buster; urgency=medium
+
+  * Set correct audio output when first run
+
+ -- Simon Long <simon@raspberrypi.com>  Wed, 06 Jan 2021 10:53:52 +0000
+
 piwiz (0.21) buster; urgency=medium
 
   * Fix incorrect user for respawned process after locale change

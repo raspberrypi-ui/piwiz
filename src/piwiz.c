@@ -1,4 +1,4 @@
-d/*
+/*
 Copyright (c) 2018 Raspberry Pi (Trading) Ltd.
 All rights reserved.
 
@@ -1791,6 +1791,9 @@ int main (int argc, char *argv[])
 #endif
 
     if (system ("raspi-config nonint is_pi")) is_pi = FALSE;
+
+    // set the audio output to HDMI if there is one, otherwise the analog jack
+    system ("if pactl list short sinks | grep -q bcm2835_audio.digital-stereo ; then pactl set-default-sink alsa_output.platform-bcm2835_audio.digital-stereo ; else pactl set-default-sink alsa_output.platform-bcm2835_audio.analog-stereo ; fi");
 
     // read country code from Pi keyboard, if any
     kbd = get_pi_keyboard ();
