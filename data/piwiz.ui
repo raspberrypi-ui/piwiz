@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.22.1 -->
 <interface>
-  <requires lib="gtk+" version="2.24"/>
-  <!-- interface-naming-policy project-wide -->
+  <requires lib="gtk+" version="3.20"/>
   <object class="GtkWindow" id="error">
+    <property name="name">pixbox</property>
     <property name="can_focus">False</property>
     <property name="modal">True</property>
     <property name="window_position">center-on-parent</property>
+    <property name="destroy_with_parent">True</property>
     <property name="type_hint">dialog</property>
     <property name="skip_taskbar_hint">True</property>
     <property name="decorated">False</property>
     <child>
+      <placeholder/>
+    </child>
+    <child>
       <object class="GtkFrame" id="errframe">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="label_xalign">0</property>
         <property name="shadow_type">in</property>
         <child>
           <object class="GtkAlignment" id="erralign">
@@ -23,15 +29,15 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkVBox" id="errvbox">
+                  <object class="GtkBox" id="errvbox">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkScrolledWindow" id="err_sw">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="hscrollbar_policy">never</property>
-                        <property name="vscrollbar_policy">automatic</property>
                         <child>
                           <object class="GtkViewport" id="err_vp">
                             <property name="visible">True</property>
@@ -45,7 +51,6 @@
                                 <property name="ypad">20</property>
                                 <property name="label">label</property>
                                 <property name="wrap">True</property>
-                                <property name="justify">left</property>
                               </object>
                             </child>
                           </object>
@@ -58,7 +63,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkHBox" id="errhbox">
+                      <object class="GtkBox" id="errhbox">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
@@ -97,16 +102,22 @@
     </child>
   </object>
   <object class="GtkWindow" id="msg">
+    <property name="name">pixbox</property>
     <property name="can_focus">False</property>
     <property name="modal">True</property>
     <property name="window_position">center-on-parent</property>
+    <property name="destroy_with_parent">True</property>
+    <property name="type_hint">dialog</property>
     <property name="skip_taskbar_hint">True</property>
     <property name="decorated">False</property>
-    <property name="type_hint">dialog</property>
+    <child>
+      <placeholder/>
+    </child>
     <child>
       <object class="GtkFrame" id="frame1">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="label_xalign">0</property>
         <property name="shadow_type">in</property>
         <child>
           <object class="GtkAlignment" id="alignment1">
@@ -117,9 +128,10 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkVBox" id="vbox1">
+                  <object class="GtkBox" id="vbox1">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkLabel" id="msg_lbl">
                         <property name="visible">True</property>
@@ -135,7 +147,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkHBox" id="pbhbox">
+                      <object class="GtkBox" id="pbhbox">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
@@ -146,23 +158,25 @@
                             <property name="expand">True</property>
                             <property name="fill">True</property>
                             <property name="padding">20</property>
+                            <property name="position">0</property>
                           </packing>
                         </child>
                         <child>
                           <object class="GtkButton" id="msg_btn">
                             <property name="label" translatable="yes">_OK</property>
+                            <property name="width_request">80</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="has_focus">True</property>
                             <property name="can_default">True</property>
                             <property name="has_default">True</property>
                             <property name="receives_default">True</property>
-                            <property name="width-request">80</property>
                             <property name="use_underline">True</property>
                           </object>
                           <packing>
                             <property name="expand">True</property>
                             <property name="fill">False</property>
+                            <property name="position">1</property>
                           </packing>
                         </child>
                       </object>
@@ -189,16 +203,20 @@
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
     <property name="title" translatable="yes">Welcome to Raspberry Pi</property>
-    <property name="icon">/usr/share/raspberrypi-artwork/raspitr.png</property>
-    <property name="type_hint">dialog</property>
     <property name="resizable">False</property>
+    <property name="icon_name">rpi</property>
+    <property name="type_hint">dialog</property>
+    <child>
+      <placeholder/>
+    </child>
     <child internal-child="vbox">
-      <object class="GtkVBox" id="wizard_vbox">
+      <object class="GtkBox" id="wizard_vbox">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="spacing">2</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">5</property>
         <child internal-child="action_area">
-          <object class="GtkHButtonBox" id="wizard_action_area">
+          <object class="GtkButtonBox" id="wizard_action_area">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="homogeneous">True</property>
@@ -264,9 +282,10 @@
             <property name="show_tabs">False</property>
             <property name="show_border">False</property>
             <child>
-              <object class="GtkVBox" id="p0vbox">
+              <object class="GtkBox" id="p0vbox">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="orientation">vertical</property>
                 <child>
                   <object class="GtkImage" id="image1">
                     <property name="visible">True</property>
@@ -284,14 +303,14 @@
                   <object class="GtkLabel" id="p0label">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
-                    <property name="yalign">0</property>
                     <property name="label" translatable="yes">Welcome to the Raspberry Pi Desktop!
 
 Before you start using it, there are a few things to set up.
 
 Press 'Next' to get started. </property>
                     <property name="wrap">True</property>
+                    <property name="max_width_chars">50</property>
+                    <property name="xalign">0</property>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -303,10 +322,10 @@ Press 'Next' to get started. </property>
                   <object class="GtkLabel" id="p0ip">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xalign">1</property>
-                    <property name="yalign">1</property>
-                    <property name="use-markup">True</property>
                     <property name="label" translatable="yes">&lt;span font_desc="10.0"&gt; &lt;/span&gt;</property>
+                    <property name="use_markup">True</property>
+                    <property name="max_width_chars">50</property>
+                    <property name="xalign">1</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -320,17 +339,19 @@ Press 'Next' to get started. </property>
               <placeholder/>
             </child>
             <child>
-              <object class="GtkVBox" id="p1vbox">
+              <object class="GtkBox" id="p1vbox">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="spacing">10</property>
+                <property name="orientation">vertical</property>
+                <property name="spacing">5</property>
                 <child>
                   <object class="GtkLabel" id="p1title">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
                     <property name="label" translatable="yes">&lt;b&gt;Set Country&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
+                    <property name="max_width_chars">50</property>
+                    <property name="xalign">0</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -342,54 +363,33 @@ Press 'Next' to get started. </property>
                   <object class="GtkLabel" id="p1info">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
-                    <property name="yalign">0</property>
                     <property name="label" translatable="yes">Enter the details of your location. This is used to set the language, time zone, keyboard and other international settings.</property>
                     <property name="wrap">True</property>
+                    <property name="max_width_chars">50</property>
+                    <property name="xalign">0</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
+                    <property name="padding">5</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkTable" id="p1table">
+                  <object class="GtkBox" id="p1hbox1">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="n_rows">4</property>
-                    <property name="n_columns">2</property>
-                    <property name="column_spacing">5</property>
                     <child>
                       <object class="GtkLabel" id="p1label10">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="xalign">0</property>
                         <property name="label" translatable="yes">Country:</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkLabel" id="p1label11">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
                         <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Language:</property>
                       </object>
                       <packing>
-                        <property name="top_attach">1</property>
-                        <property name="bottom_attach">2</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel" id="p1label12">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Timezone:</property>
-                      </object>
-                      <packing>
-                        <property name="top_attach">2</property>
-                        <property name="bottom_attach">3</property>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
                       </packing>
                     </child>
                     <child>
@@ -397,12 +397,35 @@ Press 'Next' to get started. </property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Set the country in which you are using your Pi</property>
-                        <accessibility>
-                          <relation type="labelled-by" target="p1label10"/>
-                        </accessibility>
                       </object>
                       <packing>
-                        <property name="left_attach">1</property>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkBox" id="p1hbox2">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkLabel" id="p1label11">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Language:</property>
+                        <property name="xalign">0</property>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
                       </packing>
                     </child>
                     <child>
@@ -410,14 +433,35 @@ Press 'Next' to get started. </property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Set the language in which applications should appear</property>
-                        <accessibility>
-                          <relation type="labelled-by" target="p1label11"/>
-                        </accessibility>
                       </object>
                       <packing>
-                        <property name="left_attach">1</property>
-                        <property name="top_attach">1</property>
-                        <property name="bottom_attach">2</property>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">3</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkBox" id="p1hbox3">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkLabel" id="p1label12">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Timezone:</property>
+                        <property name="xalign">0</property>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
                       </packing>
                     </child>
                     <child>
@@ -425,77 +469,78 @@ Press 'Next' to get started. </property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Set the closest city to your location</property>
-                        <accessibility>
-                          <relation type="labelled-by" target="p1label12"/>
-                        </accessibility>
                       </object>
                       <packing>
-                        <property name="left_attach">1</property>
-                        <property name="top_attach">2</property>
-                        <property name="bottom_attach">3</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkHBox" id="p1chbox">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <child>
-                          <object class="GtkCheckButton" id="p1check1">
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="label" translatable="yes">Use English language</property>
-                            <property name="tooltip_text" translatable="yes">Use English instead of the default language for your country</property>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">False</property>
-                            <property name="position">0</property>
-                            <property name="pack-type">start</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkCheckButton" id="p1check2">
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="label" translatable="yes">Use US keyboard</property>
-                            <property name="tooltip_text" translatable="yes">Use the US keyboard layout instead of the default keyboard for your country</property>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">False</property>
-                            <property name="position">0</property>
-                            <property name="pack-type">end</property>
-                          </packing>
-                        </child>
-                      </object>
-                      <packing>
-                        <property name="top_attach">3</property>
-                        <property name="bottom_attach">4</property>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="y-padding">4</property>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
                       </packing>
                     </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="position">2</property>
+                    <property name="fill">True</property>
+                    <property name="position">4</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkBox" id="p1chbox">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="spacing">10</property>
+                    <child>
+                      <object class="GtkCheckButton" id="p1check2">
+                        <property name="label" translatable="yes">Use US keyboard</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="tooltip_text" translatable="yes">Use the US keyboard layout instead of the default keyboard for your country</property>
+                        <property name="draw_indicator">True</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="pack_type">end</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkCheckButton" id="p1check1">
+                        <property name="label" translatable="yes">Use English language</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="tooltip_text" translatable="yes">Use English instead of the default language for your country</property>
+                        <property name="draw_indicator">True</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="pack_type">end</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">5</property>
                   </packing>
                 </child>
                 <child>
                   <object class="GtkLabel" id="p1prompt">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
-                    <property name="yalign">0</property>
                     <property name="label" translatable="yes">Press 'Next' when you have made your selection.</property>
                     <property name="wrap">True</property>
+                    <property name="max_width_chars">50</property>
+                    <property name="xalign">0</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
-                    <property name="position">3</property>
+                    <property name="padding">5</property>
+                    <property name="position">6</property>
                   </packing>
                 </child>
               </object>
@@ -507,17 +552,19 @@ Press 'Next' to get started. </property>
               <placeholder/>
             </child>
             <child>
-              <object class="GtkVBox" id="p2vbox">
+              <object class="GtkBox" id="p2vbox">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="spacing">10</property>
+                <property name="orientation">vertical</property>
+                <property name="spacing">5</property>
                 <child>
                   <object class="GtkLabel" id="p2title">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
                     <property name="label" translatable="yes">&lt;b&gt;Change Password&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
+                    <property name="max_width_chars">50</property>
+                    <property name="xalign">0</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -529,41 +576,33 @@ Press 'Next' to get started. </property>
                   <object class="GtkLabel" id="p2info">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
-                    <property name="yalign">0</property>
                     <property name="label" translatable="yes">The default 'pi' user account currently has the password 'raspberry'. It is strongly recommended that you change this to a different password that only you know.</property>
                     <property name="wrap">True</property>
+                    <property name="max_width_chars">50</property>
+                    <property name="xalign">0</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
+                    <property name="padding">5</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkTable" id="p2table">
+                  <object class="GtkBox" id="p2hbox1">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="n_rows">2</property>
-                    <property name="n_columns">2</property>
                     <child>
                       <object class="GtkLabel" id="p2label1">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="xalign">0</property>
                         <property name="label" translatable="yes">Enter new password:</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkLabel" id="p2label2">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
                         <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Confirm new password:</property>
                       </object>
                       <packing>
-                        <property name="top_attach">1</property>
-                        <property name="bottom_attach">2</property>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
                       </packing>
                     </child>
                     <child>
@@ -572,19 +611,38 @@ Press 'Next' to get started. </property>
                         <property name="can_focus">True</property>
                         <property name="tooltip_text" translatable="yes">Enter a new password</property>
                         <property name="invisible_char">•</property>
-                        <property name="invisible_char_set">True</property>
+                        <property name="activates_default">True</property>
                         <property name="primary_icon_activatable">False</property>
                         <property name="secondary_icon_activatable">False</property>
-                        <property name="primary_icon_sensitive">True</property>
-                        <property name="secondary_icon_sensitive">True</property>
-                        <property name="activates_default">True</property>
-                        <accessibility>
-                          <relation type="labelled-by" target="p2label1"/>
-                        </accessibility>
-                       </object>
+                      </object>
                       <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkBox" id="p2hbox2">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkLabel" id="p2label2">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Confirm new password:</property>
+                        <property name="xalign">0</property>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
                       </packing>
                     </child>
                     <child>
@@ -593,68 +651,64 @@ Press 'Next' to get started. </property>
                         <property name="can_focus">True</property>
                         <property name="tooltip_text" translatable="yes">Enter the new password again</property>
                         <property name="invisible_char">•</property>
-                        <property name="invisible_char_set">True</property>
+                        <property name="activates_default">True</property>
                         <property name="primary_icon_activatable">False</property>
                         <property name="secondary_icon_activatable">False</property>
-                        <property name="primary_icon_sensitive">True</property>
-                        <property name="secondary_icon_sensitive">True</property>
-                        <property name="activates_default">True</property>
-                        <accessibility>
-                          <relation type="labelled-by" target="p2label2"/>
-                        </accessibility>
-                       </object>
+                      </object>
                       <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">1</property>
-                        <property name="bottom_attach">2</property>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
                       </packing>
                     </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="position">2</property>
+                    <property name="fill">True</property>
+                    <property name="position">3</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkHBox" id="p2chbox">
+                  <object class="GtkBox" id="p2chbox">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
                       <object class="GtkCheckButton" id="p2check">
+                        <property name="label" translatable="yes">Hide characters</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="label" translatable="yes">Hide characters</property>
+                        <property name="receives_default">False</property>
                         <property name="tooltip_text" translatable="yes">Show or hide the characters in your password</property>
+                        <property name="draw_indicator">True</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">False</property>
+                        <property name="pack_type">end</property>
                         <property name="position">0</property>
-                        <property name="pack-type">end</property>
                       </packing>
                     </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
-                    <property name="position">3</property>
+                    <property name="position">4</property>
                   </packing>
                 </child>
                 <child>
                   <object class="GtkLabel" id="p2prompt">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
-                    <property name="yalign">0</property>
                     <property name="label" translatable="yes">Press 'Next' to activate your new password.</property>
                     <property name="wrap">True</property>
+                    <property name="max_width_chars">50</property>
+                    <property name="xalign">0</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
-                    <property name="position">4</property>
+                    <property name="padding">5</property>
+                    <property name="position">5</property>
                   </packing>
                 </child>
               </object>
@@ -666,17 +720,19 @@ Press 'Next' to get started. </property>
               <placeholder/>
             </child>
             <child>
-              <object class="GtkVBox" id="p7vbox">
+              <object class="GtkBox" id="p7vbox">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="spacing">10</property>
+                <property name="orientation">vertical</property>
+                <property name="spacing">5</property>
                 <child>
                   <object class="GtkLabel" id="p7title">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
                     <property name="label" translatable="yes">&lt;b&gt;Set Up Screen&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
+                    <property name="max_width_chars">50</property>
+                    <property name="xalign">0</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -688,24 +744,27 @@ Press 'Next' to get started. </property>
                   <object class="GtkLabel" id="p7info">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
-                    <property name="yalign">0</property>
                     <property name="label" translatable="yes">The desktop should fill the entire screen.
 Tick the box below if your screen has a black border at the edges.</property>
                     <property name="wrap">True</property>
+                    <property name="max_width_chars">50</property>
+                    <property name="xalign">0</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
+                    <property name="padding">5</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
                   <object class="GtkCheckButton" id="p7check">
+                    <property name="label" translatable="yes">This screen shows a black border around the desktop</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="label" translatable="yes">This screen shows a black border around the desktop</property>
+                    <property name="receives_default">False</property>
                     <property name="tooltip_text" translatable="yes">Tick this box if you can see a black border between the edges of the screen and the desktop</property>
+                    <property name="draw_indicator">True</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -718,16 +777,17 @@ Tick the box below if your screen has a black border at the edges.</property>
                   <object class="GtkLabel" id="p7prompt">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
-                    <property name="yalign">0</property>
-                    <property name="label" translatable="yes">Press 'Next' to save your setting.
+                    <property name="label" translatable="yes">The change will take effect when the Pi is restarted.
 
-The change will take effect when the Pi is restarted.</property>
+Press 'Next' to save your setting.</property>
                     <property name="wrap">True</property>
+                    <property name="max_width_chars">50</property>
+                    <property name="xalign">0</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
+                    <property name="padding">5</property>
                     <property name="position">3</property>
                   </packing>
                 </child>
@@ -740,17 +800,19 @@ The change will take effect when the Pi is restarted.</property>
               <placeholder/>
             </child>
             <child>
-              <object class="GtkVBox" id="p3vbox">
+              <object class="GtkBox" id="p3vbox">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="spacing">10</property>
+                <property name="orientation">vertical</property>
+                <property name="spacing">5</property>
                 <child>
                   <object class="GtkLabel" id="p3title">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
                     <property name="label" translatable="yes">&lt;b&gt;Select WiFi Network&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
+                    <property name="max_width_chars">50</property>
+                    <property name="xalign">0</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -762,14 +824,15 @@ The change will take effect when the Pi is restarted.</property>
                   <object class="GtkLabel" id="p3info">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
-                    <property name="yalign">0</property>
                     <property name="label" translatable="yes">Select your WiFi network from the list.</property>
                     <property name="wrap">True</property>
+                    <property name="max_width_chars">50</property>
+                    <property name="xalign">0</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
+                    <property name="padding">5</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
@@ -778,15 +841,16 @@ The change will take effect when the Pi is restarted.</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="tooltip_text" translatable="yes">Click the name of your network to select it</property>
-                    <property name="hscrollbar_policy">automatic</property>
-                    <property name="vscrollbar_policy">automatic</property>
                     <property name="shadow_type">in</property>
-                     <child>
+                    <child>
                       <object class="GtkTreeView" id="p3networks">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <child internal-child="selection">
+                          <object class="GtkTreeSelection"/>
+                        </child>
                         <accessibility>
-                            <relation type="labelled-by" target="p3info"/>
+                          <relation type="labelled-by" target="p3info"/>
                         </accessibility>
                       </object>
                     </child>
@@ -801,14 +865,15 @@ The change will take effect when the Pi is restarted.</property>
                   <object class="GtkLabel" id="p3prompt">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
-                    <property name="yalign">0</property>
                     <property name="label" translatable="yes">Press 'Next' to connect, or 'Skip' to continue without connecting.</property>
                     <property name="wrap">True</property>
+                    <property name="max_width_chars">50</property>
+                    <property name="xalign">0</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
+                    <property name="padding">5</property>
                     <property name="position">3</property>
                   </packing>
                 </child>
@@ -821,18 +886,19 @@ The change will take effect when the Pi is restarted.</property>
               <placeholder/>
             </child>
             <child>
-              <object class="GtkVBox" id="p4vbox">
+              <object class="GtkBox" id="p4vbox">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="spacing">10</property>
+                <property name="orientation">vertical</property>
+                <property name="spacing">5</property>
                 <child>
                   <object class="GtkLabel" id="p4title">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
-                    <property name="yalign">0</property>
                     <property name="label" translatable="yes">&lt;b&gt;Enter WiFi Password&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
+                    <property name="max_width_chars">50</property>
+                    <property name="xalign">0</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -844,27 +910,28 @@ The change will take effect when the Pi is restarted.</property>
                   <object class="GtkLabel" id="p4info">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
-                    <property name="yalign">0</property>
                     <property name="label" translatable="yes">Enter the password for your WiFi network.</property>
                     <property name="wrap">True</property>
+                    <property name="max_width_chars">50</property>
+                    <property name="xalign">0</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
+                    <property name="padding">5</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkHBox" id="p4hbox">
+                  <object class="GtkBox" id="p4hbox">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
                       <object class="GtkLabel" id="p4label">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="xalign">0</property>
                         <property name="label" translatable="yes">Password:</property>
+                        <property name="xalign">0</property>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -878,14 +945,11 @@ The change will take effect when the Pi is restarted.</property>
                         <property name="can_focus">True</property>
                         <property name="tooltip_text" translatable="yes">Enter the password for your network</property>
                         <property name="invisible_char">•</property>
-                        <property name="invisible_char_set">True</property>
+                        <property name="activates_default">True</property>
                         <property name="primary_icon_activatable">False</property>
                         <property name="secondary_icon_activatable">False</property>
-                        <property name="primary_icon_sensitive">True</property>
-                        <property name="secondary_icon_sensitive">True</property>
-                        <property name="activates_default">True</property>
                         <accessibility>
-                            <relation type="labelled-by" target="p4info"/>
+                          <relation type="labelled-by" target="p4info"/>
                         </accessibility>
                       </object>
                       <packing>
@@ -902,21 +966,23 @@ The change will take effect when the Pi is restarted.</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkHBox" id="p4chbox">
+                  <object class="GtkBox" id="p4chbox">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
                       <object class="GtkCheckButton" id="p4check">
+                        <property name="label" translatable="yes">Hide characters</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="label" translatable="yes">Hide characters</property>
+                        <property name="receives_default">False</property>
                         <property name="tooltip_text" translatable="yes">Show or hide the characters in your password</property>
+                        <property name="draw_indicator">True</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">False</property>
+                        <property name="pack_type">end</property>
                         <property name="position">0</property>
-                        <property name="pack-type">end</property>
                       </packing>
                     </child>
                   </object>
@@ -930,14 +996,15 @@ The change will take effect when the Pi is restarted.</property>
                   <object class="GtkLabel" id="p4prompt">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
-                    <property name="yalign">0</property>
                     <property name="label" translatable="yes">Press 'Next' to connect, or 'Skip' to continue without connecting.</property>
                     <property name="wrap">True</property>
+                    <property name="max_width_chars">50</property>
+                    <property name="xalign">0</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
+                    <property name="padding">5</property>
                     <property name="position">4</property>
                   </packing>
                 </child>
@@ -950,18 +1017,19 @@ The change will take effect when the Pi is restarted.</property>
               <placeholder/>
             </child>
             <child>
-              <object class="GtkVBox" id="p5vbox">
+              <object class="GtkBox" id="p5vbox">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="spacing">10</property>
+                <property name="orientation">vertical</property>
+                <property name="spacing">5</property>
                 <child>
                   <object class="GtkLabel" id="p5title">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
-                    <property name="yalign">0</property>
                     <property name="label" translatable="yes">&lt;b&gt;Update Software&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
+                    <property name="max_width_chars">50</property>
+                    <property name="xalign">0</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -973,16 +1041,17 @@ The change will take effect when the Pi is restarted.</property>
                   <object class="GtkLabel" id="p5info">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
-                    <property name="yalign">0</property>
                     <property name="label" translatable="yes">The operating system and applications will now be checked and updated if necessary. This may involve a large download.
 
 Press 'Next' to check and update software, or 'Skip' to continue without checking.</property>
                     <property name="wrap">True</property>
+                    <property name="max_width_chars">50</property>
+                    <property name="xalign">0</property>
                   </object>
                   <packing>
-                    <property name="expand">True</property>
+                    <property name="expand">False</property>
                     <property name="fill">True</property>
+                    <property name="padding">5</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
@@ -995,18 +1064,19 @@ Press 'Next' to check and update software, or 'Skip' to continue without checkin
               <placeholder/>
             </child>
             <child>
-              <object class="GtkVBox" id="p6vbox">
+              <object class="GtkBox" id="p6vbox">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="spacing">10</property>
+                <property name="orientation">vertical</property>
+                <property name="spacing">5</property>
                 <child>
                   <object class="GtkLabel" id="p6title">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
-                    <property name="yalign">0</property>
                     <property name="label" translatable="yes">&lt;b&gt;Setup Complete&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
+                    <property name="max_width_chars">50</property>
+                    <property name="xalign">0</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -1018,19 +1088,20 @@ Press 'Next' to check and update software, or 'Skip' to continue without checkin
                   <object class="GtkLabel" id="p6info">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
-                    <property name="yalign">0</property>
                     <property name="label" translatable="yes">Your Raspberry Pi is now set up and ready to go.</property>
                     <property name="wrap">True</property>
+                    <property name="max_width_chars">50</property>
+                    <property name="xalign">0</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
+                    <property name="padding">5</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkHBox" id="p6hbox">
+                  <object class="GtkBox" id="p6hbox">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="spacing">20</property>
@@ -1050,38 +1121,39 @@ Press 'Next' to check and update software, or 'Skip' to continue without checkin
                       <object class="GtkLabel" id="p6appmenu">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="xalign">0</property>
-                        <property name="yalign">0</property>
                         <property name="label" translatable="yes">To run applications, click the raspberry icon in the top left corner of the screen to open the menu.</property>
                         <property name="wrap">True</property>
+                        <property name="max_width_chars">35</property>
+                        <property name="xalign">0</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">False</property>
-                        <property name="position">1</property>
                         <property name="padding">10</property>
+                        <property name="position">1</property>
                       </packing>
                     </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
-                    <property name="position">2</property>
                     <property name="padding">15</property>
+                    <property name="position">2</property>
                   </packing>
                 </child>
                 <child>
                   <object class="GtkLabel" id="p6prompt">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
-                    <property name="yalign">0</property>
                     <property name="label" translatable="yes">Press 'Restart' to restart your Pi so the new settings will take effect.</property>
                     <property name="wrap">True</property>
+                    <property name="max_width_chars">50</property>
+                    <property name="xalign">0</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
+                    <property name="padding">5</property>
                     <property name="position">3</property>
                   </packing>
                 </child>
@@ -1102,5 +1174,15 @@ Press 'Next' to check and update software, or 'Skip' to continue without checkin
         </child>
       </object>
     </child>
+  </object>
+  <object class="GtkSizeGroup">
+    <widgets>
+      <widget name="p1comb1"/>
+      <widget name="p1comb2"/>
+      <widget name="p1comb3"/>
+      <widget name="p2pwd1"/>
+      <widget name="p2pwd2"/>
+      <widget name="p4psk"/>
+    </widgets>
   </object>
 </interface>

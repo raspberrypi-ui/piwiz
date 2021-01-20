@@ -78,8 +78,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TL_ZONE  1
 #define TL_CCODE 2  // must be the same as LL_CCODE to allow match_country to be used for both
 
-#define LABEL_WIDTH(name, w) {GtkWidget *l = (GtkWidget *) gtk_builder_get_object (builder, name); gtk_widget_set_size_request (l, w, -1);}
-
 #define FLAGFILE "/tmp/.wlflag"
 
 /* Controls */
@@ -335,7 +333,7 @@ static gpointer refresh_update_cache (gpointer data);
 static gboolean clock_synced (void);
 static void resync (void);
 static gboolean ntp_check (gpointer data);
-static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int pagenum, gpointer data);
+static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, gpointer data);
 static void next_page (GtkButton* btn, gpointer ptr);
 static void prev_page (GtkButton* btn, gpointer ptr);
 static void skip_page (GtkButton* btn, gpointer ptr);
@@ -346,14 +344,6 @@ static int get_pi_keyboard (void);
 static gboolean srprompt (gpointer data);
 
 /* Helpers */
-
-GtkWidget *gtk_box_new (GtkOrientation o, gint s)
-{
-	if (o == GTK_ORIENTATION_HORIZONTAL)
-		return gtk_hbox_new (false, s);
-	else
-		return gtk_vbox_new (false, s);
-}
 
 static char *get_shell_string (char *cmd, gboolean all)
 {
@@ -509,26 +499,12 @@ static void error_box (char *msg)
     if (!err_dlg)
     {
         GtkBuilder *builder;
-        GtkWidget *wid;
-        GdkColor col;
 
-        builder = gtk_builder_new ();
-        gtk_builder_add_from_file (builder, PACKAGE_DATA_DIR "/piwiz.ui", NULL);
+        builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/piwiz.ui");
 
         err_dlg = (GtkWidget *) gtk_builder_get_object (builder, "error");
-        gtk_window_set_modal (GTK_WINDOW (err_dlg), TRUE);
         gtk_window_set_transient_for (GTK_WINDOW (err_dlg), GTK_WINDOW (main_dlg));
-        gtk_window_set_position (GTK_WINDOW (err_dlg), GTK_WIN_POS_CENTER_ON_PARENT);
-        gtk_window_set_destroy_with_parent (GTK_WINDOW (err_dlg), TRUE);
         gtk_window_set_default_size (GTK_WINDOW (err_dlg), 400, 200);
-
-        gdk_color_parse ("#FFFFFF", &col);
-        wid = (GtkWidget *) gtk_builder_get_object (builder, "err_eb");
-        gtk_widget_modify_bg (wid, GTK_STATE_NORMAL, &col);
-        wid = (GtkWidget *) gtk_builder_get_object (builder, "err_sw");
-        gtk_widget_modify_bg (wid, GTK_STATE_NORMAL, &col);
-        wid = (GtkWidget *) gtk_builder_get_object (builder, "err_vp");
-        gtk_widget_modify_bg (wid, GTK_STATE_NORMAL, &col);
 
         err_msg = (GtkWidget *) gtk_builder_get_object (builder, "err_lbl");
         err_btn = (GtkWidget *) gtk_builder_get_object (builder, "err_btn");
@@ -550,22 +526,12 @@ static void message (char *msg, int wait, int dest_page, int prog, gboolean puls
     if (!msg_dlg)
     {
         GtkBuilder *builder;
-        GtkWidget *wid;
-        GdkColor col;
 
-        builder = gtk_builder_new ();
-        gtk_builder_add_from_file (builder, PACKAGE_DATA_DIR "/piwiz.ui", NULL);
+        builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/piwiz.ui");
 
         msg_dlg = (GtkWidget *) gtk_builder_get_object (builder, "msg");
-        gtk_window_set_modal (GTK_WINDOW (msg_dlg), TRUE);
         gtk_window_set_transient_for (GTK_WINDOW (msg_dlg), GTK_WINDOW (main_dlg));
-        gtk_window_set_position (GTK_WINDOW (msg_dlg), GTK_WIN_POS_CENTER_ON_PARENT);
-        gtk_window_set_destroy_with_parent (GTK_WINDOW (msg_dlg), TRUE);
         gtk_window_set_default_size (GTK_WINDOW (msg_dlg), 340, 100);
-
-        wid = (GtkWidget *) gtk_builder_get_object (builder, "msg_eb");
-        gdk_color_parse ("#FFFFFF", &col);
-        gtk_widget_modify_bg (wid, GTK_STATE_NORMAL, &col);
 
         msg_msg = (GtkWidget *) gtk_builder_get_object (builder, "msg_lbl");
         msg_pb = (GtkWidget *) gtk_builder_get_object (builder, "msg_pb");
@@ -1036,7 +1002,7 @@ void connect_success (void)
 {
     if (conn_timeout)
     {
-        gtk_timeout_remove (conn_timeout);
+        g_source_remove (conn_timeout);
         conn_timeout = 0;
         hide_message ();
         gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
@@ -1412,7 +1378,7 @@ static gboolean ntp_check (gpointer data)
 
 /* Page management */
 
-static void page_changed (GtkNotebook *notebook, GtkNotebookPage *page, int pagenum, gpointer data)
+static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, gpointer data)
 {
     gtk_button_set_label (GTK_BUTTON (next_btn), _("_Next"));
     gtk_button_set_label (GTK_BUTTON (prev_btn), _("_Back"));
@@ -1580,7 +1546,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                     if (select_ssid (ssid, NULL))
                                     {
                                         message (_("Connecting to WiFi network - please wait..."), 0, 0, -1, TRUE);
-                                        conn_timeout = gtk_timeout_add (30000, connect_failure, NULL);
+                                        conn_timeout = g_timeout_add (30000, connect_failure, NULL);
                                     }
                                     else message (_("Could not connect to this network"), 1, 0, -1, FALSE);
                                 }
@@ -1591,7 +1557,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             if (select_ssid (ssid, psk))
                             {
                                 message (_("Connecting to WiFi network - please wait..."), 0, 0, -1, TRUE);
-                                conn_timeout = gtk_timeout_add (30000, connect_failure, NULL);
+                                conn_timeout = g_timeout_add (30000, connect_failure, NULL);
                             }
                             else message (_("Could not connect to this network"), 1, 0, -1, FALSE);
                             break;
@@ -1785,9 +1751,9 @@ int main (int argc, char *argv[])
 
 #ifdef ENABLE_NLS
     setlocale (LC_ALL, "");
-    bindtextdomain ( GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR );
-    bind_textdomain_codeset ( GETTEXT_PACKAGE, "UTF-8" );
-    textdomain ( GETTEXT_PACKAGE );
+    bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
+    bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+    textdomain (GETTEXT_PACKAGE);
 #endif
 
     if (system ("raspi-config nonint is_pi")) is_pi = FALSE;
@@ -1811,8 +1777,6 @@ int main (int argc, char *argv[])
     set_marketing_serial ();
 
     // GTK setup
-    gdk_threads_init ();
-    gdk_threads_enter ();
     gtk_init (&argc, &argv);
     gtk_icon_theme_prepend_search_path (gtk_icon_theme_get_default(), PACKAGE_DATA_DIR);
 
@@ -1823,8 +1787,7 @@ int main (int argc, char *argv[])
     ap_list = gtk_list_store_new (5, G_TYPE_STRING, GDK_TYPE_PIXBUF, GDK_TYPE_PIXBUF, G_TYPE_INT, G_TYPE_INT);
 
     // build the UI
-    builder = gtk_builder_new ();
-    gtk_builder_add_from_file (builder, PACKAGE_DATA_DIR "/piwiz.ui", NULL);
+    builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/piwiz.ui");
 
     msg_dlg = NULL;
     err_dlg = NULL;
@@ -1911,23 +1874,6 @@ int main (int argc, char *argv[])
     gtk_tree_view_column_set_sizing (gtk_tree_view_get_column (GTK_TREE_VIEW (ap_tv), 2), GTK_TREE_VIEW_COLUMN_FIXED);
     gtk_tree_view_column_set_fixed_width (gtk_tree_view_get_column (GTK_TREE_VIEW (ap_tv), 2), 30);
 
-    // GTK word wrapping is great; no, really; I'm not being sarcastic. Honest. Why don't you believe me?
-    res = 480;
-    LABEL_WIDTH ("p0label", res);
-    LABEL_WIDTH ("p1info", res);
-    LABEL_WIDTH ("p2info", res);
-    LABEL_WIDTH ("p3info", res);
-    LABEL_WIDTH ("p4info", res);
-    LABEL_WIDTH ("p5info", res);
-    LABEL_WIDTH ("p6info", res);
-    LABEL_WIDTH ("p7info", res);
-    LABEL_WIDTH ("p1prompt", res);
-    LABEL_WIDTH ("p2prompt", res);
-    LABEL_WIDTH ("p3prompt", res);
-    LABEL_WIDTH ("p4prompt", res);
-    LABEL_WIDTH ("p6prompt", res);
-    LABEL_WIDTH ("p7prompt", res);
-
     /* start timed event to detect IP address being available */
     g_timeout_add (1000, (GSourceFunc) show_ip, NULL);
 
@@ -1952,7 +1898,6 @@ int main (int argc, char *argv[])
 
     g_object_unref (builder);
     gtk_widget_destroy (main_dlg);
-    gdk_threads_leave ();
 
     if (res == GTK_RESPONSE_CANCEL || res == GTK_RESPONSE_OK || res == GTK_RESPONSE_CLOSE)
     {
