@@ -80,6 +80,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define FLAGFILE "/tmp/.wlflag"
 
+typedef struct {
+    char *msg;
+    int prog;
+} prog_msg;
+
+static prog_msg pm;
+
 /* Controls */
 
 static GtkWidget *main_dlg, *msg_dlg, *msg_msg, *msg_pb, *msg_btn;
@@ -303,7 +310,11 @@ static int get_status (char *cmd);
 static char *get_quoted_param (char *path, char *fname, char *toseek);
 static int vsystem (const char *fmt, ...);
 static void error_box (char *msg);
+static gboolean cb_error (gpointer data);
+static void thread_error (char *msg);
 static void message (char *msg, int wait, int dest_page, int prog, gboolean pulse);
+static gboolean cb_message (gpointer data);
+static void thread_message (char *msg, int prog);
 static void hide_message (void);
 static gboolean ok_clicked (GtkButton *button, gpointer data);
 static gboolean loc_done (gpointer data);
@@ -520,6 +531,16 @@ static void error_box (char *msg)
     else gtk_label_set_text (GTK_LABEL (err_msg), msg);
 }
 
+static gboolean cb_error (gpointer data)
+{
+    error_box ((char *) data);
+    return FALSE;
+}
+
+static void thread_error (char *msg)
+{
+    gdk_threads_add_idle (cb_error, msg);
+}
 
 static void message (char *msg, int wait, int dest_page, int prog, gboolean pulse)
 {
@@ -575,6 +596,23 @@ static void message (char *msg, int wait, int dest_page, int prog, gboolean puls
             gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (msg_pb), progress);
         }
     }
+}
+
+static gboolean cb_message (gpointer data)
+{
+    prog_msg *pm = (prog_msg *) data;
+    if (pm->prog == -2)
+        message (pm->msg, 1, PAGE_DONE, -1, FALSE);
+    else
+        message (pm->msg, 0, 0, pm->prog, FALSE);
+    return FALSE;
+}
+
+static void thread_message (char *msg, int prog)
+{
+    pm.msg = msg;
+    pm.prog = prog;
+    gdk_threads_add_idle (cb_message, &pm);
 }
 
 static void hide_message (void)
@@ -1134,18 +1172,18 @@ static void progress (PkProgress *progress, PkProgressType *type, gpointer data)
             case PK_STATUS_ENUM_DOWNLOAD :  if ((int) type == PK_PROGRESS_TYPE_PERCENTAGE)
                                             {
                                                 if (role == PK_ROLE_ENUM_REFRESH_CACHE)
-                                                    message (_("Reading update list - please wait..."), 0, 0, pk_progress_get_percentage (progress), FALSE);
+                                                    thread_message (_("Reading update list - please wait..."), pk_progress_get_percentage (progress));
                                                 else if (role == PK_ROLE_ENUM_UPDATE_PACKAGES)
-                                                    message (_("Downloading updates - please wait..."), 0, 0, pk_progress_get_percentage (progress), FALSE);
+                                                    thread_message (_("Downloading updates - please wait..."), pk_progress_get_percentage (progress));
                                             }
                                             break;
 
             case PK_STATUS_ENUM_INSTALL :   if ((int) type == PK_PROGRESS_TYPE_PERCENTAGE)
                                             {
                                                 if (role == PK_ROLE_ENUM_UPDATE_PACKAGES)
-                                                    message (_("Installing updates - please wait..."), 0, 0, pk_progress_get_percentage (progress), FALSE);
+                                                    thread_message (_("Installing updates - please wait..."), pk_progress_get_percentage (progress));
                                                 else if (role == PK_ROLE_ENUM_INSTALL_PACKAGES)
-                                                    message (_("Installing languages - please wait..."), 0, 0, pk_progress_get_percentage (progress), FALSE);
+                                                    thread_message (_("Installing languages - please wait..."), pk_progress_get_percentage (progress));
                                             }
                                             break;
 
@@ -1163,15 +1201,14 @@ static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
     if (error != NULL)
     {
         char *buffer = g_strdup_printf (_("Error getting updates.\n%s"), error->message);
-        error_box (buffer);
-        g_free (buffer);
+        thread_error (buffer);
         g_error_free (error);
         return;
     }
 
     // re-set the serial number in case a Chromium update was installed
     set_marketing_serial ();
-    message (_("System is up to date"), 1, PAGE_DONE, -1, FALSE);
+    thread_message (_("System is up to date"), -2);
 }
 
 static gboolean filter_fn (PkPackage *package, gpointer user_data)
@@ -1190,8 +1227,7 @@ static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
     if (error != NULL)
     {
         char *buffer = g_strdup_printf (_("Error comparing versions.\n%s"), error->message);
-        error_box (buffer);
-        g_free (buffer);
+        thread_error (buffer);
         g_error_free (error);
         return;
     }
@@ -1202,13 +1238,13 @@ static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
     if (pk_package_sack_get_size (fsack) > 0)
     {
         reboot = TRUE;
-        message (_("Getting updates - please wait..."), 0, 0, -1, FALSE);
+        thread_message (_("Getting updates - please wait..."), -1);
 
         ids = pk_package_sack_get_ids (fsack);
         pk_task_update_packages_async (task, ids, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) do_updates_done, NULL);
         g_strfreev (ids);
     }
-    else message (_("System is up to date"), 1, PAGE_DONE, -1, FALSE);
+    else thread_message (_("System is up to date"), -2);
 
     g_object_unref (sack);
     g_object_unref (fsack);
@@ -1222,13 +1258,12 @@ static void install_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
     if (error != NULL)
     {
         char *buffer = g_strdup_printf (_("Error installing languages.\n%s"), error->message);
-        error_box (buffer);
-        g_free (buffer);
+        thread_error (buffer);
         g_error_free (error);
         return;
     }
 
-    message (_("Comparing versions - please wait..."), 0, 0, -1, FALSE);
+    thread_message (_("Comparing versions - please wait..."), -1);
     pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
 }
 
@@ -1244,8 +1279,7 @@ static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
     if (error != NULL)
     {
         char *buffer = g_strdup_printf (_("Error finding languages.\n%s"), error->message);
-        error_box (buffer);
-        g_free (buffer);
+        thread_error (buffer);
         g_error_free (error);
         return;
     }
@@ -1273,7 +1307,7 @@ static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
     if (pk_package_sack_get_size (fsack) > 0)
     {
         reboot = TRUE;
-        message (_("Installing languages - please wait..."), 0, 0, -1, FALSE);
+        thread_message (_("Installing languages - please wait..."), -1);
 
         ids = pk_package_sack_get_ids (fsack);
         pk_task_install_packages_async (task, ids, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) install_lang_done, NULL);
@@ -1281,7 +1315,7 @@ static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
     }
     else
     {
-        message (_("Comparing versions - please wait..."), 0, 0, -1, FALSE);
+        thread_message (_("Comparing versions - please wait..."), -1);
         pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
     }
 
@@ -1299,8 +1333,7 @@ static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data)
     if (error != NULL)
     {
         char *buffer = g_strdup_printf (_("Error checking for updates.\n%s"), error->message);
-        error_box (buffer);
-        g_free (buffer);
+        thread_error (buffer);
         g_error_free (error);
         return;
     }
@@ -1311,13 +1344,13 @@ static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data)
     {
         pack_array = g_strsplit (lpack, " ", -1);
 
-        message (_("Finding languages - please wait..."), 0, 0, -1, FALSE);
+        thread_message (_("Finding languages - please wait..."), -1);
         pk_client_resolve_async (PK_CLIENT (task), 0, pack_array, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) resolve_lang_done, NULL);
         g_strfreev (pack_array);
     }
     else
     {
-        message (_("Comparing versions - please wait..."), 0, 0, -1, FALSE);
+        thread_message (_("Comparing versions - please wait..."), -1);
         pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
     }
     g_free (buf);
