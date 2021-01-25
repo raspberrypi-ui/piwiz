@@ -1420,7 +1420,7 @@ static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, g
     gtk_button_set_label (GTK_BUTTON (next_btn), _("_Next"));
     gtk_button_set_label (GTK_BUTTON (prev_btn), _("_Back"));
     gtk_button_set_label (GTK_BUTTON (skip_btn), _("_Skip"));
-    gtk_widget_set_visible (skip_btn, FALSE);
+    gtk_widget_hide (skip_btn);
 
     switch (pagenum)
     {
@@ -1432,7 +1432,7 @@ static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, g
                                 gtk_widget_show (prompt);
                                 gtk_button_set_label (GTK_BUTTON (skip_btn), _("_Later"));
                                 gtk_button_set_label (GTK_BUTTON (next_btn), _("_Restart"));
-                                gtk_widget_set_visible (skip_btn, TRUE);
+                                gtk_widget_show (skip_btn);
                             }
                             else
                             {
@@ -1447,13 +1447,13 @@ static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, g
                                 gtk_list_store_clear (ap_list);
                                 scans_add (_("Searching for networks - please wait..."), 0, 0, -1, 0);
                             }
-                            gtk_widget_set_visible (skip_btn, TRUE);
+                            gtk_widget_show (skip_btn);
                             break;
 
-        case PAGE_WIFIPSK : gtk_widget_set_visible (skip_btn, TRUE);
+        case PAGE_WIFIPSK : gtk_widget_show (skip_btn);
                             break;
 
-        case PAGE_UPDATE :  gtk_widget_set_visible (skip_btn, TRUE);
+        case PAGE_UPDATE :  gtk_widget_show (skip_btn);
                             break;
     }
 
@@ -1599,7 +1599,15 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             else message (_("Could not connect to this network"), 1, 0, -1, FALSE);
                             break;
 
-        case PAGE_DONE :    gtk_dialog_response (GTK_DIALOG (main_dlg), GTK_RESPONSE_OK);
+        case PAGE_DONE :
+#ifdef HOMESCHOOL
+                            vsystem ("cp /usr/share/raspi-ui-overrides/applications/chromium-browser.desktop /etc/xdg/autostart/");
+                            vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Browse the Internet\nIcon=applications-internet\nURL=/usr/share/raspi-ui-overrides/applications/chromium-browser.desktop\" > /home/pi/Desktop/chromium-browser.desktop");
+#endif
+                            vsystem ("rm -f /etc/xdg/autostart/piwiz.desktop");
+                            if (uscan) vsystem ("raspi-config nonint do_overscan 1");
+                            if (reboot || uscan) vsystem ("sync;reboot");
+                            gtk_main_quit ();
                             break;
 
         case PAGE_UPDATE :  if (net_available ())
@@ -1639,7 +1647,13 @@ static void prev_page (GtkButton* btn, gpointer ptr)
                             }
                             break;
 
-        case PAGE_INTRO :   gtk_dialog_response (GTK_DIALOG (main_dlg), GTK_RESPONSE_CANCEL);
+        case PAGE_INTRO :
+#ifdef HOMESCHOOL
+                            vsystem ("cp /usr/share/raspi-ui-overrides/applications/chromium-browser.desktop /etc/xdg/autostart/");
+                            vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Browse the Internet\nIcon=applications-internet\nURL=/usr/share/raspi-ui-overrides/applications/chromium-browser.desktop\" > /home/pi/Desktop/chromium-browser.desktop");
+#endif
+                            vsystem ("rm -f /etc/xdg/autostart/piwiz.desktop");
+                            gtk_main_quit ();
                             break;
 
         case PAGE_WIFIAP :  if (is_pi)
@@ -1664,7 +1678,14 @@ static void skip_page (GtkButton* btn, gpointer ptr)
         case PAGE_UPDATE :  gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_DONE);
                             break;
 
-        case PAGE_DONE :    gtk_dialog_response (GTK_DIALOG (main_dlg), GTK_RESPONSE_CLOSE);
+        case PAGE_DONE :
+#ifdef HOMESCHOOL
+                            vsystem ("cp /usr/share/raspi-ui-overrides/applications/chromium-browser.desktop /etc/xdg/autostart/");
+                            vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Browse the Internet\nIcon=applications-internet\nURL=/usr/share/raspi-ui-overrides/applications/chromium-browser.desktop\" > /home/pi/Desktop/chromium-browser.desktop");
+#endif
+                            vsystem ("rm -f /etc/xdg/autostart/piwiz.desktop");
+                            if (uscan) vsystem ("raspi-config nonint do_overscan 1");
+                            gtk_main_quit ();
                             break;
 
         default :           gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
@@ -1776,6 +1797,11 @@ static gboolean srprompt (gpointer data)
     return FALSE;
 }
 
+static gboolean close_prog (GtkWidget *widget, GdkEvent *event, gpointer data)
+{
+    gtk_main_quit ();
+    return TRUE;
+}
 
 /* The dialog... */
 
@@ -1829,6 +1855,8 @@ int main (int argc, char *argv[])
     msg_dlg = NULL;
     err_dlg = NULL;
     main_dlg = (GtkWidget *) gtk_builder_get_object (builder, "wizard_dlg");
+    g_signal_connect (main_dlg, "delete_event", G_CALLBACK (close_prog), NULL);
+
     wizard_nb = (GtkWidget *) gtk_builder_get_object (builder, "wizard_nb");
     g_signal_connect (wizard_nb, "switch-page", G_CALLBACK (page_changed), NULL);
 
@@ -1931,29 +1959,11 @@ int main (int argc, char *argv[])
         fclose (fopen (FLAGFILE, "wb"));
     }
 
-    res = gtk_dialog_run (GTK_DIALOG (main_dlg));
-
     g_object_unref (builder);
+
+    gtk_widget_show (main_dlg);
+    gtk_main ();
     gtk_widget_destroy (main_dlg);
-
-    if (res == GTK_RESPONSE_CANCEL || res == GTK_RESPONSE_OK || res == GTK_RESPONSE_CLOSE)
-    {
-#ifdef HOMESCHOOL
-        vsystem ("cp /usr/share/raspi-ui-overrides/applications/chromium-browser.desktop /etc/xdg/autostart/");
-        vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Browse the Internet\nIcon=applications-internet\nURL=/usr/share/raspi-ui-overrides/applications/chromium-browser.desktop\" > /home/pi/Desktop/chromium-browser.desktop");
-#endif
-        vsystem ("rm -f /etc/xdg/autostart/piwiz.desktop");
-    }
-
-    if (res == GTK_RESPONSE_OK || res == GTK_RESPONSE_CLOSE)
-    {
-        if (uscan) vsystem ("raspi-config nonint do_overscan 1");
-    }
-
-    if (res == GTK_RESPONSE_OK)
-    {
-        if (reboot || uscan) vsystem ("sync;reboot");
-    }
 
     return 0;
 }
