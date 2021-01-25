@@ -544,19 +544,22 @@ static void thread_error (char *msg)
 
 static void message (char *msg, int wait, int dest_page, int prog, gboolean pulse)
 {
+    GtkWidget *wid;
+
     if (!msg_dlg)
     {
         GtkBuilder *builder;
 
         builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/piwiz.ui");
 
-        msg_dlg = (GtkWidget *) gtk_builder_get_object (builder, "msg");
+        msg_dlg = (GtkWidget *) gtk_builder_get_object (builder, "modal");
         gtk_window_set_transient_for (GTK_WINDOW (msg_dlg), GTK_WINDOW (main_dlg));
-        gtk_window_set_default_size (GTK_WINDOW (msg_dlg), 340, 100);
 
-        msg_msg = (GtkWidget *) gtk_builder_get_object (builder, "msg_lbl");
-        msg_pb = (GtkWidget *) gtk_builder_get_object (builder, "msg_pb");
-        msg_btn = (GtkWidget *) gtk_builder_get_object (builder, "msg_btn");
+        msg_msg = (GtkWidget *) gtk_builder_get_object (builder, "modal_msg");
+        msg_pb = (GtkWidget *) gtk_builder_get_object (builder, "modal_pb");
+        msg_btn = (GtkWidget *) gtk_builder_get_object (builder, "modal_ok");
+        wid = (GtkWidget *) gtk_builder_get_object (builder, "modal_cancel");
+        gtk_widget_hide (wid);
 
         gtk_label_set_text (GTK_LABEL (msg_msg), msg);
 
@@ -564,7 +567,6 @@ static void message (char *msg, int wait, int dest_page, int prog, gboolean puls
         gtk_widget_set_sensitive (next_btn, FALSE);
         gtk_widget_set_sensitive (skip_btn, FALSE);
 
-        gtk_widget_show_all (msg_dlg);
         g_object_unref (builder);
     }
     else gtk_label_set_text (GTK_LABEL (msg_msg), msg);
@@ -573,15 +575,15 @@ static void message (char *msg, int wait, int dest_page, int prog, gboolean puls
     pulse_timer = 0;
     if (wait)
     {
+        gtk_widget_hide (msg_pb);
+        gtk_widget_show (msg_btn);
         g_signal_connect (msg_btn, "clicked", G_CALLBACK (ok_clicked), (void *) dest_page);
-        gtk_widget_set_visible (msg_pb, FALSE);
-        gtk_widget_set_visible (msg_btn, TRUE);
         gtk_widget_grab_focus (msg_btn);
     }
     else
     {
-        gtk_widget_set_visible (msg_btn, FALSE);
-        gtk_widget_set_visible (msg_pb, TRUE);
+        gtk_widget_hide (msg_btn);
+        gtk_widget_show (msg_pb);
         if (prog == -1)
         {
             if (pulse)
@@ -596,6 +598,8 @@ static void message (char *msg, int wait, int dest_page, int prog, gboolean puls
             gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (msg_pb), progress);
         }
     }
+
+    gtk_widget_show (msg_dlg);
 }
 
 static gboolean cb_message (gpointer data)
