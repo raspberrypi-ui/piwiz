@@ -515,14 +515,12 @@ static void error_box (char *msg)
 
         err_dlg = (GtkWidget *) gtk_builder_get_object (builder, "error");
         gtk_window_set_transient_for (GTK_WINDOW (err_dlg), GTK_WINDOW (main_dlg));
-        gtk_window_set_default_size (GTK_WINDOW (err_dlg), 400, 200);
 
         err_msg = (GtkWidget *) gtk_builder_get_object (builder, "err_lbl");
         err_btn = (GtkWidget *) gtk_builder_get_object (builder, "err_btn");
 
         gtk_label_set_text (GTK_LABEL (err_msg), msg);
 
-        gtk_button_set_label (GTK_BUTTON (err_btn), "_OK");
         g_signal_connect (err_btn, "clicked", G_CALLBACK (ok_clicked), (void *) dest_page);
 
         gtk_widget_show_all (err_dlg);
