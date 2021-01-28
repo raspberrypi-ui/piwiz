@@ -465,7 +465,7 @@ static int get_pi_keyboard (void)
     int val, ret = 0;
     char *res;
 
-    res = get_string ("hexdump -n 1 -e '1/1 \"%d\"' /proc/device-tree/chosen/rpi-country-code 2> /dev/null");
+    res = get_string ("hexdump -n 1 -s 3 -e '1/1 \"%d\"' /proc/device-tree/chosen/rpi-country-code 2> /dev/null");
     if (res)
     {
         if (sscanf (res, "%x", &val) == 1) ret = val;
