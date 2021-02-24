@@ -1,3 +1,9 @@
+piwiz (0.23) buster; urgency=medium
+
+  * Fix reading of Pi 400 keyboard code
+
+ -- Simon Long <simon@raspberrypi.com>  Wed, 24 Feb 2021 13:15:29 +0000
+
 piwiz (0.22) buster; urgency=medium
 
   * Set correct audio output when first run
