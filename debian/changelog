@@ -1,3 +1,9 @@
+piwiz (0.24) buster; urgency=medium
+
+  * GTK+3 version
+
+ -- Simon Long <simon@raspberrypi.com>  Fri, 26 Mar 2021 14:18:37 +0000
+
 piwiz (0.23) buster; urgency=medium
 
   * Fix reading of Pi 400 keyboard code
