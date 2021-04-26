@@ -1,0 +1,513 @@
+# Armenian translations for piwiz package.
+# Copyright (C) 2019 Raspberry Pi Ltd
+# This file is distributed under the same license as the piwiz package.
+# Simon Long <simon@raspberrypi.org>, 2019.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: piwiz 1.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-05-06 19:08+0100\n"
+"PO-Revision-Date: 2019-02-18 15:13+0000\n"
+"Last-Translator: Armath <info@armath.am>\n"
+"Language-Team: Armenian\n"
+"Language: hy\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ../src/piwiz.c:981 ../src/piwiz.c:1353
+msgid "Searching for networks - please wait..."
+msgstr "Ցանցի որոնում - խնդրում ենք սպասել..."
+
+#: ../src/piwiz.c:1001
+msgid "Failed to connect to network."
+msgstr "Ցանցի կապակցումը ձախողվեց։"
+
+#: ../src/piwiz.c:1122
+msgid "Reading update list - please wait..."
+msgstr "Թարմացման ցանկի ընթերցում - խնդրում ենք սպասել..."
+
+#: ../src/piwiz.c:1124
+msgid "Downloading updates - please wait..."
+msgstr "Թարմացումների ներբեռում - խնդրում ենք սպասել..."
+
+#: ../src/piwiz.c:1131
+msgid "Installing updates - please wait..."
+msgstr "Թարմացումների տեղադրում - խնդրում ենք սպասել..."
+
+#: ../src/piwiz.c:1133 ../src/piwiz.c:1224
+msgid "Installing languages - please wait..."
+msgstr "Լեզուների տեղադրում - խնդրում ենք սպասել..."
+
+#: ../src/piwiz.c:1150
+#, c-format
+msgid ""
+"Error getting updates.\n"
+"%s"
+msgstr ""
+"Թարմացումների ստացումը ձախողվեց։\n"
+"%s"
+
+#: ../src/piwiz.c:1157 ../src/piwiz.c:1183
+msgid "System is up to date"
+msgstr "Համակարգն արդեն թարմացված է"
+
+#: ../src/piwiz.c:1167
+#, c-format
+msgid ""
+"Error comparing versions.\n"
+"%s"
+msgstr ""
+"Տարբերակների համեմատումը ձախողվեց։\n"
+"%s"
+
+#: ../src/piwiz.c:1180
+msgid "Getting updates - please wait..."
+msgstr "Թարմացումների ստացում - խնդրում ենք սպասել..."
+
+#: ../src/piwiz.c:1193
+#, c-format
+msgid ""
+"Error installing languages.\n"
+"%s"
+msgstr ""
+"Լեզուների տեղադրումը ձախողվեց։\n"
+"%s"
+
+#: ../src/piwiz.c:1200 ../src/piwiz.c:1229 ../src/piwiz.c:1262
+msgid "Comparing versions - please wait..."
+msgstr "Տարբերակների համեմատում - խնդրում ենք սպասել..."
+
+#: ../src/piwiz.c:1211
+#, c-format
+msgid ""
+"Error finding languages.\n"
+"%s"
+msgstr ""
+"Լեզուների որոնումը ձախողվեց։\n"
+"%s"
+
+#: ../src/piwiz.c:1243
+#, c-format
+msgid ""
+"Error checking for updates.\n"
+"%s"
+msgstr ""
+"Թարմացումների ստուգումը ձախողվեց։\n"
+"%s"
+
+#: ../src/piwiz.c:1256
+msgid "Finding languages - please wait..."
+msgstr "Լեզուների որոնում - խնդրում ենք սպասել..."
+
+#: ../src/piwiz.c:1305 ../src/piwiz.c:1514
+msgid "Checking for updates - please wait..."
+msgstr "Թարմացումների ստուգում - խնդրում ենք սպասել..."
+
+#: ../src/piwiz.c:1314
+msgid "Could not sync time - unable to check for updates"
+msgstr "Չհաջողվեց սինխորնացնել ժամը - հնարավոր չէ ստուգել թարմացումները"
+
+#: ../src/piwiz.c:1325 ../data/piwiz.ui.h:5
+msgid "_Next"
+msgstr "_Հաջորդը"
+
+#: ../src/piwiz.c:1326
+msgid "_Back"
+msgstr "_Հետ գնալ"
+
+#: ../src/piwiz.c:1327 ../data/piwiz.ui.h:4
+msgid "_Skip"
+msgstr "_Բաց թողել"
+
+#: ../src/piwiz.c:1332 ../data/piwiz.ui.h:3
+msgid "_Cancel"
+msgstr "_Չեղարկել"
+
+#: ../src/piwiz.c:1338
+msgid "_Later"
+msgstr "_Հետո"
+
+#: ../src/piwiz.c:1339
+msgid "_Restart"
+msgstr "_Վերագործարկել"
+
+#: ../src/piwiz.c:1345
+msgid "_Done"
+msgstr "_Կատարված"
+
+#: ../src/piwiz.c:1427
+msgid "Setting location - please wait..."
+msgstr "Տեղորոշման կարգավորում - խնդրում ենք սպասել..."
+
+#: ../src/piwiz.c:1439
+msgid "The two passwords entered do not match."
+msgstr "Մուտքագրված երկու գաղտնաբառերը չեն համընկնում։"
+
+#: ../src/piwiz.c:1476
+#, c-format
+msgid "Enter the password for the WiFi network \"%s\"."
+msgstr "Մուտքագրել անլար ցանցի գաղտնաբառը \"%s\"."
+
+#: ../src/piwiz.c:1490 ../src/piwiz.c:1501
+msgid "Connecting to WiFi network - please wait..."
+msgstr "Անլար ցանցի կապակցում - խնդրում ենք սպասել..."
+
+#: ../src/piwiz.c:1493 ../src/piwiz.c:1504
+msgid "Could not connect to this network"
+msgstr "Հնարավոր չէ միանալ այս ցանցին"
+
+#: ../src/piwiz.c:1519
+msgid "Synchronising clock - please wait..."
+msgstr "Ժամացույցի համաժամեցում - խնդրում ենք սպասել..."
+
+#: ../src/piwiz.c:1524
+msgid "No network connection found - unable to check for updates"
+msgstr "Ցանցի կապակցում չի գտնվել - հնարավոր չէ ստուգել թարմացումները"
+
+#: ../src/piwiz.c:1624
+#, c-format
+msgid "<span font_desc=\"10.0\">IP : %s</span>"
+msgstr "<span font_desc=\"10.0\">IP : %s</span>"
+
+#: ../src/piwiz.c:1748
+msgid "Set the country in which you are using your Pi"
+msgstr "Սահամնել այն երկիրը, որտեղ որ օգտագործում եք Raspberry Pi սարքը"
+
+#: ../src/piwiz.c:1749
+msgid "Set the language in which applications should appear"
+msgstr "Սահմանել ծրագրաշարերի և հավելվածների լեզուն"
+
+#: ../src/piwiz.c:1750
+msgid "Set the closest city to your location"
+msgstr "Ընտրեք ձեզ ամենամոտ քաղաքը"
+
+#: ../src/dhcpcd-gtk/main.c:375
+msgid "Error creating new GIO Channel\n"
+msgstr "Նոր GIO ալիքի ստեղծումը ձախողվեց\n"
+
+#: ../src/dhcpcd-gtk/main.c:380
+msgid "Error creating watch\n"
+msgstr "Դիտման ստեղծումը ձախողվեց\n"
+
+#: ../src/dhcpcd-gtk/main.c:387
+msgid "g_try_malloc\n"
+msgstr "g_try_malloc\n"
+
+#: ../src/dhcpcd-gtk/main.c:415
+msgid "Connection to dhcpcd lost"
+msgstr "Միացումը dhcpcd-ին առկա չէ"
+
+#: ../src/dhcpcd-gtk/main.c:437
+#, c-format
+msgid "Connected to %s-%s"
+msgstr "Միացված է %s-%s -ին"
+
+#: ../src/dhcpcd-gtk/main.c:455
+msgid "dhcpcd connection lost"
+msgstr "dhcpcd կապ առկա չէ"
+
+#: ../src/dhcpcd-gtk/main.c:520
+msgid "Network event"
+msgstr "Ցանցի իրադարձություն"
+
+#: ../src/dhcpcd-gtk/main.c:561
+#, c-format
+msgid "dhcpcd WPA connection lost: %s"
+msgstr "dhcpcd WPA կապը առկա չէ՝ %s"
+
+#: ../src/dhcpcd-gtk/main.c:617
+#, c-format
+msgid "%s: Received scan results"
+msgstr "%s՝ Սկանավորման արդյունքները"
+
+#: ../src/dhcpcd-gtk/main.c:640
+msgid "New Access Point"
+msgstr "New Access Point"
+
+#: ../src/dhcpcd-gtk/main.c:649
+msgid "New Access Points"
+msgstr "New Access Points"
+
+#: ../src/dhcpcd-gtk/main.c:738
+msgid "Connecting to dhcpcd ..."
+msgstr "Միացում dhcpcd-ին ..."
+
+#: ../src/dhcpcd-gtk/main.c:746 ../src/dhcpcd-gtk/main.c:777
+msgid "Connecting ..."
+msgstr "Միացում ..."
+
+#: ../src/dhcpcd-gtk/wpa.c:76
+msgid "Failed to disconnect."
+msgstr "Չհաջողվեց անջատել։"
+
+#: ../src/dhcpcd-gtk/wpa.c:79
+msgid "Faile to reconfigure."
+msgstr "Չհաջողվեց կազմաձևել"
+
+#: ../src/dhcpcd-gtk/wpa.c:82
+msgid "Failed to set key management."
+msgstr "Չհաջողվեց սահմանել կառավարումը։"
+
+#: ../src/dhcpcd-gtk/wpa.c:85
+msgid "Failed to set password, probably too short."
+msgstr "Չհաջողվեց սահմանել գաղտնաբառը, միգուցե շատ կարճ է։"
+
+#: ../src/dhcpcd-gtk/wpa.c:88
+msgid "Failed to enable the network."
+msgstr "Ցանցի միացումը ձախողվեց։"
+
+#: ../src/dhcpcd-gtk/wpa.c:91
+msgid "Failed to select the network."
+msgstr "Ցանցի ընտրումը ձախողվեց։"
+
+#: ../src/dhcpcd-gtk/wpa.c:94
+msgid "Failed to start association."
+msgstr "Միացման մեկնարկը ձախողվեց։"
+
+#: ../src/dhcpcd-gtk/wpa.c:97
+msgid ""
+"Failed to save wpa_supplicant configuration.\n"
+"\n"
+"You should add update_config=1 to /etc/wpa_supplicant.conf."
+msgstr ""
+"Չհաջողվեց պահել wpa_supplicant կարգաբերումը։\n"
+"\n"
+"Դուք պետք է ավելացնեք update_config=1 /etc/wpa_supplicant.conf նիշքին։"
+
+#: ../src/dhcpcd-gtk/wpa.c:103
+msgid "Error enabling network"
+msgstr "Ցանցի միացման սխալմունք"
+
+#: ../src/dhcpcd-gtk/wpa.c:141
+msgid "Pre Shared Key:"
+msgstr "Pre Shared Key:"
+
+#: ../data/piwiz.ui.h:1
+msgid "_OK"
+msgstr "_Լավ"
+
+#: ../data/piwiz.ui.h:2
+msgid "Welcome to Raspberry Pi"
+msgstr "Բարի գալուստ Raspberry Pi"
+
+#: ../data/piwiz.ui.h:6
+msgid ""
+"Welcome to the Raspberry Pi Desktop!\n"
+"\n"
+"Before you start using it, there are a few things to set up.\n"
+"\n"
+"Press 'Next' to get started. "
+msgstr ""
+"Բարի գալուստ the Raspberry Pi աշխատասեղան!\n"
+"\n"
+"Մինչ այն օգտագործելը, անհրաժեշտ է կարգավորել որոշ բաներ\n"
+"\n"
+"Սեղմեք «Հաջորդը»՝ սկսելու համար։"
+
+#: ../data/piwiz.ui.h:11
+msgid "<span font_desc=\"10.0\"> </span>"
+msgstr "<span font_desc=\"10.0\"> </span>"
+
+#: ../data/piwiz.ui.h:12
+msgid "<b>Set Country</b>"
+msgstr "<b>Սահմանել երկիրը</b>"
+
+#: ../data/piwiz.ui.h:13
+msgid ""
+"Enter the details of your location. This is used to set the language, time "
+"zone, keyboard and other international settings."
+msgstr ""
+"Մուտքագրեք տեղորոշման մանրամասները։ Սա օգտագորվում է սահմանելու համար ժամային "
+"Գոտին, ստեղնաշարը և այլ միջազգային կարգավորումներ։"
+
+#: ../data/piwiz.ui.h:14
+msgid "Country:"
+msgstr "Երկիր՝"
+
+#: ../data/piwiz.ui.h:15
+msgid "Language:"
+msgstr "Լեզու՝"
+
+#: ../data/piwiz.ui.h:16
+msgid "Timezone:"
+msgstr "Ժամային գոտի՝"
+
+#: ../data/piwiz.ui.h:17
+msgid "Use English language"
+msgstr "Օգտագործել անգլերենը"
+
+#: ../data/piwiz.ui.h:18
+msgid "Use English instead of the default language for your country"
+msgstr "Լռելայն օգտագործել անգլերենը, որպես հիմնական լեզու"
+
+#: ../data/piwiz.ui.h:19
+msgid "Use US keyboard"
+msgstr "Օգտագործել US ստեղնաշար"
+
+#: ../data/piwiz.ui.h:20
+msgid ""
+"Use the US keyboard layout instead of the default keyboard for your country"
+msgstr ""
+"Լռելայն օգտագործել US ստեղնաշարի դասավորությունը"
+
+#: ../data/piwiz.ui.h:21
+msgid "Press 'Next' when you have made your selection."
+msgstr "Սեղմել «Հաջորդը», երբ կատարել եք ձեր ընտրությունը։"
+
+#: ../data/piwiz.ui.h:22
+msgid "<b>Change Password</b>"
+msgstr "<b>Փոխել գաղտնաբառը</b>"
+
+#: ../data/piwiz.ui.h:23
+msgid ""
+"The default 'pi' user account currently has the password 'raspberry'. It is "
+"strongly recommended that you change this to a different password that only "
+"you know."
+msgstr ""
+"Լռելայն «pi» հաշվի գաղտնաբառը «raspberry» է։ Խստորեն "
+"խորհուրդ ենք տալիս փոխել այս գաղտնաբառը։"
+
+#: ../data/piwiz.ui.h:24
+msgid "Enter new password:"
+msgstr "Մուտքագրել նոր գաղտնաբառ՝"
+
+#: ../data/piwiz.ui.h:25
+msgid "Confirm new password:"
+msgstr "Հաստատել նոր գաղտնաբառը"
+
+#: ../data/piwiz.ui.h:26
+msgid "Enter a new password"
+msgstr "Մուտքագրել նոր գաղտնաբառ"
+
+#: ../data/piwiz.ui.h:27
+msgid "Enter the new password again"
+msgstr "Կրկին մուտքագրել նոր գաղտնաբառը"
+
+#: ../data/piwiz.ui.h:28
+msgid "Hide characters"
+msgstr "Թաքցնել նիշերը"
+
+#: ../data/piwiz.ui.h:29
+msgid "Show or hide the characters in your password"
+msgstr "Ցույց տալ կամ թաքցնել գաղտնաբառի նիշերը"
+
+#: ../data/piwiz.ui.h:30
+msgid "Press 'Next' to activate your new password."
+msgstr "Սեղմել «Հաջորդը» նոր գաղտնաբառը ակտիվացնելու համար։"
+
+#: ../data/piwiz.ui.h:31
+msgid "<b>Set Up Screen</b>"
+msgstr "<b>Կարգավորել էկրանը</b>"
+
+#: ../data/piwiz.ui.h:32
+msgid ""
+"The desktop should fill the entire screen.\n"
+"Tick the box below if your screen has a black border at the edges."
+msgstr ""
+"Աշխատասեղանը պետք է լցնի ամբողջ էկրանը\n"
+"Նշեք վանդակը, եթե ձեր էկրանին առկա են սև եզրեր։"
+
+#: ../data/piwiz.ui.h:34
+msgid "This screen shows a black border around the desktop"
+msgstr "Էկրանի և աշխատասեղանի շուրջը առկա է սև սահման"
+
+#: ../data/piwiz.ui.h:35
+msgid ""
+"Tick this box if you can see a black border between the edges of the screen "
+"and the desktop"
+msgstr ""
+"Նշեք վանդակը, եթե տեսնում եք, որ էկրանի և աշխատասեղանի միջ առկա է սև եզրեր"
+
+#: ../data/piwiz.ui.h:36
+msgid ""
+"Press 'Next' to save your setting.\n"
+"\n"
+"The change will take effect when the Pi is restarted."
+msgstr ""
+"Սեղմել «Հաջորդը»՝ կարգավորումները պահելու համար\n"
+"\n"
+"Փոփոխություններն ուժի մեջ կմտնեն Raspberry Pi վերագործարկումից հետո։"
+
+#: ../data/piwiz.ui.h:39
+msgid "<b>Select WiFi Network</b>"
+msgstr "<b>Ընտրեք անլար ցանցը</b>"
+
+#: ../data/piwiz.ui.h:40
+msgid "Select your WiFi network from the list."
+msgstr "Ընտրել ցանկից ձեր WiFi ցանցը"
+
+#: ../data/piwiz.ui.h:41
+msgid "Click the name of your network to select it"
+msgstr "Կտտացրեք ձեր ցանցի անվան վրա՝ այն ընտրելու համար"
+
+#: ../data/piwiz.ui.h:42
+msgid "Press 'Next' to connect, or 'Skip' to continue without connecting."
+msgstr "Սեղմել '«Հաջորդը»՝ միանալու, «Բաղ թողնել»՝ շարունակելու առանց կապի"
+
+#: ../data/piwiz.ui.h:43
+msgid "<b>Enter WiFi Password</b>"
+msgstr "<b>Մուտքագրել անլար ցանցի գաղտնաբառը</b>"
+
+#: ../data/piwiz.ui.h:44
+msgid "Enter the password for your WiFi network."
+msgstr "Մուտքագրեք ձեր WiFi ցանցի գաղտնաբառը։"
+
+#: ../data/piwiz.ui.h:45
+msgid "Password:"
+msgstr "Գաղտնաբառ՝"
+
+#: ../data/piwiz.ui.h:46
+msgid "Enter the password for your network"
+msgstr "Մուտքագրեք ձեր անլար ցանցի գաղտնաբառը"
+
+#: ../data/piwiz.ui.h:47
+msgid "<b>Update Software</b>"
+msgstr "<b>Թարմացնել ծրագիրը</b>"
+
+#: ../data/piwiz.ui.h:48
+msgid ""
+"The operating system and applications will now be checked and updated if "
+"necessary. This may involve a large download.\n"
+"\n"
+"Press 'Next' to check and update software, or 'Skip' to continue without "
+"checking."
+msgstr ""
+"Օպերացիոն համակարգը և ծրագրերը այժմ ստուգվելու են և անհրաժեշտության դեպքում "
+"կթարմացվեն։ Սա կարող է ներառել մեծ ծավալով ներբեռնում.\n"
+"\n"
+"Սեղմել «Հաջորդը»՝ ծրագիրը ստուգելու և թարմացնելու համար, «Բաց թողնել»՝ շարունակելու "
+"առանց ստուգման։"
+
+#: ../data/piwiz.ui.h:51
+msgid "<b>Setup Complete</b>"
+msgstr "<b>Կարգավորման ավարտ</b>"
+
+#: ../data/piwiz.ui.h:52
+msgid "Your Raspberry Pi is now set up and ready to go."
+msgstr "Ձեր Raspberry Pi արդեն կարգավորված է ու պատրաստ է օգտագործման"
+
+#: ../data/piwiz.ui.h:53
+msgid ""
+"To run applications, click the raspberry icon in the top left corner of the "
+"screen to open the menu."
+msgstr ""
+"Ծրագրերը գործարկելու համար, կտտացրեք էկրանի վերևի անկյունի ազնվամորու պատկերի վրա "
+"մենյուն բացելու համար"
+
+#: ../data/piwiz.ui.h:54
+msgid ""
+"Press 'Restart' to restart your Pi so the new settings will take effect."
+msgstr ""
+"Սեղմել «Վերագործարկել» Raspberry Pi սարքը վերագործարկելու համար, այսպես կբեռնվեն նաև նոր կարագովորումները։ "
+"Սեղմեք «Հաջորդը», որից հետո պատուհանը կփակվի և վերագործարկումը տեղի կունենա ավելի ուշ"
+
+#: ../data/piwiz.desktop.in.h:1
+msgid "Raspberry Pi First-Run Wizard"
+msgstr "Raspberry Pi First-Run Wizard"
+
+#: ../data/piwiz.desktop.in.h:2
+msgid "Configure Raspberry Pi system on first run"
+msgstr "Կարհաբերել Raspberry Pi համակարգը առաջին գործարկամ ժամանակ"
