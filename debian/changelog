@@ -1,3 +1,9 @@
+piwiz (0.25) bullseye; urgency=medium
+
+  * Added Armenian translation
+
+ -- Simon Long <simon@raspberrypi.com>  Mon, 26 Apr 2021 09:58:29 +0100
+
 piwiz (0.24) bullseye; urgency=medium
 
   * GTK+3 version
