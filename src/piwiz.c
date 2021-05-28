@@ -1961,8 +1961,8 @@ int main (int argc, char *argv[])
         sscanf (argv[2], "%d:%d", &x, &y);
         gtk_window_move (GTK_WINDOW (main_dlg), x, y);
 
-        if (argc >= 4) lc = g_strdup_printf (argv[3]);
-        if (argc >= 5) cc = g_strdup_printf (argv[4]);
+        if (argc >= 4) lc = g_strdup (argv[3]);
+        if (argc >= 5) cc = g_strdup (argv[4]);
 
         gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
 
