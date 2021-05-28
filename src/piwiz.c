@@ -80,6 +80,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define FLAGFILE "/tmp/.wlflag"
 
+#define JAPAN_FONTS "fonts-vlgothic fonts-mplus"
+
 typedef struct {
     char *msg;
     int prog;
@@ -663,9 +665,9 @@ static gboolean loc_done (gpointer data)
         loc = g_strdup_printf ("%d:%d", x, y);
 
 #ifdef HOMESCHOOL
-        execl ("/usr/bin/piwizhs", "piwizhs", "--langset", loc, NULL);
+        execl ("/usr/bin/piwizhs", "piwizhs", "--langset", loc, lc, cc, NULL);
 #else
-        execl ("/usr/bin/piwiz", "piwiz", "--langset", loc, NULL);
+        execl ("/usr/bin/piwiz", "piwiz", "--langset", loc, lc, cc, NULL);
 #endif
         g_free (loc);
         exit (0);
@@ -1330,7 +1332,7 @@ static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data)
     GError *error = NULL;
     PkResults *results = pk_task_generic_finish (task, res, &error);
     gchar **pack_array;
-    gchar *lpack, *buf;
+    gchar *lpack, *buf, *tmp;
 
     if (error != NULL)
     {
@@ -1342,6 +1344,14 @@ static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data)
 
     buf = g_strdup_printf ("check-language-support -l %s_%s", lc, cc);
     lpack = get_shell_string (buf, TRUE);
+
+    if (!g_strcmp0 (lc, "ja"))
+    {
+        tmp = g_strdup_printf ("%s%s%s", JAPAN_FONTS, strlen(lpack) ? " " : "", lpack);
+        g_free (lpack);
+        lpack = tmp;
+    }
+
     if (strlen (lpack))
     {
         pack_array = g_strsplit (lpack, " ", -1);
@@ -1945,11 +1955,14 @@ int main (int argc, char *argv[])
     if (res) g_timeout_add_seconds (15, srprompt, NULL);
 
     /* if restarting after language set, skip to password page */
-    if (argc == 3 && !g_strcmp0 (argv[1], "--langset"))
+    if (argc >= 3 && !g_strcmp0 (argv[1], "--langset"))
     {
         gint x, y;
         sscanf (argv[2], "%d:%d", &x, &y);
         gtk_window_move (GTK_WINDOW (main_dlg), x, y);
+
+        if (argc >= 4) lc = g_strdup_printf (argv[3]);
+        if (argc >= 5) cc = g_strdup_printf (argv[4]);
 
         gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
 
