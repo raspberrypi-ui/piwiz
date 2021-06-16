@@ -315,6 +315,9 @@ Press 'Next' to get started. </property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Set the country in which you are using your Pi</property>
+                        <accessibility>
+                          <relation type="labelled-by" target="p1label10"/>
+                        </accessibility>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -351,6 +354,9 @@ Press 'Next' to get started. </property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Set the language in which applications should appear</property>
+                        <accessibility>
+                          <relation type="labelled-by" target="p1label11"/>
+                        </accessibility>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -387,6 +393,9 @@ Press 'Next' to get started. </property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Set the closest city to your location</property>
+                        <accessibility>
+                          <relation type="labelled-by" target="p1label12"/>
+                        </accessibility>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -532,6 +541,9 @@ Press 'Next' to get started. </property>
                         <property name="activates_default">True</property>
                         <property name="primary_icon_activatable">False</property>
                         <property name="secondary_icon_activatable">False</property>
+                        <accessibility>
+                          <relation type="labelled-by" target="p2label1"/>
+                        </accessibility>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -572,6 +584,9 @@ Press 'Next' to get started. </property>
                         <property name="activates_default">True</property>
                         <property name="primary_icon_activatable">False</property>
                         <property name="secondary_icon_activatable">False</property>
+                        <accessibility>
+                          <relation type="labelled-by" target="p2label2"/>
+                        </accessibility>
                       </object>
                       <packing>
                         <property name="expand">False</property>

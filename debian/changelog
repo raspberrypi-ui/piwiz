@@ -1,3 +1,9 @@
+piwiz (0.27) bullseye; urgency=medium
+
+  * Restore accessibility labels that Glade decided to remove...
+
+ -- Simon Long <simon@raspberrypi.com>  Wed, 16 Jun 2021 16:17:11 +0100
+
 piwiz (0.26) bullseye; urgency=medium
 
   * Install additional Japanese fonts
