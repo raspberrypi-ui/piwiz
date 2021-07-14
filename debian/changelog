@@ -1,3 +1,9 @@
+piwiz (0.28) bullseye; urgency=medium
+
+  * Make audio compatible with KMS
+
+ -- Simon Long <simon@raspberrypi.com>  Wed, 14 Jul 2021 13:02:28 +0100
+
 piwiz (0.27) bullseye; urgency=medium
 
   * Restore accessibility labels that Glade decided to remove...
