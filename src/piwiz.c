@@ -1830,7 +1830,12 @@ int main (int argc, char *argv[])
     if (system ("raspi-config nonint is_pi")) is_pi = FALSE;
 
     // set the audio output to HDMI if there is one, otherwise the analog jack
-    system ("if sudo -u $SUDO_USER XDG_RUNTIME_DIR=/run/user/$SUDO_UID pactl list short sinks | grep -q bcm2835_audio.digital-stereo ; then sudo -u $SUDO_USER XDG_RUNTIME_DIR=/run/user/$SUDO_UID pactl set-default-sink alsa_output.platform-bcm2835_audio.digital-stereo ; else sudo -u $SUDO_USER XDG_RUNTIME_DIR=/run/user/$SUDO_UID pactl set-default-sink alsa_output.platform-bcm2835_audio.analog-stereo ; fi");
+    system ("SINKS=$(sudo -u $SUDO_USER XDG_RUNTIME_DIR=/run/user/$SUDO_UID pactl list short sinks) ; \
+        if echo \"$SINKS\" | grep -q bcm2835_audio.digital-stereo; then OUTPUT=bcm2835_audio.digital-stereo ; \
+        elif echo \"$SINKS\" | grep -q fef00700.hdmi.iec958-stereo ; then OUTPUT=fef00700.hdmi.iec958-stereo ; \
+        elif echo \"$SINKS\" | grep -q fef05700.hdmi.iec958-stereo ; then OUTPUT=fef05700.hdmi.iec958-stereo ; \
+        else OUTPUT=bcm2835_audio.analog-stereo ; fi ; \
+        sudo -u $SUDO_USER XDG_RUNTIME_DIR=/run/user/$SUDO_UID pactl set-default-sink alsa_output.platform-$OUTPUT");
 
     // read country code from Pi keyboard, if any
     kbd = get_pi_keyboard ();
