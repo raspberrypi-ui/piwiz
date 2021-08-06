@@ -775,7 +775,7 @@ static gpointer set_locale (gpointer data)
 
 static void read_locales (void)
 {
-    char *cname, *lname, *buffer, *cptr, *cptr1, *cptr2;
+    char *cname, *lname, *buffer, *cptr, *cptr1, *cptr2, *cptr3;
     GtkTreeModelSort *scount;
     GtkTreeIter iter;
     FILE *fp;
@@ -834,7 +834,7 @@ static void read_locales (void)
     // populate the timezone database
     buffer = NULL;
     len = 0;
-    fp = fopen ("/usr/share/zoneinfo/zone.tab", "rb");
+    fp = fopen ("/usr/share/zoneinfo/zone1970.tab", "rb");
     if (fp)
     {
         while (getline (&buffer, &len, fp) > 0)
@@ -855,8 +855,13 @@ static void read_locales (void)
                     cptr = cname;
                     while (*cptr++) if (*cptr == '_') *cptr = ' ';
 
-                    gtk_list_store_append (tz_list, &iter);
-                    gtk_list_store_set (tz_list, &iter, TL_ZONE, cptr2, TL_CCODE, cptr1, TL_CITY, cname, -1);
+                    cptr3 = strtok (cptr1, ",");
+                    while (cptr3)
+                    {
+                        gtk_list_store_append (tz_list, &iter);
+                        gtk_list_store_set (tz_list, &iter, TL_ZONE, cptr2, TL_CCODE, cptr3, TL_CITY, cname, -1);
+                        cptr3 = strtok (NULL, ",");
+                    }
                     g_free (cname);
                 }
             }
