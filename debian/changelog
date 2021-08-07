@@ -1,3 +1,9 @@
+piwiz (0.29) bullseye; urgency=medium
+
+  * Various fixes to locale and timezone settings
+
+ -- Simon Long <simon@raspberrypi.com>  Sat, 07 Aug 2021 17:15:44 +0100
+
 piwiz (0.28) bullseye; urgency=medium
 
   * Make audio compatible with KMS
