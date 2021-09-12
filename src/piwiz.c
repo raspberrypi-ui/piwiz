@@ -1278,6 +1278,9 @@ static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
         return;
     }
 
+    // check reboot flag set by install process
+    if (!access ("/run/reboot-required", F_OK)) reboot = TRUE;
+
     // re-set the serial number in case a Chromium update was installed
     set_marketing_serial ();
     thread_message (_("System is up to date"), -2);
@@ -1309,14 +1312,19 @@ static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
 
     if (pk_package_sack_get_size (fsack) > 0)
     {
-        reboot = TRUE;
         thread_message (_("Getting updates - please wait..."), -1);
 
         ids = pk_package_sack_get_ids (fsack);
         pk_task_update_packages_async (task, ids, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) do_updates_done, NULL);
         g_strfreev (ids);
     }
-    else thread_message (_("System is up to date"), -2);
+    else
+    {
+        // check reboot flag set by install process
+        if (!access ("/run/reboot-required", F_OK)) reboot = TRUE;
+
+        thread_message (_("System is up to date"), -2);
+    }
 
     g_object_unref (sack);
     g_object_unref (fsack);
@@ -1378,7 +1386,6 @@ static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
 
     if (pk_package_sack_get_size (fsack) > 0)
     {
-        reboot = TRUE;
         thread_message (_("Installing languages - please wait..."), -1);
 
         ids = pk_package_sack_get_ids (fsack);
