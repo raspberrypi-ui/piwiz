@@ -1688,7 +1688,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Browse the Internet\nIcon=applications-internet\nURL=/usr/share/raspi-ui-overrides/applications/chromium-browser.desktop\" > /home/pi/Desktop/chromium-browser.desktop");
 #endif
                             vsystem ("rm -f /etc/xdg/autostart/piwiz.desktop");
-                            if (uscan) vsystem ("raspi-config nonint do_overscan 1");
+                            if (uscan) vsystem ("raspi-config nonint do_overscan 0");
                             if (reboot || uscan) vsystem ("sync;reboot");
                             gtk_main_quit ();
                             break;
@@ -1767,7 +1767,7 @@ static void skip_page (GtkButton* btn, gpointer ptr)
                             vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Browse the Internet\nIcon=applications-internet\nURL=/usr/share/raspi-ui-overrides/applications/chromium-browser.desktop\" > /home/pi/Desktop/chromium-browser.desktop");
 #endif
                             vsystem ("rm -f /etc/xdg/autostart/piwiz.desktop");
-                            if (uscan) vsystem ("raspi-config nonint do_overscan 1");
+                            if (uscan) vsystem ("raspi-config nonint do_overscan 0");
                             gtk_main_quit ();
                             break;
 
@@ -1979,6 +1979,7 @@ int main (int argc, char *argv[])
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (psk_hide), TRUE);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (eng_chk), FALSE);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (uskey_chk), FALSE);
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (uscan_chk), FALSE);
 
     // set up the locale combo boxes
     read_locales ();

@@ -677,8 +677,8 @@ Press 'Next' to get started. </property>
                   <object class="GtkLabel" id="p7info">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">The desktop should fill the entire screen.
-Tick the box below if your screen has a black border at the edges.</property>
+                    <property name="label" translatable="yes">You should be able to see the taskbar along the top of the screen.
+Tick the box if some or all of it does not fit on the screen.</property>
                     <property name="wrap">True</property>
                     <property name="max_width_chars">50</property>
                     <property name="xalign">0</property>
@@ -692,11 +692,11 @@ Tick the box below if your screen has a black border at the edges.</property>
                 </child>
                 <child>
                   <object class="GtkCheckButton" id="p7check">
-                    <property name="label" translatable="yes">This screen shows a black border around the desktop</property>
+                    <property name="label" translatable="yes">The taskbar does not fit onto the screen</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
-                    <property name="tooltip_text" translatable="yes">Tick this box if you can see a black border between the edges of the screen and the desktop</property>
+                    <property name="tooltip_text" translatable="yes">Tick this box if the taskbar is not completely visible</property>
                     <property name="draw_indicator">True</property>
                   </object>
                   <packing>

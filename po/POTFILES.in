@@ -3,5 +3,3 @@ src/piwiz.c
 src/dhcpcd-gtk/main.c
 src/dhcpcd-gtk/wpa.c
 [type: gettext/glade] data/piwiz.ui
-# files added by intltool-prepare
-data/piwiz.desktop.in
