@@ -7,42 +7,42 @@ msgid ""
 msgstr ""
 "Project-Id-Version: piwiz\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-15 18:15+0200\n"
-"PO-Revision-Date: 2020-09-21 14:56+0200\n"
+"POT-Creation-Date: 2021-10-05 15:51+0200\n"
+"PO-Revision-Date: 2021-10-05 16:02+0200\n"
+"Last-Translator: Emanuele Goldoni <emanuele.goldoni@gmail.com>\n"
 "Language-Team: Italian\n"
+"Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.3\n"
-"Last-Translator: Emanuele Goldoni <emanuele.goldoni@gmail.com>\n"
+"X-Generator: Poedit 2.4.1\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Language: it\n"
 
-#: ../src/piwiz.c:990 ../src/piwiz.c:1381
+#: ../src/piwiz.c:1106 ../src/piwiz.c:1531
 msgid "Searching for networks - please wait..."
 msgstr "Ricerca delle reti..."
 
-#: ../src/piwiz.c:1010
+#: ../src/piwiz.c:1126
 msgid "Failed to connect to network."
 msgstr "Connessione alla rete non riuscita."
 
-#: ../src/piwiz.c:1131
+#: ../src/piwiz.c:1247
 msgid "Reading update list - please wait..."
 msgstr "Lettura lista degli aggiornamenti..."
 
-#: ../src/piwiz.c:1133
+#: ../src/piwiz.c:1249
 msgid "Downloading updates - please wait..."
 msgstr "Recupero degli aggiornamenti..."
 
-#: ../src/piwiz.c:1140
+#: ../src/piwiz.c:1256
 msgid "Installing updates - please wait..."
 msgstr "Installazione degli aggiornamenti..."
 
-#: ../src/piwiz.c:1142 ../src/piwiz.c:1252
+#: ../src/piwiz.c:1258 ../src/piwiz.c:1389
 msgid "Installing languages - please wait..."
 msgstr "Installazione delle lingue..."
 
-#: ../src/piwiz.c:1159
+#: ../src/piwiz.c:1275
 #, c-format
 msgid ""
 "Error getting updates.\n"
@@ -51,11 +51,11 @@ msgstr ""
 "Errore scaricando gli aggiornamenti.\n"
 "%s"
 
-#: ../src/piwiz.c:1166 ../src/piwiz.c:1192
+#: ../src/piwiz.c:1286 ../src/piwiz.c:1326
 msgid "System is up to date"
 msgstr "Il sistema è aggiornato"
 
-#: ../src/piwiz.c:1176
+#: ../src/piwiz.c:1304
 #, c-format
 msgid ""
 "Error comparing versions.\n"
@@ -64,29 +64,29 @@ msgstr ""
 "Errore confrontando le versioni.\n"
 "%s"
 
-#: ../src/piwiz.c:1189
+#: ../src/piwiz.c:1315
 msgid "Getting updates - please wait..."
 msgstr "Recupero degli aggiornamenti..."
 
-#: ../src/piwiz.c:1202
+#: ../src/piwiz.c:1340
 #, c-format
 msgid ""
 "Error installing languages.\n"
 "%s"
 msgstr "Errore installando le lingue. %s"
 
-#: ../src/piwiz.c:1209 ../src/piwiz.c:1257 ../src/piwiz.c:1290
+#: ../src/piwiz.c:1346 ../src/piwiz.c:1397 ../src/piwiz.c:1440
 msgid "Comparing versions - please wait..."
 msgstr "Confronto tra le versioni..."
 
-#: ../src/piwiz.c:1223
+#: ../src/piwiz.c:1361
 #, c-format
 msgid ""
 "Error finding languages.\n"
 "%s"
 msgstr "Errore nella ricerca delle lingue. %s"
 
-#: ../src/piwiz.c:1271
+#: ../src/piwiz.c:1414
 #, c-format
 msgid ""
 "Error checking for updates.\n"
@@ -95,95 +95,83 @@ msgstr ""
 "Errore nella ricerca di aggiornamenti.\n"
 "%s"
 
-#: ../src/piwiz.c:1284
+#: ../src/piwiz.c:1434
 msgid "Finding languages - please wait..."
 msgstr "Ricerca delle lingue..."
 
-#: ../src/piwiz.c:1333 ../src/piwiz.c:1542
+#: ../src/piwiz.c:1483 ../src/piwiz.c:1700
 msgid "Checking for updates - please wait..."
 msgstr "Ricerca di aggiornamenti..."
 
-#: ../src/piwiz.c:1342
+#: ../src/piwiz.c:1492
 msgid "Could not sync time - unable to check for updates"
 msgstr ""
 "Sincronizzazione dell'orologio non riuscita: impossibile verificare la "
 "presenza di aggiornamenti"
 
-#: ../src/piwiz.c:1353 ../data/piwiz.ui.h:5
+#: ../src/piwiz.c:1503 ../data/piwiz.ui.h:58
 msgid "_Next"
 msgstr "_Avanti"
 
-#: ../src/piwiz.c:1354
+#: ../src/piwiz.c:1504
 msgid "_Back"
 msgstr "_Indietro"
 
-#: ../src/piwiz.c:1355 ../data/piwiz.ui.h:4
+#: ../src/piwiz.c:1505 ../data/piwiz.ui.h:57
 msgid "_Skip"
 msgstr "_Salta"
 
-#: ../src/piwiz.c:1360 ../data/piwiz.ui.h:3
+#: ../src/piwiz.c:1510 ../src/dhcpcd-gtk/wpa.c:130 ../data/piwiz.ui.h:3
 msgid "_Cancel"
 msgstr "_Annulla"
 
-#: ../src/piwiz.c:1366
+#: ../src/piwiz.c:1516
 msgid "_Later"
 msgstr "_Ria_vvia in seguito"
 
-#: ../src/piwiz.c:1367
+#: ../src/piwiz.c:1517
 msgid "_Restart"
 msgstr "_Riavvia ora"
 
-#: ../src/piwiz.c:1373
+#: ../src/piwiz.c:1523
 msgid "_Done"
 msgstr "_Fine"
 
-#: ../src/piwiz.c:1455
+#: ../src/piwiz.c:1605
 msgid "Setting location - please wait..."
 msgstr "Impostazione della posizione..."
 
-#: ../src/piwiz.c:1467
+#: ../src/piwiz.c:1617
 msgid "The two passwords entered do not match."
 msgstr "Le due password inserite non coincidono."
 
-#: ../src/piwiz.c:1504
+#: ../src/piwiz.c:1654
 #, c-format
 msgid "Enter the password for the WiFi network \"%s\"."
 msgstr "Inserire la password per la rete WiFi «%s»."
 
-#: ../src/piwiz.c:1518 ../src/piwiz.c:1529
+#: ../src/piwiz.c:1668 ../src/piwiz.c:1679
 msgid "Connecting to WiFi network - please wait..."
 msgstr "Connessione alla rete WiFi..."
 
-#: ../src/piwiz.c:1521 ../src/piwiz.c:1532
+#: ../src/piwiz.c:1671 ../src/piwiz.c:1682
 msgid "Could not connect to this network"
 msgstr "Impossibile connettersi a questa rete"
 
-#: ../src/piwiz.c:1547
+#: ../src/piwiz.c:1705
 msgid "Synchronising clock - please wait..."
 msgstr "Sincronizzazione dell'orologio..."
 
-#: ../src/piwiz.c:1552
+#: ../src/piwiz.c:1710
 msgid "No network connection found - unable to check for updates"
 msgstr ""
 "Nessuna connessione di rete trovata: impossibile verificare la presenza di "
 "aggiornamenti"
 
-#: ../src/piwiz.c:1652
+#: ../src/piwiz.c:1823
 #, c-format
 msgid "<span font_desc=\"10.0\">IP : %s</span>"
 msgstr "<span font_desc=\"10.0\">IP : %s</span>"
-
-#: ../src/piwiz.c:1791
-msgid "Set the country in which you are using your Pi"
-msgstr "Impostare la nazione nella quale si sta utilizzando Raspberry Pi"
-
-#: ../src/piwiz.c:1792
-msgid "Set the language in which applications should appear"
-msgstr "Impostare la lingua delle applicazioni"
-
-#: ../src/piwiz.c:1793
-msgid "Set the closest city to your location"
-msgstr "Impostare la città più vicina"
 
 #: ../src/dhcpcd-gtk/main.c:375
 msgid "Error creating new GIO Channel\n"
@@ -283,19 +271,23 @@ msgstr ""
 msgid "Error enabling network"
 msgstr "Errore abilitando la rete"
 
+#: ../src/dhcpcd-gtk/wpa.c:129 ../data/piwiz.ui.h:1
+msgid "_OK"
+msgstr "_OK"
+
 #: ../src/dhcpcd-gtk/wpa.c:141
 msgid "Pre Shared Key:"
 msgstr "Chiave condivisa (PSK):"
 
-#: ../data/piwiz.ui.h:1
-msgid "_OK"
-msgstr "_OK"
-
 #: ../data/piwiz.ui.h:2
+msgid "label"
+msgstr "etichetta"
+
+#: ../data/piwiz.ui.h:4
 msgid "Welcome to Raspberry Pi"
 msgstr "Benvenuti in Raspberry Pi"
 
-#: ../data/piwiz.ui.h:6
+#: ../data/piwiz.ui.h:5
 msgid ""
 "Welcome to the Raspberry Pi Desktop!\n"
 "\n"
@@ -309,15 +301,15 @@ msgstr ""
 "\n"
 "Premere «Avanti» per iniziare. "
 
-#: ../data/piwiz.ui.h:11
+#: ../data/piwiz.ui.h:10
 msgid "<span font_desc=\"10.0\"> </span>"
 msgstr "<span font_desc=\"10.0\"> </span>"
 
-#: ../data/piwiz.ui.h:12
+#: ../data/piwiz.ui.h:11
 msgid "<b>Set Country</b>"
 msgstr "<b>Impostazione della nazione</b>"
 
-#: ../data/piwiz.ui.h:13
+#: ../data/piwiz.ui.h:12
 msgid ""
 "Enter the details of your location. This is used to set the language, time "
 "zone, keyboard and other international settings."
@@ -326,25 +318,29 @@ msgstr ""
 "utilizzate per impostare la lingua, il fuso orario, la tastiera e altre "
 "impostazioni internazionali."
 
-#: ../data/piwiz.ui.h:14
+#: ../data/piwiz.ui.h:13
 msgid "Country:"
 msgstr "Nazione:"
+
+#: ../data/piwiz.ui.h:14
+msgid "Set the country in which you are using your Pi"
+msgstr "Impostare la nazione nella quale si sta utilizzando Raspberry Pi"
 
 #: ../data/piwiz.ui.h:15
 msgid "Language:"
 msgstr "Lingua:"
 
 #: ../data/piwiz.ui.h:16
+msgid "Set the language in which applications should appear"
+msgstr "Impostare la lingua delle applicazioni"
+
+#: ../data/piwiz.ui.h:17
 msgid "Timezone:"
 msgstr "Fuso orario:"
 
-#: ../data/piwiz.ui.h:17
-msgid "Use English language"
-msgstr "Utilizza la lingua inglese"
-
 #: ../data/piwiz.ui.h:18
-msgid "Use English instead of the default language for your country"
-msgstr "Utilizza l'inglese al posto della lingua predefinita per la nazione"
+msgid "Set the closest city to your location"
+msgstr "Impostare la città più vicina"
 
 #: ../data/piwiz.ui.h:19
 msgid "Use US keyboard"
@@ -358,124 +354,129 @@ msgstr ""
 "tastiera predefinita per la propria nazione"
 
 #: ../data/piwiz.ui.h:21
+msgid "Use English language"
+msgstr "Utilizza la lingua inglese"
+
+#: ../data/piwiz.ui.h:22
+msgid "Use English instead of the default language for your country"
+msgstr "Utilizza l'inglese al posto della lingua predefinita per la nazione"
+
+#: ../data/piwiz.ui.h:23
 msgid "Press 'Next' when you have made your selection."
 msgstr "Premere «Avanti» dopo aver selezionato l'opzione desiderata."
 
-#: ../data/piwiz.ui.h:22
+#: ../data/piwiz.ui.h:24
 msgid "<b>Change Password</b>"
 msgstr "<b>Cambio password</b>"
 
-#: ../data/piwiz.ui.h:23
+#: ../data/piwiz.ui.h:25
 msgid ""
 "The default 'pi' user account currently has the password 'raspberry'. It is "
 "strongly recommended that you change this to a different password that only "
 "you know."
 msgstr ""
 "La password per l'utente predefinito «pi» è attualmente «raspberry». E' "
-"consigliabile modificare la password corrente con una nuova password "
-"segreta."
+"consigliabile modificare la password corrente con una nuova password segreta."
 
-#: ../data/piwiz.ui.h:24
+#: ../data/piwiz.ui.h:26
 msgid "Enter new password:"
 msgstr "Inserire la nuova password:"
 
-#: ../data/piwiz.ui.h:25
-msgid "Confirm new password:"
-msgstr "Confermare la nuova password:"
-
-#: ../data/piwiz.ui.h:26
+#: ../data/piwiz.ui.h:27
 msgid "Enter a new password"
 msgstr "Inserire una nuova password"
 
-#: ../data/piwiz.ui.h:27
+#: ../data/piwiz.ui.h:28
+msgid "Confirm new password:"
+msgstr "Confermare la nuova password:"
+
+#: ../data/piwiz.ui.h:29
 msgid "Enter the new password again"
 msgstr "Inserire nuovamente la nuova password"
 
-#: ../data/piwiz.ui.h:28
+#: ../data/piwiz.ui.h:30
 msgid "Hide characters"
 msgstr "Nascondi caratteri"
 
-#: ../data/piwiz.ui.h:29
+#: ../data/piwiz.ui.h:31
 msgid "Show or hide the characters in your password"
 msgstr "Mostra o nasconde la password inserita"
 
-#: ../data/piwiz.ui.h:30
+#: ../data/piwiz.ui.h:32
 msgid "Press 'Next' to activate your new password."
 msgstr "Premere «Avanti» per attivare la nuova password."
 
-#: ../data/piwiz.ui.h:31
+#: ../data/piwiz.ui.h:33
 msgid "<b>Set Up Screen</b>"
 msgstr "<b>Configurazione dello schermo</b>"
 
-#: ../data/piwiz.ui.h:32
-msgid ""
-"The desktop should fill the entire screen.\n"
-"Tick the box below if your screen has a black border at the edges."
-msgstr ""
-"Il desktop dovrebbe riempire l'intero schermo.\n"
-"Spuntare la casella sottostante se lo schermo presenta dei bordi neri."
-
 #: ../data/piwiz.ui.h:34
-msgid "This screen shows a black border around the desktop"
-msgstr "Sono presenti dei bordi neri intorno al desktop"
-
-#: ../data/piwiz.ui.h:35
 msgid ""
-"Tick this box if you can see a black border between the edges of the screen "
-"and the desktop"
+"You should be able to see the taskbar along the top of the screen.\n"
+"Tick the box if some or all of it does not fit on the screen."
 msgstr ""
-"Spuntare questa casella se sono visibili dei bordi neri tra il desktop e il "
-"bordo dello schermo"
+"La barra delle attività dovrebbe essere visibile lungo parte alta dello "
+"schermo.\n"
+"Spuntare la casella se non si adatta del tutto o in parte allo schermo."
 
 #: ../data/piwiz.ui.h:36
-msgid ""
-"Press 'Next' to save your setting.\n"
-"\n"
-"The change will take effect when the Pi is restarted."
-msgstr ""
-"Premere «Avanti» per salvare le impostazioni.\n"
-"\n"
-"Le modifiche avranno effetto al riavvio di Raspberry Pi."
+msgid "The taskbar does not fit onto the screen"
+msgstr "La barra delle attività non si adatta allo schermo"
 
-#: ../data/piwiz.ui.h:39
+#: ../data/piwiz.ui.h:37
+msgid "Tick this box if the taskbar is not completely visible"
+msgstr ""
+"Spuntare la casella se la barra delle attività non è completamente visibile"
+
+#: ../data/piwiz.ui.h:38
+msgid ""
+"The change will take effect when the Pi is restarted.\n"
+"\n"
+"Press 'Next' to save your setting."
+msgstr ""
+"Le modifiche verranno applicate al riavvio di Raspberry Pi\n"
+"\n"
+"Premere «Avanti» per salvare le impostazioni."
+
+#: ../data/piwiz.ui.h:41
 msgid "<b>Select WiFi Network</b>"
 msgstr "<b>Selezione della rete WiFi</b>"
 
-#: ../data/piwiz.ui.h:40
+#: ../data/piwiz.ui.h:42
 msgid "Select your WiFi network from the list."
 msgstr "Selezionare la rete WiFi dalla lista."
 
-#: ../data/piwiz.ui.h:41
+#: ../data/piwiz.ui.h:43
 msgid "Click the name of your network to select it"
 msgstr "Fare clic sul nome della rete per selezionarla"
 
-#: ../data/piwiz.ui.h:42
+#: ../data/piwiz.ui.h:44
 msgid "Press 'Next' to connect, or 'Skip' to continue without connecting."
 msgstr ""
 "Premere «Avanti» per collegarsi oppure «Salta» per continuare senza "
 "connessione."
 
-#: ../data/piwiz.ui.h:43
+#: ../data/piwiz.ui.h:45
 msgid "<b>Enter WiFi Password</b>"
 msgstr "<b>Inserire la password del WiFi</b>"
 
-#: ../data/piwiz.ui.h:44
+#: ../data/piwiz.ui.h:46
 msgid "Enter the password for your WiFi network."
 msgstr "Inserire la password della rete WiFi."
 
-#: ../data/piwiz.ui.h:45
+#: ../data/piwiz.ui.h:47
 msgid "Password:"
 msgstr "Password:"
 
-#: ../data/piwiz.ui.h:46
+#: ../data/piwiz.ui.h:48
 msgid "Enter the password for your network"
 msgstr "Inserire la password della rete"
 
-#: ../data/piwiz.ui.h:47
+#: ../data/piwiz.ui.h:49
 msgid "<b>Update Software</b>"
 msgstr "<b>Aggiornamento software</b>"
 
-#: ../data/piwiz.ui.h:48
+#: ../data/piwiz.ui.h:50
 msgid ""
 "The operating system and applications will now be checked and updated if "
 "necessary. This may involve a large download.\n"
@@ -490,15 +491,15 @@ msgstr ""
 "Premere «Avanti» per verificare e aggiornare il software oppure «Salta» per "
 "proseguire senza verificare."
 
-#: ../data/piwiz.ui.h:51
+#: ../data/piwiz.ui.h:53
 msgid "<b>Setup Complete</b>"
 msgstr "<b>Completamento configurazione</b>"
 
-#: ../data/piwiz.ui.h:52
+#: ../data/piwiz.ui.h:54
 msgid "Your Raspberry Pi is now set up and ready to go."
 msgstr "Raspberry Pi è ora configurato e pronto all'uso."
 
-#: ../data/piwiz.ui.h:53
+#: ../data/piwiz.ui.h:55
 msgid ""
 "To run applications, click the raspberry icon in the top left corner of the "
 "screen to open the menu."
@@ -507,17 +508,41 @@ msgstr ""
 "sull'icona con il lampone posizionata nell'angolo in alto a sinistra dello "
 "schermo."
 
-#: ../data/piwiz.ui.h:54
+#: ../data/piwiz.ui.h:56
 msgid ""
 "Press 'Restart' to restart your Pi so the new settings will take effect."
 msgstr ""
 "Premere «Riavvia ora» per riavviare Raspberry Pi e applicare le nuove "
 "impostazioni."
 
-#: ../data/piwiz.desktop.in.h:1
-msgid "Raspberry Pi First-Run Wizard"
-msgstr "Configurazione guidata al primo avvio di Raspberry"
+#~ msgid ""
+#~ "The desktop should fill the entire screen.\n"
+#~ "Tick the box below if your screen has a black border at the edges."
+#~ msgstr ""
+#~ "Il desktop dovrebbe riempire l'intero schermo.\n"
+#~ "Spuntare la casella sottostante se lo schermo presenta dei bordi neri."
 
-#: ../data/piwiz.desktop.in.h:2
-msgid "Configure Raspberry Pi system on first run"
-msgstr "Configura il sistema Raspberry Pi al primo avvio"
+#~ msgid "This screen shows a black border around the desktop"
+#~ msgstr "Sono presenti dei bordi neri intorno al desktop"
+
+#~ msgid ""
+#~ "Tick this box if you can see a black border between the edges of the "
+#~ "screen and the desktop"
+#~ msgstr ""
+#~ "Spuntare questa casella se sono visibili dei bordi neri tra il desktop e "
+#~ "il bordo dello schermo"
+
+#~ msgid ""
+#~ "Press 'Next' to save your setting.\n"
+#~ "\n"
+#~ "The change will take effect when the Pi is restarted."
+#~ msgstr ""
+#~ "Premere «Avanti» per salvare le impostazioni.\n"
+#~ "\n"
+#~ "Le modifiche avranno effetto al riavvio di Raspberry Pi."
+
+#~ msgid "Raspberry Pi First-Run Wizard"
+#~ msgstr "Configurazione guidata al primo avvio di Raspberry"
+
+#~ msgid "Configure Raspberry Pi system on first run"
+#~ msgstr "Configura il sistema Raspberry Pi al primo avvio"
