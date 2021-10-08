@@ -1,3 +1,9 @@
+piwiz (0.32) bullseye; urgency=medium
+
+  * Italian translation updated
+
+ -- Simon Long <simon@raspberrypi.com>  Fri, 08 Oct 2021 09:16:26 +0100
+
 piwiz (0.31) bullseye; urgency=medium
 
   * Change sense of overscan check
