@@ -1,3 +1,9 @@
+piwiz (0.33) bullseye; urgency=medium
+
+  * Add detection of HDMI audio device on Pi 1 / 2 / 3
+
+ -- Simon Long <simon@raspberrypi.com>  Thu, 28 Oct 2021 11:57:52 +0100
+
 piwiz (0.32) bullseye; urgency=medium
 
   * Italian translation updated
