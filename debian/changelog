@@ -1,3 +1,9 @@
+piwiz (0.34) bullseye; urgency=medium
+
+  * Spawn screen reader prompt rather than using system
+
+ -- Simon Long <simon@raspberrypi.com>  Thu, 04 Nov 2021 16:15:33 +0000
+
 piwiz (0.33) bullseye; urgency=medium
 
   * Add detection of HDMI audio device on Pi 1 / 2 / 3

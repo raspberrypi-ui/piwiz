@@ -1871,9 +1871,8 @@ static gboolean srprompt (gpointer data)
     {
         if (net_available () && clock_synced ())
         {
-            char *buf = g_strdup_printf ("sudo -u $SUDO_USER XDG_RUNTIME_DIR=/run/user/$SUDO_UID aplay %s/srprompt.wav", PACKAGE_DATA_DIR);
-            system (buf);
-            g_free (buf);
+            char *args[7] = { "/usr/bin/sudo", "-u", "pi", "XDG_RUNTIME_DIR=/run/user/1000", "/usr/bin/aplay", "srprompt.wav", NULL };
+            g_spawn_async (PACKAGE_DATA_DIR, args, NULL, 0, NULL, NULL, NULL, NULL);
         }
         return TRUE;
     }
