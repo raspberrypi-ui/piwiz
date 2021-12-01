@@ -1,3 +1,9 @@
+piwiz (0.35) bullseye; urgency=medium
+
+  * Add some more keyboard definitions
+
+ -- Simon Long <simon@raspberrypi.com>  Wed, 01 Dec 2021 17:53:05 +0000
+
 piwiz (0.34) bullseye; urgency=medium
 
   * Spawn screen reader prompt rather than using system

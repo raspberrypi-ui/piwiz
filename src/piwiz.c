@@ -244,7 +244,7 @@ static const char keyboard_map[][13] = {
 	"",	    "",	    "us",	    ""
 };
 
-#define MAX_KBS 15
+#define MAX_KBS 17
 static const char kb_countries[MAX_KBS][3] = {
     "GB",   // default if no Pi keyboard found
     "GB",
@@ -260,7 +260,9 @@ static const char kb_countries[MAX_KBS][3] = {
     "DK",
     "RU",
     "TR",
-    "IL"
+    "IL",
+    "HU",
+    "KR"
 };
 
 static const char kb_langs[MAX_KBS][3] = {
@@ -278,7 +280,9 @@ static const char kb_langs[MAX_KBS][3] = {
     "fi",
     "ru",
     "tr",
-    "he"
+    "he",
+    "hu",
+    "ko"
 };
 
 static const char kb_tzs[MAX_KBS][20] = {
@@ -296,7 +300,9 @@ static const char kb_tzs[MAX_KBS][20] = {
     "Europe/Helsinki",
     "Europe/Moscow",
     "Europe/Istanbul",
-    "Europe/Jerusalem"
+    "Europe/Jerusalem",
+    "Europe/Budapest",
+    "Asia/Seoul"
 };
 
 /* In dhcpcd-gtk/main.c */
