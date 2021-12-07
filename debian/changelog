@@ -1,3 +1,9 @@
+piwiz (0.36) bullseye; urgency=medium
+
+  * Modify audio output selection code to handle new format device names
+
+ -- Simon Long <simon@raspberrypi.com>  Tue, 07 Dec 2021 14:29:21 +0000
+
 piwiz (0.35) bullseye; urgency=medium
 
   * Add some more keyboard definitions
