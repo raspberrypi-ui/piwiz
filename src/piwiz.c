@@ -1912,7 +1912,7 @@ int main (int argc, char *argv[])
     // set the audio output to HDMI if there is one, otherwise the analog jack
     system ("SINKS=$(sudo -u $SUDO_USER XDG_RUNTIME_DIR=/run/user/$SUDO_UID pactl list short sinks) ; \
         DOUT=$(echo $SINKS | grep -oE bcm2835_audio\\.digital\\-stereo) ; \
-        HOUT=$(echo $SINKS | grep -oE [0-9a-f]{8}\\.hdmi\\.[0-9a-z]+\\-stereo) ; \
+        HOUT=$(echo $SINKS | grep -oE [0-9a-f]{8}\\.hdmi\\.[0-9a-z]+\\-stereo | head -n 1) ; \
         if ! [ -z $DOUT ] ; then OUTPUT=$DOUT ; elif ! [ -z $HOUT ] ; then OUTPUT=$HOUT ; else OUTPUT=bcm2835_audio.analog-stereo ; fi ; \
         sudo -u $SUDO_USER XDG_RUNTIME_DIR=/run/user/$SUDO_UID pactl set-default-sink alsa_output.platform-$OUTPUT");
 

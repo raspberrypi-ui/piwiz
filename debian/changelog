@@ -1,3 +1,9 @@
+piwiz (0.37) bullseye; urgency=medium
+
+  * Fix audio output selection when dual HDMI audio devices are in use
+
+ -- Simon Long <simon@raspberrypi.com>  Wed, 08 Dec 2021 12:04:50 +0000
+
 piwiz (0.36) bullseye; urgency=medium
 
   * Modify audio output selection code to handle new format device names
