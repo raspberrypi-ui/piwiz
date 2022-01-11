@@ -1,3 +1,9 @@
+piwiz (0.38) bullseye; urgency=medium
+
+  * Tidy homeschool Chromium shortcuts
+
+ -- Simon Long <simon@raspberrypi.com>  Tue, 11 Jan 2022 12:39:16 +0000
+
 piwiz (0.37) bullseye; urgency=medium
 
   * Fix audio output selection when dual HDMI audio devices are in use

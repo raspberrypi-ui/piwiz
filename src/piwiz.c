@@ -1690,8 +1690,8 @@ static void next_page (GtkButton* btn, gpointer ptr)
 
         case PAGE_DONE :
 #ifdef HOMESCHOOL
-                            vsystem ("cp /usr/share/raspi-ui-overrides/applications/chromium-browser.desktop /etc/xdg/autostart/");
-                            vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Browse the Internet\nIcon=applications-internet\nURL=/usr/share/raspi-ui-overrides/applications/chromium-browser.desktop\" > /home/pi/Desktop/chromium-browser.desktop");
+                            vsystem ("cp /usr/share/applications/chromium-browser.desktop /etc/xdg/autostart/");
+                            vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Web Browser\nIcon=applications-internet\nURL=/usr/share/applications/chromium-browser.desktop\" > /home/pi/Desktop/chromium-browser.desktop");
 #endif
                             vsystem ("rm -f /etc/xdg/autostart/piwiz.desktop");
                             if (uscan) vsystem ("raspi-config nonint do_overscan 0");
@@ -1738,8 +1738,8 @@ static void prev_page (GtkButton* btn, gpointer ptr)
 
         case PAGE_INTRO :
 #ifdef HOMESCHOOL
-                            vsystem ("cp /usr/share/raspi-ui-overrides/applications/chromium-browser.desktop /etc/xdg/autostart/");
-                            vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Browse the Internet\nIcon=applications-internet\nURL=/usr/share/raspi-ui-overrides/applications/chromium-browser.desktop\" > /home/pi/Desktop/chromium-browser.desktop");
+                            vsystem ("cp /usr/share/applications/chromium-browser.desktop /etc/xdg/autostart/");
+                            vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Web Browser\nIcon=applications-internet\nURL=/usr/share/applications/chromium-browser.desktop\" > /home/pi/Desktop/chromium-browser.desktop");
 #endif
                             vsystem ("rm -f /etc/xdg/autostart/piwiz.desktop");
                             gtk_main_quit ();
@@ -1769,8 +1769,8 @@ static void skip_page (GtkButton* btn, gpointer ptr)
 
         case PAGE_DONE :
 #ifdef HOMESCHOOL
-                            vsystem ("cp /usr/share/raspi-ui-overrides/applications/chromium-browser.desktop /etc/xdg/autostart/");
-                            vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Browse the Internet\nIcon=applications-internet\nURL=/usr/share/raspi-ui-overrides/applications/chromium-browser.desktop\" > /home/pi/Desktop/chromium-browser.desktop");
+                            vsystem ("cp /usr/share/applications/chromium-browser.desktop /etc/xdg/autostart/");
+                            vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Web Browser\nIcon=applications-internet\nURL=/usr/share/applications/chromium-browser.desktop\" > /home/pi/Desktop/chromium-browser.desktop");
 #endif
                             vsystem ("rm -f /etc/xdg/autostart/piwiz.desktop");
                             if (uscan) vsystem ("raspi-config nonint do_overscan 0");
@@ -1840,14 +1840,7 @@ static void set_marketing_serial (void)
 {
     if (is_pi)
     {
-        if (access ("/usr/lib/chromium-browser/master_preferences", F_OK) != -1)
-        {
-            if (system ("grep -q \"^Revision\\s*:\\s*[ 123][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]11[0-9a-fA-F]$\" /proc/cpuinfo") == 0)
-                vsystem ("sed -i /usr/lib/chromium-browser/master_preferences -e s/UNIDENTIFIED/`vcgencmd otp_dump | grep ^6[45] | sha256sum | cut -d ' ' -f 1`/g");
-            else
-                vsystem ("sed -i /usr/lib/chromium-browser/master_preferences -e s/UNIDENTIFIED/`cat /proc/cpuinfo | grep Serial | sha256sum | cut -d ' ' -f 1`/g");
-        }
-        else if (access ("/etc/chromium/master_preferences", F_OK) != -1)
+        if (access ("/etc/chromium/master_preferences", F_OK) != -1)
         {
             if (system ("grep -q \"^Revision\\s*:\\s*[ 123][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]11[0-9a-fA-F]$\" /proc/cpuinfo") == 0)
                 vsystem ("sed -i /etc/chromium/master_preferences -e s/UNIDENTIFIED/`vcgencmd otp_dump | grep ^6[45] | sha256sum | cut -d ' ' -f 1`/g");
