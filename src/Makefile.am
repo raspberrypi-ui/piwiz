@@ -24,7 +24,7 @@ piwiz_includedir = $(includedir)/piwiz
 
 piwiz_include_HEADERS =
 
-piwiz_LDFLAGS = $(DYNAMIC_FLAGS)
+piwiz_LDFLAGS = $(DYNAMIC_FLAGS) -lcrypt
 piwiz_DEPENDENCIES_EXTRA = $(BUILTIN_PLUGINS)
 
 piwiz_LDADD = \
@@ -57,7 +57,7 @@ piwizhs_includedir = $(includedir)/piwiz
 
 piwizhs_include_HEADERS =
 
-piwizhs_LDFLAGS = $(DYNAMIC_FLAGS)
+piwizhs_LDFLAGS = $(DYNAMIC_FLAGS) -lcrypt
 piwizhs_DEPENDENCIES_EXTRA = $(BUILTIN_PLUGINS)
 
 piwizhs_LDADD = \

@@ -494,7 +494,7 @@ Press 'Next' to get started. </property>
                   <object class="GtkLabel" id="p2info">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">You need to create a user account to log in to the Raspberry Pi. Choose a username and password.
+                    <property name="label" translatable="yes">You need to create a user account, with username and password, to log in to your Raspberry Pi.
 
 The username can only contain lower-case letters, digits and hyphens, and must start with a letter.</property>
                     <property name="wrap">True</property>

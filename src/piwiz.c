@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <X11/XKBlib.h>
 
 #include <libintl.h>
+#include <crypt.h>
 
 #include "dhcpcd.h"
 #include "dhcpcd-gtk.h"
@@ -98,7 +99,7 @@ static GtkWidget *err_dlg, *err_msg, *err_btn;
 static GtkWidget *wizard_nb, *next_btn, *prev_btn, *skip_btn;
 static GtkWidget *country_cb, *language_cb, *timezone_cb;
 static GtkWidget *ap_tv, *psk_label, *prompt, *ip_label;
-static GtkWidget *pwd1_te, *pwd2_te, *psk_te;
+static GtkWidget *user_te, *pwd1_te, *pwd2_te, *psk_te;
 static GtkWidget *pwd_hide, *psk_hide, *eng_chk, *uskey_chk, *uscan1_sw, *uscan2_sw, *uscan2_box;
 
 /* Lists for localisation */
@@ -116,6 +117,7 @@ GtkListStore *ap_list;
 char *wifi_if, *init_country, *init_lang, *init_kb, *init_var, *init_tz;
 char *cc, *lc, *city, *ext, *lay, *var;
 char *ssid;
+char *user = NULL, *pw = NULL;
 gint conn_timeout = 0, pulse_timer = 0;
 gboolean reboot, is_pi = TRUE;
 int last_btn = NEXT_BTN;
@@ -1563,9 +1565,8 @@ static void next_page (GtkButton* btn, gpointer ptr)
 {
     GtkTreeModel *model;
     GtkTreeIter iter;
-    const char *psk;
-    char *pw1, *pw2, *wc;
-    char *text;
+    const char *ccptr;
+    char *wc, *text;
     int secure, connected;
 
     last_btn = NEXT_BTN;
@@ -1617,19 +1618,48 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             else gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
                             break;
 
-        case PAGE_PASSWD :  escape_passwd (gtk_entry_get_text (GTK_ENTRY (pwd1_te)), &pw1);
-                            escape_passwd (gtk_entry_get_text (GTK_ENTRY (pwd2_te)), &pw2);
-                            if (strlen (pw1) || strlen (pw2))
+        case PAGE_PASSWD :  if (user != NULL)
                             {
-                                if (g_strcmp0 (pw1, pw2))
-                                {
-                                    message (_("The two passwords entered do not match."), 1, 0, -1, FALSE);
-                                    break;
-                                }
-                                vsystem ("echo \"$SUDO_USER:%s\" | chpasswd", pw1);
+                                g_free (user);
+                                user = NULL;
                             }
-                            g_free (pw1);
-                            g_free (pw2);
+                            if (pw != NULL)
+                            {
+                                g_free (pw);
+                                pw = NULL;
+                            }
+                            ccptr = gtk_entry_get_text (GTK_ENTRY (user_te));
+                            if (!strlen (ccptr))
+                            {
+                                message (_("The username is blank."), 1, 0, -1, FALSE);
+                                break;
+                            }
+                            if (*ccptr < 'a' || *ccptr > 'z')
+                            {
+                                message (_("The first character of the username must be a lower-case letter."), 1, 0, -1, FALSE);
+                                break;
+                            }
+                            while (*++ccptr)
+                            {
+                                if ((*ccptr < 'a' || *ccptr > 'z') && (*ccptr < '0' || *ccptr > '9') && *ccptr != '-') break;
+                            }
+                            if (*ccptr)
+                            {
+                                message (_("Usernames can only contain lower-case letters, digits and hyphens."), 1, 0, -1, FALSE);
+                                break;
+                            }
+                            if (!strlen (gtk_entry_get_text (GTK_ENTRY (pwd1_te))) || !strlen (gtk_entry_get_text (GTK_ENTRY (pwd2_te))))
+                            {
+                                message (_("The password is blank."), 1, 0, -1, FALSE);
+                                break;
+                            }
+                            if (g_strcmp0 (gtk_entry_get_text (GTK_ENTRY (pwd1_te)), gtk_entry_get_text (GTK_ENTRY (pwd2_te))))
+                            {
+                                message (_("The two passwords entered do not match."), 1, 0, -1, FALSE);
+                                break;
+                            }
+                            user = g_strdup (gtk_entry_get_text (GTK_ENTRY (user_te)));
+                            pw = g_strdup (crypt (gtk_entry_get_text (GTK_ENTRY (pwd1_te)), crypt_gensalt (NULL, 0, NULL, 0)));
                             if (is_pi) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
                             else
                             {
@@ -1681,8 +1711,8 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             }
                             break;
 
-        case PAGE_WIFIPSK : psk = gtk_entry_get_text (GTK_ENTRY (psk_te));
-                            if (select_ssid (ssid, psk))
+        case PAGE_WIFIPSK : ccptr = gtk_entry_get_text (GTK_ENTRY (psk_te));
+                            if (select_ssid (ssid, ccptr))
                             {
                                 message (_("Connecting to WiFi network - please wait..."), 0, 0, -1, TRUE);
                                 conn_timeout = g_timeout_add (30000, connect_failure, NULL);
@@ -1696,6 +1726,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Web Browser\nIcon=applications-internet\nURL=/usr/share/applications/chromium-browser.desktop\" > /home/pi/Desktop/chromium-browser.desktop");
 #endif
                             vsystem ("rm -f /etc/xdg/autostart/piwiz.desktop");
+                            // do the user creation here from globals user and pw
                             if (reboot) vsystem ("sync;reboot");
                             gtk_main_quit ();
                             break;
@@ -1966,6 +1997,7 @@ int main (int argc, char *argv[])
     g_signal_connect (skip_btn, "clicked", G_CALLBACK (skip_page), NULL);
 
     ip_label = (GtkWidget *) gtk_builder_get_object (builder, "p0ip");
+    user_te = (GtkWidget *) gtk_builder_get_object (builder, "p2user");
     pwd1_te = (GtkWidget *) gtk_builder_get_object (builder, "p2pwd1");
     pwd2_te = (GtkWidget *) gtk_builder_get_object (builder, "p2pwd2");
     psk_te = (GtkWidget *) gtk_builder_get_object (builder, "p4psk");
