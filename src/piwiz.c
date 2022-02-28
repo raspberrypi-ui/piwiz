@@ -477,12 +477,12 @@ static int get_pi_keyboard (void)
     res = get_string ("hexdump -n 1 -s 3 -e '1/1 \"%d\"' /proc/device-tree/chosen/rpi-country-code 2> /dev/null");
     if (res)
     {
-        if (sscanf (res, "%x", &val) == 1) ret = val;
+        if (sscanf (res, "%d", &val) == 1) ret = val;
         g_free (res);
         if (ret) return ret;
     }
 
-    res = get_string ("lsusb -v -d 04d9:0006 | grep \"RPI Wired Keyboard\" | rev");
+    res = get_string ("lsusb -v -d 04d9:0006 2> /dev/null | grep iProduct | rev");
     if (res)
     {
         if (sscanf (res, "%x", &val) == 1) ret = val;
