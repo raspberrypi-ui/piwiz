@@ -530,8 +530,6 @@ Press 'Next' to get started. </property>
                         <property name="tooltip-text" translatable="yes">Enter a new password</property>
                         <property name="invisible-char">•</property>
                         <property name="activates-default">True</property>
-                        <property name="primary-icon-activatable">False</property>
-                        <property name="secondary-icon-activatable">False</property>
                         <accessibility>
                           <relation type="labelled-by" target="p2label1"/>
                         </accessibility>
@@ -573,8 +571,6 @@ Press 'Next' to get started. </property>
                         <property name="tooltip-text" translatable="yes">Enter the new password again</property>
                         <property name="invisible-char">•</property>
                         <property name="activates-default">True</property>
-                        <property name="primary-icon-activatable">False</property>
-                        <property name="secondary-icon-activatable">False</property>
                         <accessibility>
                           <relation type="labelled-by" target="p2label2"/>
                         </accessibility>
@@ -931,8 +927,6 @@ Press 'Next' to get started. </property>
                         <property name="tooltip-text" translatable="yes">Enter the password for your network</property>
                         <property name="invisible-char">•</property>
                         <property name="activates-default">True</property>
-                        <property name="primary-icon-activatable">False</property>
-                        <property name="secondary-icon-activatable">False</property>
                         <accessibility>
                           <relation type="labelled-by" target="p4info"/>
                         </accessibility>
