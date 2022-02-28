@@ -97,7 +97,7 @@ static GtkWidget *wizard_nb, *next_btn, *prev_btn, *skip_btn;
 static GtkWidget *country_cb, *language_cb, *timezone_cb;
 static GtkWidget *ap_tv, *psk_label, *prompt, *ip_label;
 static GtkWidget *pwd1_te, *pwd2_te, *psk_te;
-static GtkWidget *pwd_hide, *psk_hide, *eng_chk, *uskey_chk, *uscan_chk;
+static GtkWidget *pwd_hide, *psk_hide, *eng_chk, *uskey_chk, *uscan1_sw, *uscan2_sw, *uscan2_box;
 
 /* Lists for localisation */
 
@@ -115,7 +115,7 @@ char *wifi_if, *init_country, *init_lang, *init_kb, *init_var, *init_tz;
 char *cc, *lc, *city, *ext, *lay, *var;
 char *ssid;
 gint conn_timeout = 0, pulse_timer = 0;
-gboolean reboot, uscan, is_pi = TRUE;
+gboolean reboot, is_pi = TRUE;
 int last_btn = NEXT_BTN;
 int calls;
 
@@ -361,6 +361,7 @@ static void set_marketing_serial (void);
 static gboolean net_available (void);
 static int get_pi_keyboard (void);
 static gboolean srprompt (gpointer data);
+static void uscan_toggle (GtkSwitch *sw, gpointer ptr);
 
 /* Helpers */
 
@@ -1516,7 +1517,7 @@ static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, g
         case PAGE_INTRO :   gtk_button_set_label (GTK_BUTTON (prev_btn), _("_Cancel"));
                             break;
 
-        case PAGE_DONE :    if (reboot || uscan)
+        case PAGE_DONE :    if (reboot)
                             {
                                 gtk_widget_show (prompt);
                                 gtk_button_set_label (GTK_BUTTON (skip_btn), _("_Later"));
@@ -1637,8 +1638,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             }
                             break;
 
-        case PAGE_OSCAN :   uscan = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (uscan_chk));
-                            if (!wifi_if[0])
+        case PAGE_OSCAN :   if (!wifi_if[0])
                                 gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
                             else
                                 gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIAP);
@@ -1694,8 +1694,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Web Browser\nIcon=applications-internet\nURL=/usr/share/applications/chromium-browser.desktop\" > /home/pi/Desktop/chromium-browser.desktop");
 #endif
                             vsystem ("rm -f /etc/xdg/autostart/piwiz.desktop");
-                            if (uscan) vsystem ("raspi-config nonint do_overscan 0");
-                            if (reboot || uscan) vsystem ("sync;reboot");
+                            if (reboot) vsystem ("sync;reboot");
                             gtk_main_quit ();
                             break;
 
@@ -1773,7 +1772,6 @@ static void skip_page (GtkButton* btn, gpointer ptr)
                             vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Web Browser\nIcon=applications-internet\nURL=/usr/share/applications/chromium-browser.desktop\" > /home/pi/Desktop/chromium-browser.desktop");
 #endif
                             vsystem ("rm -f /etc/xdg/autostart/piwiz.desktop");
-                            if (uscan) vsystem ("raspi-config nonint do_overscan 0");
                             gtk_main_quit ();
                             break;
 
@@ -1884,6 +1882,18 @@ static gboolean close_prog (GtkWidget *widget, GdkEvent *event, gpointer data)
     return TRUE;
 }
 
+/* Underscan */
+
+static void uscan_toggle (GtkSwitch *sw, gpointer ptr)
+{
+    int enable = gtk_switch_get_active (sw) ? 0 : 1;
+    if (GTK_WIDGET (sw) == uscan2_sw)
+        vsystem ("raspi-config nonint do_overscan_kms 2 %d", enable);
+    else
+        vsystem ("raspi-config nonint do_overscan_kms 1 %d", enable);
+}
+
+
 /* The dialog... */
 
 int main (int argc, char *argv[])
@@ -1919,7 +1929,6 @@ int main (int argc, char *argv[])
 #else
     reboot = FALSE;
 #endif
-    uscan = FALSE;
     read_inits ();
 
     set_marketing_serial ();
@@ -1967,7 +1976,6 @@ int main (int argc, char *argv[])
     g_signal_connect (psk_hide, "toggled", G_CALLBACK (psk_toggle), NULL);
     eng_chk = (GtkWidget *) gtk_builder_get_object (builder, "p1check1");
     uskey_chk = (GtkWidget *) gtk_builder_get_object (builder, "p1check2");
-    uscan_chk = (GtkWidget *) gtk_builder_get_object (builder, "p7check");
 
     gtk_entry_set_visibility (GTK_ENTRY (pwd1_te), FALSE);
     gtk_entry_set_visibility (GTK_ENTRY (pwd2_te), FALSE);
@@ -1976,7 +1984,16 @@ int main (int argc, char *argv[])
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (psk_hide), TRUE);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (eng_chk), FALSE);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (uskey_chk), FALSE);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (uscan_chk), FALSE);
+
+    // set up underscan
+    uscan1_sw = (GtkWidget *) gtk_builder_get_object (builder, "p7switch1");
+    uscan2_sw = (GtkWidget *) gtk_builder_get_object (builder, "p7switch2");
+    uscan2_box  = (GtkWidget *) gtk_builder_get_object (builder, "p7hbox2");
+    gtk_switch_set_active (GTK_SWITCH (uscan1_sw), !get_status ("raspi-config nonint get_overscan_kms 1"));
+    gtk_switch_set_active (GTK_SWITCH (uscan2_sw), !get_status ("raspi-config nonint get_overscan_kms 2"));
+    g_signal_connect (uscan1_sw, "state-set", G_CALLBACK (uscan_toggle), NULL);
+    g_signal_connect (uscan2_sw, "state-set", G_CALLBACK (uscan_toggle), NULL);
+    if (get_status ("xrandr -q | grep -cw connected") != 2) gtk_widget_hide (uscan2_box);
 
     // set up the locale combo boxes
     read_locales ();

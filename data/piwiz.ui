@@ -668,8 +668,7 @@ Press 'Next' to get started. </property>
                   <object class="GtkLabel" id="p7info">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">You should be able to see the taskbar along the top of the screen.
-Tick the box if some or all of it does not fit on the screen.</property>
+                    <property name="label" translatable="yes">On some monitors, the desktop is larger than the screen and the edges are cut off. You can adjust this here.</property>
                     <property name="wrap">True</property>
                     <property name="max-width-chars">50</property>
                     <property name="xalign">0</property>
@@ -682,28 +681,90 @@ Tick the box if some or all of it does not fit on the screen.</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkCheckButton" id="p7check">
-                    <property name="label" translatable="yes">The taskbar does not fit onto the screen</property>
+                  <object class="GtkBox" id="p7hbox1">
                     <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="receives-default">False</property>
-                    <property name="tooltip-text" translatable="yes">Tick this box if the taskbar is not completely visible</property>
-                    <property name="draw-indicator">True</property>
+                    <property name="can-focus">False</property>
+                    <child>
+                      <object class="GtkLabel" id="p7swlabel1">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="label" translatable="yes">Reduce the size of the desktop on this monitor</property>
+                        <property name="xalign">0</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkSwitch" id="p7switch1">
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="tooltip-text" translatable="yes">Turn on to shrink the desktop to fit the monitor</property>
+                        <accessibility>
+                          <relation type="labelled-by" target="p7swlabel1"/>
+                        </accessibility>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="pack-type">end</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="padding">10</property>
+                    <property name="fill">True</property>
                     <property name="position">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkBox" id="p7hbox2">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <child>
+                      <object class="GtkLabel" id="p7swlabel2">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="label" translatable="yes">Reduce the size of the desktop on the second monitor</property>
+                        <property name="xalign">0</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkSwitch" id="p7switch2">
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="tooltip-text" translatable="yes">Turn on to shrink the desktop to fit the second monitor</property>
+                        <accessibility>
+                          <relation type="labelled-by" target="p7swlabel2"/>
+                        </accessibility>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="pack-type">end</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">3</property>
                   </packing>
                 </child>
                 <child>
                   <object class="GtkLabel" id="p7prompt">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">The change will take effect when the Pi is restarted.
-
-Press 'Next' to save your setting.</property>
+                    <property name="label" translatable="yes">Press 'Next' when the screen looks correct.</property>
                     <property name="wrap">True</property>
                     <property name="max-width-chars">50</property>
                     <property name="xalign">0</property>
@@ -712,7 +773,7 @@ Press 'Next' to save your setting.</property>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
                     <property name="padding">5</property>
-                    <property name="position">3</property>
+                    <property name="position">4</property>
                   </packing>
                 </child>
               </object>
