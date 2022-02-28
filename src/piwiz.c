@@ -82,6 +82,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define JAPAN_FONTS "fonts-vlgothic fonts-mplus"
 
+#define AUDIO_USER "#1000" // may need to change for new wizard user
+
 typedef struct {
     char *msg;
     int prog;
@@ -1868,7 +1870,7 @@ static gboolean srprompt (gpointer data)
     {
         if (net_available () && clock_synced ())
         {
-            char *args[7] = { "/usr/bin/sudo", "-u", "pi", "XDG_RUNTIME_DIR=/run/user/1000", "/usr/bin/aplay", "srprompt.wav", NULL };
+            char *args[7] = { "/usr/bin/sudo", "-u", AUDIO_USER, "XDG_RUNTIME_DIR=/run/user/1000", "/usr/bin/aplay", "srprompt.wav", NULL };
             g_spawn_async (PACKAGE_DATA_DIR, args, NULL, 0, NULL, NULL, NULL, NULL);
         }
         return TRUE;
