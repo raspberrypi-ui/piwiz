@@ -614,7 +614,7 @@ dhcpcd_wpa_scan_cb(DHCPCD_WPA *wpa, _unused void *data)
 		g_critical("No interface for WPA %p", wpa);
 		return;
 	}
-	g_message(_("%s: Received scan results"), i->ifname);
+	//g_message(_("%s: Received scan results"), i->ifname);
 	lerrno = errno;
 	errno = 0;
 	scans = dhcpcd_wi_scans(i);

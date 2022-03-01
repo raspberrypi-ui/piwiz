@@ -1638,6 +1638,10 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                 message (_("The two passwords entered do not match."), 1, 0, -1, FALSE);
                                 break;
                             }
+                            if (g_strcmp0 (gtk_entry_get_text (GTK_ENTRY (user_te)), "pi") || g_strcmp0 (gtk_entry_get_text (GTK_ENTRY (pwd1_te)), "raspberry"))
+                            {
+                                message (_("You have used a known default value for the username or password.\n\nWe strongly recommend you go back and choose something else."), 1, 0, -1, FALSE);
+                            }
                             user = g_strdup (gtk_entry_get_text (GTK_ENTRY (user_te)));
                             pw = g_strdup (crypt (gtk_entry_get_text (GTK_ENTRY (pwd1_te)), crypt_gensalt (NULL, 0, NULL, 0)));
                             if (is_pi) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
@@ -1706,8 +1710,9 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Web Browser\nIcon=applications-internet\nURL=/usr/share/applications/chromium-browser.desktop\" > /home/pi/Desktop/chromium-browser.desktop");
 #endif
                             vsystem ("rm -f /etc/xdg/autostart/piwiz.desktop");
-                            // do the user creation here from globals user and pw
-                            if (reboot) vsystem ("sync;reboot");
+                            vsystem ("/usr/bin/newuser %s %s", user, pw);
+
+                            vsystem ("sync;reboot");
                             gtk_main_quit ();
                             break;
 
