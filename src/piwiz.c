@@ -1853,7 +1853,7 @@ static void set_marketing_serial (void)
     {
         if (access ("/etc/chromium/master_preferences", F_OK) != -1)
         {
-            if (system ("grep -q \"^Revision\\s*:\\s*[ 123][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]11[0-9a-fA-F]$\" /proc/cpuinfo") == 0)
+            if (system ("raspi-config nonint is_pifour") == 0)
                 vsystem ("sed -i /etc/chromium/master_preferences -e s/UNIDENTIFIED/`vcgencmd otp_dump | grep ^6[45] | sha256sum | cut -d ' ' -f 1`/g");
             else
                 vsystem ("sed -i /etc/chromium/master_preferences -e s/UNIDENTIFIED/`cat /proc/cpuinfo | grep Serial | sha256sum | cut -d ' ' -f 1`/g");
