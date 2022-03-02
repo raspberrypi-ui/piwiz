@@ -1495,10 +1495,11 @@ static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, g
     gtk_button_set_label (GTK_BUTTON (prev_btn), _("_Back"));
     gtk_button_set_label (GTK_BUTTON (skip_btn), _("_Skip"));
     gtk_widget_hide (skip_btn);
+    gtk_widget_show (prev_btn);
 
     switch (pagenum)
     {
-        case PAGE_INTRO :   gtk_button_set_label (GTK_BUTTON (prev_btn), _("_Cancel"));
+        case PAGE_INTRO :   gtk_widget_hide (prev_btn);
                             break;
 
         case PAGE_DONE :    if (reboot)
@@ -2083,6 +2084,7 @@ int main (int argc, char *argv[])
         /* touch the flag file to close the old window on restart */
         fclose (fopen (FLAGFILE, "wb"));
     }
+    else gtk_widget_hide (prev_btn);
 
     g_object_unref (builder);
 
