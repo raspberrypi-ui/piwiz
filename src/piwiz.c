@@ -119,7 +119,7 @@ char *cc, *lc, *city, *ext, *lay, *var;
 char *ssid;
 char *user = NULL, *pw = NULL;
 gint conn_timeout = 0, pulse_timer = 0;
-gboolean reboot, is_pi = TRUE;
+gboolean reboot = TRUE, is_pi = TRUE;
 int last_btn = NEXT_BTN;
 int calls;
 
@@ -1713,7 +1713,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             vsystem ("rm -f /etc/xdg/autostart/piwiz.desktop");
                             vsystem ("/usr/bin/newuser %s %s", user, pw);
 
-                            vsystem ("sync;reboot");
+                            if (reboot) vsystem ("sync;reboot");
                             gtk_main_quit ();
                             break;
 
