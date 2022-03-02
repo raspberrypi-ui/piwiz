@@ -83,8 +83,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define JAPAN_FONTS "fonts-vlgothic fonts-mplus"
 
-#define AUDIO_USER "#1000" // may need to change for new wizard user
-
 typedef struct {
     char *msg;
     int prog;
@@ -1887,8 +1885,13 @@ static gboolean srprompt (gpointer data)
     {
         if (net_available () && clock_synced ())
         {
-            char *args[7] = { "/usr/bin/sudo", "-u", AUDIO_USER, "XDG_RUNTIME_DIR=/run/user/1000", "/usr/bin/aplay", "srprompt.wav", NULL };
+            char *udir = getenv ("XDG_RUNTIME_DIR");
+            char *dir = g_strdup_printf ("XDG_RUNTIME_DIR=%s", udir);
+            char *unum = g_strdup_printf ("#%s", udir + 10);
+            char *args[7] = { "/usr/bin/sudo", "-u", unum, dir, "/usr/bin/aplay", "srprompt.wav", NULL };
             g_spawn_async (PACKAGE_DATA_DIR, args, NULL, 0, NULL, NULL, NULL, NULL);
+            g_free (dir);
+            g_free (unum);
         }
         return TRUE;
     }
@@ -1944,10 +1947,9 @@ int main (int argc, char *argv[])
 
 #ifdef HOMESCHOOL
     vsystem ("familyshield on");
-    reboot = TRUE;
-#else
-    reboot = FALSE;
 #endif
+
+    reboot = TRUE;
     read_inits ();
 
     set_marketing_serial ();
