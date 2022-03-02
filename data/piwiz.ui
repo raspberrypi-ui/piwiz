@@ -1098,43 +1098,16 @@ Press 'Next' to check and update software, or 'Skip' to continue without checkin
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkBox" id="p6hbox">
+                  <object class="GtkImage" id="image2">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="spacing">20</property>
-                    <child>
-                      <object class="GtkImage" id="image2">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="pixbuf">corner.png</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">False</property>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel" id="p6appmenu">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="label" translatable="yes">To run applications, click the raspberry icon in the top left corner of the screen to open the menu.</property>
-                        <property name="wrap">True</property>
-                        <property name="max-width-chars">35</property>
-                        <property name="xalign">0</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">False</property>
-                        <property name="padding">10</property>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
+                    <property name="pixbuf">raspberry-pi-logo.png</property>
+                    <property name="pixel-size">96</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="padding">15</property>
+                    <property name="fill">True</property>
+                    <property name="padding">20</property>
                     <property name="position">2</property>
                   </packing>
                 </child>

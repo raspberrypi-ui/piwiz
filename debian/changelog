@@ -1,3 +1,9 @@
+piwiz (0.39) bullseye; urgency=medium
+
+  * Add user creation
+
+ -- Simon Long <simon@raspberrypi.com>  Wed, 02 Mar 2022 12:09:30 +0000
+
 piwiz (0.38) bullseye; urgency=medium
 
   * Tidy homeschool Chromium shortcuts

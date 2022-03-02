@@ -1503,9 +1503,7 @@ static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, g
         case PAGE_DONE :    if (reboot)
                             {
                                 gtk_widget_show (prompt);
-                                gtk_button_set_label (GTK_BUTTON (skip_btn), _("_Later"));
                                 gtk_button_set_label (GTK_BUTTON (next_btn), _("_Restart"));
-                                gtk_widget_show (skip_btn);
                             }
                             else
                             {
@@ -1637,7 +1635,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                 message (_("The two passwords entered do not match."), 1, 0, -1, FALSE);
                                 break;
                             }
-                            if (g_strcmp0 (gtk_entry_get_text (GTK_ENTRY (user_te)), "pi") || g_strcmp0 (gtk_entry_get_text (GTK_ENTRY (pwd1_te)), "raspberry"))
+                            if (!g_strcmp0 (gtk_entry_get_text (GTK_ENTRY (user_te)), "pi") || !g_strcmp0 (gtk_entry_get_text (GTK_ENTRY (pwd1_te)), "raspberry"))
                             {
                                 message (_("You have used a known default value for the username or password.\n\nWe strongly recommend you go back and choose something else."), 1, 0, -1, FALSE);
                             }
