@@ -1759,15 +1759,6 @@ static void prev_page (GtkButton* btn, gpointer ptr)
                             }
                             break;
 
-        case PAGE_INTRO :
-#ifdef HOMESCHOOL
-                            vsystem ("cp /usr/share/applications/chromium-browser.desktop /etc/xdg/autostart/");
-                            vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Web Browser\nIcon=applications-internet\nURL=/usr/share/applications/chromium-browser.desktop\" > /home/pi/Desktop/chromium-browser.desktop");
-#endif
-                            vsystem ("rm -f /etc/xdg/autostart/piwiz.desktop");
-                            gtk_main_quit ();
-                            break;
-
         case PAGE_WIFIAP :  if (is_pi)
                                 gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
                             else
