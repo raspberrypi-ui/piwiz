@@ -1790,15 +1790,6 @@ static void skip_page (GtkButton* btn, gpointer ptr)
         case PAGE_UPDATE :  gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_DONE);
                             break;
 
-        case PAGE_DONE :
-#ifdef HOMESCHOOL
-                            vsystem ("cp /usr/share/applications/chromium-browser.desktop /etc/xdg/autostart/");
-                            vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Web Browser\nIcon=applications-internet\nURL=/usr/share/applications/chromium-browser.desktop\" > /home/pi/Desktop/chromium-browser.desktop");
-#endif
-                            vsystem ("rm -f /etc/xdg/autostart/piwiz.desktop");
-                            gtk_main_quit ();
-                            break;
-
         default :           gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
                             break;
     }
