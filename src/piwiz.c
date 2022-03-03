@@ -1704,7 +1704,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
         case PAGE_DONE :
 #ifdef HOMESCHOOL
                             vsystem ("cp /usr/share/applications/chromium-browser.desktop /etc/xdg/autostart/");
-                            vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Web Browser\nIcon=applications-internet\nURL=/usr/share/applications/chromium-browser.desktop\" > /home/pi/Desktop/chromium-browser.desktop");
+                            vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Web Browser\nIcon=applications-internet\nURL=/usr/share/applications/chromium-browser.desktop\" > /home/%s/Desktop/chromium-browser.desktop", user);
 #endif
                             // rename the pi user to the new user and set the password
                             vsystem ("/usr/bin/newuser %s %s", user, pw);
