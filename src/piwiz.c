@@ -1706,8 +1706,17 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             vsystem ("cp /usr/share/applications/chromium-browser.desktop /etc/xdg/autostart/");
                             vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Web Browser\nIcon=applications-internet\nURL=/usr/share/applications/chromium-browser.desktop\" > /home/pi/Desktop/chromium-browser.desktop");
 #endif
-                            vsystem ("rm -f /etc/xdg/autostart/piwiz.desktop");
+                            // rename the pi user to the new user and set the password
                             vsystem ("/usr/bin/newuser %s %s", user, pw);
+
+                            // remove the autostart of the wizard
+                            vsystem ("rm -f /etc/xdg/autostart/piwiz.desktop");
+
+                            // set the new user to be the default autologin user
+                            vsystem ("sed /etc/lightdm/lightdm.conf -i -e \"s/^#\\?autologin-user=.*/autologin-user=%s/\"", user);
+
+                            // set up a self-deleting autostart to delete the wizard user
+                            vsystem ("echo \"[Desktop Entry]\nType=Application\nName=Delete Wizard User\nNoDisplay=true\nExec=sh -c 'sudo userdel -r mytest;sudo rm /etc/xdg/autostart/deluser.desktop'\" > /etc/xdg/autostart/deluser.desktop");
 
                             if (reboot) vsystem ("sync;reboot");
                             gtk_main_quit ();
