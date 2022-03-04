@@ -1716,7 +1716,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             vsystem ("sed /etc/lightdm/lightdm.conf -i -e \"s/^#\\?autologin-user=.*/autologin-user=%s/\"", user);
 
                             // set up a self-deleting autostart to delete the wizard user
-                            vsystem ("echo \"[Desktop Entry]\nType=Application\nName=Delete Wizard User\nNoDisplay=true\nExec=sh -c 'sudo userdel -r mytest;sudo rm /etc/xdg/autostart/deluser.desktop'\" > /etc/xdg/autostart/deluser.desktop");
+                            vsystem ("echo \"[Desktop Entry]\nType=Application\nName=Delete Wizard User\nNoDisplay=true\nExec=sh -c 'sudo userdel -r rpi-first-boot-wizard;sudo rm /etc/xdg/autostart/deluser.desktop'\" > /etc/xdg/autostart/deluser.desktop");
 
                             if (reboot) vsystem ("sync;reboot");
                             gtk_main_quit ();
