@@ -1712,9 +1712,6 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             // remove the autostart of the wizard
                             vsystem ("rm -f /etc/xdg/autostart/piwiz.desktop");
 
-                            // set the new user to be the default autologin user
-                            vsystem ("sed /etc/lightdm/lightdm.conf -i -e \"s/^#\\?autologin-user=.*/autologin-user=%s/\"", user);
-
                             // set up a self-deleting autostart to delete the wizard user
                             vsystem ("echo \"[Desktop Entry]\nType=Application\nName=Delete Wizard User\nNoDisplay=true\nExec=sh -c 'sudo userdel -r rpi-first-boot-wizard;sudo rm /etc/xdg/autostart/deluser.desktop'\" > /etc/xdg/autostart/deluser.desktop");
 
