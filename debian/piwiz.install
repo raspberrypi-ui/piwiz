@@ -4,3 +4,4 @@ po/en_GB.gmo => /usr/share/locale/en_GB/LC_MESSAGES/piwiz.mo
 data/piwiz.ui usr/share/piwiz
 data/raspberry-pi-logo.png usr/share/piwiz
 data/srprompt.wav usr/share/piwiz
+data/rewiz usr/bin
