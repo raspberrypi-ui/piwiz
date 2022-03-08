@@ -115,7 +115,7 @@ GtkListStore *ap_list;
 char *wifi_if, *init_country, *init_lang, *init_kb, *init_var, *init_tz;
 char *cc, *lc, *city, *ext, *lay, *var;
 char *ssid;
-char *user = NULL, *pw = NULL;
+char *user = NULL, *pw = NULL, *chuser = NULL;
 gint conn_timeout = 0, pulse_timer = 0;
 gboolean reboot = TRUE, is_pi = TRUE;
 int last_btn = NEXT_BTN;
@@ -124,126 +124,126 @@ int calls;
 /* Map from country code to keyboard */
 
 static const char keyboard_map[][13] = {
-	"",	    "AL",	"al",	    "",
-	"",	    "AZ",	"az",	    "",
-	"",	    "BD",	"bd",	    "",     //us
-	"",	    "BE",	"be",	    "",
-	"",	    "BG",	"bg",	    "",     //us
-	"",	    "BR",	"br",	    "",
-	"",	    "BT",	"bt",	    "",     //us
-	"",	    "BY",	"by",	    "",     //us
-	"fr",	"CA",	"ca",	    "",
-	"",	    "CA",	"us",	    "",
-	"de",	"CH",	"ch",	    "",
-	"fr",	"CH",	"ch",	    "fr",
-	"",	    "CH",	"ch",	    "",
-	"",	    "CZ",	"cz",	    "",
-	"",	    "DK",	"dk",	    "",
-	"",	    "EE",	"ee",	    "",
-	"ast",	"ES",	"es",	    "ast",
-	"bo",	"",	    "cn",	    "tib",  //us
-	"ca",	"ES",	"es",	    "cat",
-	"",	    "ES",	"es",	    "",
-	"",	    "ET",	"et",	    "",     //us
-	"se",	"FI",	"fi",	    "smi",
-	"",	    "FI",	"fi",	    "",
-	"",	    "FR",	"fr",	    "latin9",
-	"",	    "GB",	"gb",	    "",
-	"",	    "GG",	"gb",	    "",
-	"",	    "HU",	"hu",	    "",
-	"",	    "IE",	"ie",	    "",
-	"",	    "IL",	"il",	    "",     //us
-	"",	    "IM",	"gb",	    "",
-	"",	    "IR",	"ir",	    "",     //us
-	"",	    "IS",	"is",	    "",
-	"",	    "IT",	"it",	    "",
-	"",	    "JE",	"gb",	    "",
-	"",	    "JP",	"jp",	    "",
-	"",	    "LT",	"lt",	    "",
-	"",	    "LV",	"lv",	    "",
-	"",	    "KG",	"kg",	    "",     //us
-	"",	    "KH",	"kh",	    "",     //us
-	"",	    "KR",	"kr",	    "kr104",
-	"",	    "KZ",	"kz",	    "",     //us
-	"",	    "LK",	"lk",	    "",     //us
-	"",	    "MA",	"ma",	    "",     //us
-	"",	    "MK",	"mk",	    "",     //us
-	"",	    "NL",	"us",	    "",
-	"",	    "MM",	"mm",	    "",     //us
-	"",	    "MN",	"mn",	    "",     //us
-	"",	    "MT",	"mt",	    "",
-	"se",	"NO",	"no",	    "smi",
-	"",	    "NO",	"no",	    "",
-	"",	    "NP",	"np",	    "",     //us
-	"",	    "PH",	"ph",	    "",
-	"",	    "PL",	"pl",	    "",
-	"",	    "PT",	"pt",	    "",
-	"",	    "RO",	"ro",	    "",
-	"",	    "RU",	"ru",	    "",     //us
-	"se",	"SE",	"se",	    "smi",
-	"",	    "SK",	"sk",	    "",
-	"",	    "SI",	"si",	    "",
-	"tg",	"",	    "tj",	    "",     //us
-	"",	    "TJ",	"tj",	    "",     //us
-	"",	    "TH",	"th",	    "",     //us
-	"ku",	"TR",	"tr",	    "ku",
-	"",	    "TR",	"tr",	    "",
-	"",	    "UA",	"ua",	    "",     //us
-	"en",	"US",	"us",	    "",
-	"",	    "VN",	"us",	    "",
-	"",	    "ZA",	"za",	    "",
-	"",	    "AR",	"latam",	"",
-	"",	    "BO",	"latam",	"",
-	"",	    "CL",	"latam",	"",
-	"",	    "CO",	"latam",	"",
-	"",	    "CR",	"latam",	"",
-	"",	    "DO",	"latam",	"",
-	"",	    "EC",	"latam",	"",
-	"",	    "GT",	"latam",	"",
-	"",	    "HN",	"latam",	"",
-	"",	    "MX",	"latam",	"",
-	"",	    "NI",	"latam",	"",
-	"",	    "PA",	"latam",	"",
-	"",	    "PE",	"latam",	"",
-	"es",	"PR",	"latam",	"",
-	"",	    "PY",	"latam",	"",
-	"",	    "SV",	"latam",	"",
-	"es",	"US",	"latam",	"",
-	"",	    "UY",	"latam",	"",
-	"",	    "VE",	"latam",    "",
-	"ar",	"",	    "ara",	    "",     //us
-	"bn",	"",	    "in",	    "ben",  //us
-	"bs",	"",	    "ba",	    "",
-	"de",	"LI",	"ch",	    "",
-	"de",	"",	    "de",	    "",
-	"el",	"",	    "gr",	    "",     //us
-	"eo",	"",     "epo",      "",
-	"fr",	"",	    "fr",	    "latin9",
-	"gu",	"",	    "in",	    "guj",  //us
-	"hi",	"",	    "in",	    "",     //us
-	"hr",	"",	    "hr",	    "",
-	"hy",	"",	    "am",	    "",     //us
-	"ka",	"",	    "ge",	    "",     //us
-	"kn",	"",	    "in",	    "kan",  //us
-	"ku",	"",	    "tr",	    "ku",
-	"lo",	"",	    "la",	    "",     //us
-	"mr",	"",	    "in",	    "",     //us
-	"ml",	"",	    "in",	    "mal",  //us
-	"my",	"",	    "mm",	    "",     //us
-	"ne",	"",	    "np",	    "",     //us
-	"os",	"",	    "ru",	    "os",
-	"pa",	"",	    "in",	    "guru", //us
-	"si",	"",	    "si",	    "sin_phonetic",     //us
-	"sr",	"",	    "rs",	    "latin",
-	"sv",	"",	    "se",	    "",
-	"ta",	"",	    "in",	    "tam",  //us
-	"te",	"",	    "in",	    "tel",  //us
-	"tg",	"",	    "tj",	    "",     //us
-	"the",	"",	    "np",	    "",     //us
-	"tl",	"",	    "ph",	    "",
-	"ug",	"",	    "cn",	    "ug",   //us
-	"zh",	"",	    "cn",	    "",
-	"",	    "",	    "us",	    ""
+    "",     "AL",   "al",       "",
+    "",     "AZ",   "az",       "",
+    "",     "BD",   "bd",       "",     //us
+    "",     "BE",   "be",       "",
+    "",     "BG",   "bg",       "",     //us
+    "",     "BR",   "br",       "",
+    "",     "BT",   "bt",       "",     //us
+    "",     "BY",   "by",       "",     //us
+    "fr",   "CA",   "ca",       "",
+    "",     "CA",   "us",       "",
+    "de",   "CH",   "ch",       "",
+    "fr",   "CH",   "ch",       "fr",
+    "",     "CH",   "ch",       "",
+    "",     "CZ",   "cz",       "",
+    "",     "DK",   "dk",       "",
+    "",     "EE",   "ee",       "",
+    "ast",  "ES",   "es",       "ast",
+    "bo",   "",     "cn",       "tib",  //us
+    "ca",   "ES",   "es",       "cat",
+    "",     "ES",   "es",       "",
+    "",     "ET",   "et",       "",     //us
+    "se",   "FI",   "fi",       "smi",
+    "",     "FI",   "fi",       "",
+    "",     "FR",   "fr",       "latin9",
+    "",     "GB",   "gb",       "",
+    "",     "GG",   "gb",       "",
+    "",     "HU",   "hu",       "",
+    "",     "IE",   "ie",       "",
+    "",     "IL",   "il",       "",     //us
+    "",     "IM",   "gb",       "",
+    "",     "IR",   "ir",       "",     //us
+    "",     "IS",   "is",       "",
+    "",     "IT",   "it",       "",
+    "",     "JE",   "gb",       "",
+    "",     "JP",   "jp",       "",
+    "",     "LT",   "lt",       "",
+    "",     "LV",   "lv",       "",
+    "",     "KG",   "kg",       "",     //us
+    "",     "KH",   "kh",       "",     //us
+    "",     "KR",   "kr",       "kr104",
+    "",     "KZ",   "kz",       "",     //us
+    "",     "LK",   "lk",       "",     //us
+    "",     "MA",   "ma",       "",     //us
+    "",     "MK",   "mk",       "",     //us
+    "",     "NL",   "us",       "",
+    "",     "MM",   "mm",       "",     //us
+    "",     "MN",   "mn",       "",     //us
+    "",     "MT",   "mt",       "",
+    "se",   "NO",   "no",       "smi",
+    "",     "NO",   "no",       "",
+    "",     "NP",   "np",       "",     //us
+    "",     "PH",   "ph",       "",
+    "",     "PL",   "pl",       "",
+    "",     "PT",   "pt",       "",
+    "",     "RO",   "ro",       "",
+    "",     "RU",   "ru",       "",     //us
+    "se",   "SE",   "se",       "smi",
+    "",     "SK",   "sk",       "",
+    "",     "SI",   "si",       "",
+    "tg",   "",     "tj",       "",     //us
+    "",     "TJ",   "tj",       "",     //us
+    "",     "TH",   "th",       "",     //us
+    "ku",   "TR",   "tr",       "ku",
+    "",     "TR",   "tr",       "",
+    "",     "UA",   "ua",       "",     //us
+    "en",   "US",   "us",       "",
+    "",     "VN",   "us",       "",
+    "",     "ZA",   "za",       "",
+    "",     "AR",   "latam",    "",
+    "",     "BO",   "latam",    "",
+    "",     "CL",   "latam",    "",
+    "",     "CO",   "latam",    "",
+    "",     "CR",   "latam",    "",
+    "",     "DO",   "latam",    "",
+    "",     "EC",   "latam",    "",
+    "",     "GT",   "latam",    "",
+    "",     "HN",   "latam",    "",
+    "",     "MX",   "latam",    "",
+    "",     "NI",   "latam",    "",
+    "",     "PA",   "latam",    "",
+    "",     "PE",   "latam",    "",
+    "es",   "PR",   "latam",    "",
+    "",     "PY",   "latam",    "",
+    "",     "SV",   "latam",    "",
+    "es",   "US",   "latam",    "",
+    "",     "UY",   "latam",    "",
+    "",     "VE",   "latam",    "",
+    "ar",   "",     "ara",      "",     //us
+    "bn",   "",     "in",       "ben",  //us
+    "bs",   "",     "ba",       "",
+    "de",   "LI",   "ch",       "",
+    "de",   "",     "de",       "",
+    "el",   "",     "gr",       "",     //us
+    "eo",   "",     "epo",      "",
+    "fr",   "",     "fr",       "latin9",
+    "gu",   "",     "in",       "guj",  //us
+    "hi",   "",     "in",       "",     //us
+    "hr",   "",     "hr",       "",
+    "hy",   "",     "am",       "",     //us
+    "ka",   "",     "ge",       "",     //us
+    "kn",   "",     "in",       "kan",  //us
+    "ku",   "",     "tr",       "ku",
+    "lo",   "",     "la",       "",     //us
+    "mr",   "",     "in",       "",     //us
+    "ml",   "",     "in",       "mal",  //us
+    "my",   "",     "mm",       "",     //us
+    "ne",   "",     "np",       "",     //us
+    "os",   "",     "ru",       "os",
+    "pa",   "",     "in",       "guru", //us
+    "si",   "",     "si",       "sin_phonetic",     //us
+    "sr",   "",     "rs",       "latin",
+    "sv",   "",     "se",       "",
+    "ta",   "",     "in",       "tam",  //us
+    "te",   "",     "in",       "tel",  //us
+    "tg",   "",     "tj",       "",     //us
+    "the",  "",     "np",       "",     //us
+    "tl",   "",     "ph",       "",
+    "ug",   "",     "cn",       "ug",   //us
+    "zh",   "",     "cn",       "",
+    "",     "",     "us",       ""
 };
 
 #define MAX_KBS 17
@@ -1500,6 +1500,9 @@ static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, g
         case PAGE_INTRO :   gtk_widget_hide (prev_btn);
                             break;
 
+        case PAGE_PASSWD :  if (chuser != NULL) gtk_widget_hide (prev_btn);
+                            break;
+
         case PAGE_DONE :    if (reboot)
                             {
                                 gtk_widget_show (prompt);
@@ -1641,7 +1644,8 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             }
                             user = g_strdup (gtk_entry_get_text (GTK_ENTRY (user_te)));
                             pw = g_strdup (crypt (gtk_entry_get_text (GTK_ENTRY (pwd1_te)), crypt_gensalt (NULL, 0, NULL, 0)));
-                            if (is_pi) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
+                            if (chuser != NULL) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_DONE);
+                            else if (is_pi) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
                             else
                             {
                                 if (!wifi_if[0])
@@ -1707,7 +1711,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Web Browser\nIcon=applications-internet\nURL=/usr/share/applications/chromium-browser.desktop\" > /home/%s/Desktop/chromium-browser.desktop", user);
 #endif
                             // rename the pi user to the new user and set the password
-                            vsystem ("/usr/bin/mvuser pi %s %s", user, pw);
+                            vsystem ("/usr/bin/mvuser %s %s %s", chuser ? chuser : "pi", user, pw);
 
                             if (reboot) vsystem ("sync;reboot");
                             gtk_main_quit ();
@@ -1754,6 +1758,12 @@ static void prev_page (GtkButton* btn, gpointer ptr)
                                 gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
                             else
                                 gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
+                            break;
+
+        case PAGE_DONE :    if (chuser != NULL)
+                                gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
+                            else
+                                gtk_notebook_prev_page (GTK_NOTEBOOK (wizard_nb));
                             break;
 
         default :           gtk_notebook_prev_page (GTK_NOTEBOOK (wizard_nb));
@@ -2065,6 +2075,12 @@ int main (int argc, char *argv[])
 
         /* touch the flag file to close the old window on restart */
         fclose (fopen (FLAGFILE, "wb"));
+    }
+    else if (argc == 3 && !g_strcmp0 (argv[1], "--useronly"))
+    {
+        chuser = g_strdup (argv[2]);
+        gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
+        gtk_widget_hide (prev_btn);
     }
     else gtk_widget_hide (prev_btn);
 
