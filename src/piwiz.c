@@ -1509,7 +1509,7 @@ static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, g
                                 gtk_label_set_text (GTK_LABEL (rename_info), msg);
                                 g_free (msg);
                                 gtk_label_set_text (GTK_LABEL (rename_prompt), _("Press 'Next' to rename the user."));
-                                gtk_widget_hide (prev_btn);
+                                gtk_button_set_label (GTK_BUTTON (prev_btn), _("_Cancel"));
                             }
                             break;
 
@@ -1762,6 +1762,17 @@ static void prev_page (GtkButton* btn, gpointer ptr)
     last_btn = PREV_BTN;
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
     {
+        case PAGE_PASSWD :  if (chuser != NULL)
+                            {
+                                // call the script to cancel renaming and reset original user
+                                vsystem ("/usr/bin/cancel-rename %s", chuser);
+                                vsystem ("sync;reboot");
+                                gtk_main_quit ();
+                            }
+                            else
+                                gtk_notebook_prev_page (GTK_NOTEBOOK (wizard_nb));
+                            break;
+
         case PAGE_UPDATE :  if (wifi_if[0]) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIAP);
                             else
                             {
