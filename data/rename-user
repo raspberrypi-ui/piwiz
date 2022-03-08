@@ -1,14 +1,11 @@
 #!/bin/sh
 
 # create the first boot user
-sudo adduser rpi-first-boot-wizard --gecos ',,,,'
-sudo adduser rpi-first-boot-wizard adm
-sudo adduser rpi-first-boot-wizard sudo
-sudo adduser rpi-first-boot-wizard audio
-sudo adduser rpi-first-boot-wizard video
-sudo adduser rpi-first-boot-wizard users
-sudo adduser rpi-first-boot-wizard input
-sudo adduser rpi-first-boot-wizard netdev
+sudo adduser rpi-first-boot-wizard --gecos ',,,,' --add_extra_groups --quiet --disabled-password > /dev/null
+sudo adduser rpi-first-boot-wizard adm --quiet > /dev/null
+sudo adduser rpi-first-boot-wizard sudo --quiet > /dev/null
+sudo adduser rpi-first-boot-wizard input --quiet > /dev/null
+sudo adduser rpi-first-boot-wizard netdev --quiet > /dev/null
 echo "rpi-first-boot-wizard ALL=(ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers.d/010_wiz-nopasswd > /dev/null
 
 # set autologin
@@ -20,4 +17,6 @@ sudo sed /etc/lightdm/lightdm.conf -i -e "s/^\(#\|\)autologin-user=.*/autologin-
 # create the wizard autostart...
 echo "[Desktop Entry]\nType=Application\nName=Raspberry Pi First-Run Wizard\nExec=sudo -AE piwiz --useronly $USER\nStartupNotify=true" | sudo tee /etc/xdg/autostart/piwiz.desktop > /dev/null
 
-
+echo "Rebooting - please wait..."
+sync
+reboot
