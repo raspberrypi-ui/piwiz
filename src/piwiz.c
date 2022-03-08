@@ -99,6 +99,8 @@ static GtkWidget *country_cb, *language_cb, *timezone_cb;
 static GtkWidget *ap_tv, *psk_label, *prompt, *ip_label;
 static GtkWidget *user_te, *pwd1_te, *pwd2_te, *psk_te;
 static GtkWidget *pwd_hide, *psk_hide, *eng_chk, *uskey_chk, *uscan1_sw, *uscan2_sw, *uscan2_box;
+static GtkWidget *rename_title, *rename_info, *rename_prompt;
+static GtkWidget *done_title, *done_info, *done_prompt;
 
 /* Lists for localisation */
 
@@ -1500,13 +1502,29 @@ static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, g
         case PAGE_INTRO :   gtk_widget_hide (prev_btn);
                             break;
 
-        case PAGE_PASSWD :  if (chuser != NULL) gtk_widget_hide (prev_btn);
+        case PAGE_PASSWD :  if (chuser != NULL)
+                            {
+                                gtk_label_set_markup (GTK_LABEL (rename_title), _("<b>Rename User</b>"));
+                                char *msg = g_strdup_printf (_("Your current user '%s' will be renamed.\n\nThe new username can only contain lower-case letters, digits and hyphens, and must start with a letter."), chuser);
+                                gtk_label_set_text (GTK_LABEL (rename_info), msg);
+                                g_free (msg);
+                                gtk_label_set_text (GTK_LABEL (rename_prompt), _("Press 'Next' to rename the user."));
+                                gtk_widget_hide (prev_btn);
+                            }
                             break;
 
         case PAGE_DONE :    if (reboot)
                             {
                                 gtk_widget_show (prompt);
                                 gtk_button_set_label (GTK_BUTTON (next_btn), _("_Restart"));
+                                if (chuser != NULL)
+                                {
+                                    gtk_label_set_markup (GTK_LABEL (done_title), _("<b>User Renamed</b>"));
+                                    char *msg = g_strdup_printf (_("The '%s' user has been renamed to '%s' and the new password set."), chuser, user);
+                                    gtk_label_set_text (GTK_LABEL (done_info), msg);
+                                    g_free (msg);
+                                    gtk_label_set_text (GTK_LABEL (done_prompt), _("Press 'Restart' to reboot and login as the new user."));
+                                }
                             }
                             else
                             {
@@ -1981,6 +1999,12 @@ int main (int argc, char *argv[])
     psk_te = (GtkWidget *) gtk_builder_get_object (builder, "p4psk");
     psk_label = (GtkWidget *) gtk_builder_get_object (builder, "p4info");
     prompt = (GtkWidget *) gtk_builder_get_object (builder, "p6prompt");
+    rename_title = (GtkWidget *) gtk_builder_get_object (builder, "p2title");
+    rename_info = (GtkWidget *) gtk_builder_get_object (builder, "p2info");
+    rename_prompt = (GtkWidget *) gtk_builder_get_object (builder, "p2prompt");
+    done_title = (GtkWidget *) gtk_builder_get_object (builder, "p6title");
+    done_info = (GtkWidget *) gtk_builder_get_object (builder, "p6info");
+    done_prompt = (GtkWidget *) gtk_builder_get_object (builder, "p6prompt");
 
     pwd_hide = (GtkWidget *) gtk_builder_get_object (builder, "p2check");
     g_signal_connect (pwd_hide, "toggled", G_CALLBACK (pwd_toggle), NULL);
@@ -2080,7 +2104,6 @@ int main (int argc, char *argv[])
     {
         chuser = g_strdup (argv[2]);
         gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
-        gtk_widget_hide (prev_btn);
     }
     else gtk_widget_hide (prev_btn);
 
