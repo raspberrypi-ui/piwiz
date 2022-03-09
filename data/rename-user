@@ -1,5 +1,7 @@
 #!/bin/sh
 
+echo "Preparing to run wizard - please wait..."
+
 # create the first boot user
 sudo adduser rpi-first-boot-wizard --gecos ',,,,' --add_extra_groups --quiet --disabled-password > /dev/null
 sudo adduser rpi-first-boot-wizard adm --quiet > /dev/null
@@ -15,7 +17,7 @@ echo "[Service]\nExecStart=\nExecStart=-/sbin/agetty --autologin rpi-first-boot-
 sudo sed /etc/lightdm/lightdm.conf -i -e "s/^\(#\|\)autologin-user=.*/autologin-user=rpi-first-boot-wizard/"
 
 # create the wizard autostart...
-echo "[Desktop Entry]\nType=Application\nName=Raspberry Pi First-Run Wizard\nExec=sudo -AE piwiz --useronly $USER\nStartupNotify=true" | sudo tee /etc/xdg/autostart/piwiz.desktop > /dev/null
+echo "[Desktop Entry]\nType=Application\nName=Raspberry Pi First-Run Wizard\nExec=sh -c 'gsettings set org.gnome.mutter center-new-windows true; sudo -AE piwiz --useronly $USER'\nStartupNotify=true" | sudo tee /etc/xdg/autostart/piwiz.desktop > /dev/null
 
 echo "Rebooting - please wait..."
 sync

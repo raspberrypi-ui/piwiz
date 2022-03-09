@@ -655,8 +655,7 @@ static gboolean ok_clicked (GtkButton *button, gpointer data)
 
 static gboolean loc_done (gpointer data)
 {
-    char *lang, *language, *lcall, *loc;
-    gint x, y;
+    char *lang, *language, *lcall;
 
     remove (FLAGFILE);
     sync ();
@@ -671,15 +670,11 @@ static gboolean loc_done (gpointer data)
         putenv (language);
         putenv (lcall);
 
-        gtk_window_get_position (GTK_WINDOW (main_dlg), &x, &y);
-        loc = g_strdup_printf ("%d:%d", x, y);
-
 #ifdef HOMESCHOOL
-        execl ("/usr/bin/piwizhs", "piwizhs", "--langset", loc, lc, cc, NULL);
+        execl ("/usr/bin/piwizhs", "piwizhs", "--langset", lc, cc, NULL);
 #else
-        execl ("/usr/bin/piwiz", "piwiz", "--langset", loc, lc, cc, NULL);
+        execl ("/usr/bin/piwiz", "piwiz", "--langset", lc, cc, NULL);
 #endif
-        g_free (loc);
         exit (0);
     }
     else
@@ -1934,7 +1929,6 @@ static void uscan_toggle (GtkSwitch *sw, gpointer ptr)
         vsystem ("raspi-config nonint do_overscan_kms 1 %d", enable);
 }
 
-
 /* The dialog... */
 
 int main (int argc, char *argv[])
@@ -2099,12 +2093,8 @@ int main (int argc, char *argv[])
     /* if restarting after language set, skip to password page */
     if (argc >= 3 && !g_strcmp0 (argv[1], "--langset"))
     {
-        gint x, y;
-        sscanf (argv[2], "%d:%d", &x, &y);
-        gtk_window_move (GTK_WINDOW (main_dlg), x, y);
-
-        if (argc >= 4) lc = g_strdup (argv[3]);
-        if (argc >= 5) cc = g_strdup (argv[4]);
+        if (argc >= 3) lc = g_strdup (argv[2]);
+        if (argc >= 4) cc = g_strdup (argv[3]);
 
         gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
 
