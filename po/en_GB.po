@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: piwiz 1.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-02 13:04+0100\n"
+"POT-Creation-Date: 2022-03-10 11:38+0000\n"
 "PO-Revision-Date: 2019-02-18 15:13+0000\n"
 "Last-Translator: Simon Long <simon@raspberrypi.org>\n"
 "Language-Team: English (British)\n"
@@ -17,31 +17,31 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../src/piwiz.c:1106 ../src/piwiz.c:1531
+#: ../src/piwiz.c:1092 ../src/piwiz.c:1535
 msgid "Searching for networks - please wait..."
 msgstr "Searching for networks - please wait..."
 
-#: ../src/piwiz.c:1126
+#: ../src/piwiz.c:1112
 msgid "Failed to connect to network."
 msgstr "Failed to connect to network."
 
-#: ../src/piwiz.c:1247
+#: ../src/piwiz.c:1233
 msgid "Reading update list - please wait..."
 msgstr "Reading update list - please wait..."
 
-#: ../src/piwiz.c:1249
+#: ../src/piwiz.c:1235
 msgid "Downloading updates - please wait..."
 msgstr "Downloading updates - please wait..."
 
-#: ../src/piwiz.c:1256
+#: ../src/piwiz.c:1242
 msgid "Installing updates - please wait..."
 msgstr "Installing updates - please wait..."
 
-#: ../src/piwiz.c:1258 ../src/piwiz.c:1389
+#: ../src/piwiz.c:1244 ../src/piwiz.c:1375
 msgid "Installing languages - please wait..."
 msgstr "Installing languages - please wait..."
 
-#: ../src/piwiz.c:1275
+#: ../src/piwiz.c:1261
 #, c-format
 msgid ""
 "Error getting updates.\n"
@@ -50,11 +50,11 @@ msgstr ""
 "Error getting updates.\n"
 "%s"
 
-#: ../src/piwiz.c:1286 ../src/piwiz.c:1326
+#: ../src/piwiz.c:1272 ../src/piwiz.c:1312
 msgid "System is up to date"
 msgstr "System is up to date"
 
-#: ../src/piwiz.c:1304
+#: ../src/piwiz.c:1290
 #, c-format
 msgid ""
 "Error comparing versions.\n"
@@ -63,11 +63,11 @@ msgstr ""
 "Error comparing versions.\n"
 "%s"
 
-#: ../src/piwiz.c:1315
+#: ../src/piwiz.c:1301
 msgid "Getting updates - please wait..."
 msgstr "Getting updates - please wait..."
 
-#: ../src/piwiz.c:1340
+#: ../src/piwiz.c:1326
 #, c-format
 msgid ""
 "Error installing languages.\n"
@@ -76,11 +76,11 @@ msgstr ""
 "Error installing languages.\n"
 "%s"
 
-#: ../src/piwiz.c:1346 ../src/piwiz.c:1397 ../src/piwiz.c:1440
+#: ../src/piwiz.c:1332 ../src/piwiz.c:1383 ../src/piwiz.c:1426
 msgid "Comparing versions - please wait..."
 msgstr "Comparing versions - please wait..."
 
-#: ../src/piwiz.c:1361
+#: ../src/piwiz.c:1347
 #, c-format
 msgid ""
 "Error finding languages.\n"
@@ -89,7 +89,7 @@ msgstr ""
 "Error finding languages.\n"
 "%s"
 
-#: ../src/piwiz.c:1414
+#: ../src/piwiz.c:1400
 #, c-format
 msgid ""
 "Error checking for updates.\n"
@@ -98,76 +98,132 @@ msgstr ""
 "Error checking for updates.\n"
 "%s"
 
-#: ../src/piwiz.c:1434
+#: ../src/piwiz.c:1420
 msgid "Finding languages - please wait..."
 msgstr "Finding languages - please wait..."
 
-#: ../src/piwiz.c:1483 ../src/piwiz.c:1700
+#: ../src/piwiz.c:1469 ../src/piwiz.c:1737
 msgid "Checking for updates - please wait..."
 msgstr "Checking for updates - please wait..."
 
-#: ../src/piwiz.c:1492
+#: ../src/piwiz.c:1478
 msgid "Could not sync time - unable to check for updates"
 msgstr "Could not sync time - unable to check for updates"
 
-#: ../src/piwiz.c:1503 ../data/piwiz.ui.h:58
+#: ../src/piwiz.c:1489 ../data/piwiz.ui.h:60
 msgid "_Next"
 msgstr "_Next"
 
-#: ../src/piwiz.c:1504
+#: ../src/piwiz.c:1490
 msgid "_Back"
 msgstr "_Back"
 
-#: ../src/piwiz.c:1505 ../data/piwiz.ui.h:57
+#: ../src/piwiz.c:1491 ../data/piwiz.ui.h:59
 msgid "_Skip"
 msgstr "_Skip"
 
-#: ../src/piwiz.c:1510 ../src/dhcpcd-gtk/wpa.c:130 ../data/piwiz.ui.h:3
+#: ../src/piwiz.c:1502
+msgid "<b>Rename User</b>"
+msgstr "<b>Rename User</b>"
+
+#: ../src/piwiz.c:1503
+#, c-format
+msgid ""
+"Your current user '%s' will be renamed.\n"
+"\n"
+"The new username can only contain lower-case letters, digits and hyphens, "
+"and must start with a letter."
+msgstr ""
+"Your current user '%s' will be renamed.\n"
+"\n"
+"The new username can only contain lower-case letters, digits and hyphens, "
+"and must start with a letter."
+
+#: ../src/piwiz.c:1506
+msgid "Press 'Next' to rename the user."
+msgstr "Press 'Next' to rename the user."
+
+#: ../src/piwiz.c:1507 ../src/dhcpcd-gtk/wpa.c:130 ../data/piwiz.ui.h:3
 msgid "_Cancel"
 msgstr "_Cancel"
 
-#: ../src/piwiz.c:1516
-msgid "_Later"
-msgstr "_Later"
-
-#: ../src/piwiz.c:1517
+#: ../src/piwiz.c:1514
 msgid "_Restart"
 msgstr "_Restart"
 
-#: ../src/piwiz.c:1523
+#: ../src/piwiz.c:1517
+msgid "<b>User Renamed</b>"
+msgstr "<b>User Renamed</b>"
+
+#: ../src/piwiz.c:1518
+#, c-format
+msgid "The '%s' user has been renamed to '%s' and the new password set."
+msgstr "The '%s' user has been renamed to '%s' and the new password set."
+
+#: ../src/piwiz.c:1521
+msgid "Press 'Restart' to reboot and login as the new user."
+msgstr "Press 'Restart' to reboot and login as the new user."
+
+#: ../src/piwiz.c:1527
 msgid "_Done"
 msgstr "_Done"
 
-#: ../src/piwiz.c:1605
+#: ../src/piwiz.c:1608
 msgid "Setting location - please wait..."
 msgstr "Setting location - please wait..."
 
-#: ../src/piwiz.c:1617
+#: ../src/piwiz.c:1627
+msgid "The username is blank."
+msgstr "The username is blank."
+
+#: ../src/piwiz.c:1632
+msgid "The first character of the username must be a lower-case letter."
+msgstr "The first character of the username must be a lower-case letter."
+
+#: ../src/piwiz.c:1641
+msgid "Usernames can only contain lower-case letters, digits and hyphens."
+msgstr "Usernames can only contain lower-case letters, digits and hyphens."
+
+#: ../src/piwiz.c:1646
+msgid "The password is blank."
+msgstr "The password is blank."
+
+#: ../src/piwiz.c:1651
 msgid "The two passwords entered do not match."
 msgstr "The two passwords entered do not match."
 
-#: ../src/piwiz.c:1654
+#: ../src/piwiz.c:1656
+msgid ""
+"You have used a known default value for the username or password.\n"
+"\n"
+"We strongly recommend you go back and choose something else."
+msgstr ""
+"You have used a known default value for the username or password.\n"
+"\n"
+"We strongly recommend you go back and choose something else."
+
+#: ../src/piwiz.c:1690
 #, c-format
 msgid "Enter the password for the WiFi network \"%s\"."
 msgstr "Enter the password for the wireless network \"%s\"."
 
-#: ../src/piwiz.c:1668 ../src/piwiz.c:1679
+#: ../src/piwiz.c:1704 ../src/piwiz.c:1715
 msgid "Connecting to WiFi network - please wait..."
 msgstr "Connecting to wireless network - please wait..."
 
-#: ../src/piwiz.c:1671 ../src/piwiz.c:1682
+#: ../src/piwiz.c:1707 ../src/piwiz.c:1718
 msgid "Could not connect to this network"
 msgstr "Could not connect to this network"
 
-#: ../src/piwiz.c:1705
+#: ../src/piwiz.c:1742
 msgid "Synchronising clock - please wait..."
 msgstr "Synchronising clock - please wait..."
 
-#: ../src/piwiz.c:1710
+#: ../src/piwiz.c:1747
 msgid "No network connection found - unable to check for updates"
 msgstr "No network connection found - unable to check for updates"
 
-#: ../src/piwiz.c:1823
+#: ../src/piwiz.c:1858
 #, c-format
 msgid "<span font_desc=\"10.0\">IP : %s</span>"
 msgstr "<span font_desc=\"10.0\">IP : %s</span>"
@@ -205,11 +261,6 @@ msgstr "Network event"
 #, c-format
 msgid "dhcpcd WPA connection lost: %s"
 msgstr "dhcpcd WPA connection lost: %s"
-
-#: ../src/dhcpcd-gtk/main.c:617
-#, c-format
-msgid "%s: Received scan results"
-msgstr "%s: Received scan results"
 
 #: ../src/dhcpcd-gtk/main.c:640
 msgid "New Access Point"
@@ -362,114 +413,126 @@ msgid "Press 'Next' when you have made your selection."
 msgstr "Press 'Next' when you have made your selection."
 
 #: ../data/piwiz.ui.h:24
-msgid "<b>Change Password</b>"
-msgstr "<b>Change Password</b>"
+msgid "<b>Create User</b>"
+msgstr "<b>Create User</b>"
 
 #: ../data/piwiz.ui.h:25
 msgid ""
-"The default 'pi' user account currently has the password 'raspberry'. It is "
-"strongly recommended that you change this to a different password that only "
-"you know."
+"You need to create a user account to log in to your Raspberry Pi.\n"
+"\n"
+"The username can only contain lower-case letters, digits and hyphens, and "
+"must start with a letter."
 msgstr ""
-"The default 'pi' user account currently has the password 'raspberry'. It is "
-"strongly recommended that you change this to a different password that only "
-"you know."
-
-#: ../data/piwiz.ui.h:26
-msgid "Enter new password:"
-msgstr "Enter new password:"
-
-#: ../data/piwiz.ui.h:27
-msgid "Enter a new password"
-msgstr "Enter a new password"
+"You need to create a user account to log in to your Raspberry Pi.\n"
+"\n"
+"The username can only contain lower-case letters, digits and hyphens, and "
+"must start with a letter."
 
 #: ../data/piwiz.ui.h:28
-msgid "Confirm new password:"
-msgstr "Confirm new password:"
+msgid "Enter password:"
+msgstr "Enter password:"
 
 #: ../data/piwiz.ui.h:29
-msgid "Enter the new password again"
-msgstr "Enter the new password again"
+msgid "Confirm password:"
+msgstr "Confirm password:"
 
 #: ../data/piwiz.ui.h:30
+msgid "Enter username:"
+msgstr "Enter username:"
+
+#: ../data/piwiz.ui.h:31
+msgid "Enter a password"
+msgstr "Enter a password"
+
+#: ../data/piwiz.ui.h:32
+msgid "Enter the password again"
+msgstr "Enter the password again"
+
+#: ../data/piwiz.ui.h:33
+msgid "Enter a username"
+msgstr "Enter a username"
+
+#: ../data/piwiz.ui.h:34
 msgid "Hide characters"
 msgstr "Hide characters"
 
-#: ../data/piwiz.ui.h:31
+#: ../data/piwiz.ui.h:35
 msgid "Show or hide the characters in your password"
 msgstr "Show or hide the characters in your password"
 
-#: ../data/piwiz.ui.h:32
-msgid "Press 'Next' to activate your new password."
-msgstr "Press 'Next' to activate your new password."
+#: ../data/piwiz.ui.h:36
+msgid "Press 'Next' to create your account."
+msgstr "Press 'Next' to create your account."
 
-#: ../data/piwiz.ui.h:33
+#: ../data/piwiz.ui.h:37
 msgid "<b>Set Up Screen</b>"
 msgstr "<b>Set Up Screen</b>"
 
-#: ../data/piwiz.ui.h:34
-msgid ""
-"You should be able to see the taskbar along the top of the screen.\n"
-"Tick the box if some or all of it does not fit on the screen."
-msgstr ""
-"You should be able to see the taskbar along the top of the screen.\n"
-"Tick the box if some or all of it does not fit on the screen."
-
-#: ../data/piwiz.ui.h:36
-msgid "The taskbar does not fit onto the screen"
-msgstr "The taskbar does not fit onto the screen"
-
-#: ../data/piwiz.ui.h:37
-msgid "Tick this box if the taskbar is not completely visible"
-msgstr "Tick this box if the taskbar is not completely visible"
-
 #: ../data/piwiz.ui.h:38
 msgid ""
-"The change will take effect when the Pi is restarted.\n"
-"\n"
-"Press 'Next' to save your setting."
+"On some monitors, the desktop is larger than the screen and the edges are "
+"cut off. You can adjust this here."
 msgstr ""
-"The change will take effect when the Pi is restarted.\n"
-"\n"
-"Press 'Next' to save your setting."
+"On some monitors, the desktop is larger than the screen and the edges are "
+"cut off. You can adjust this here."
+
+#: ../data/piwiz.ui.h:39
+msgid "Reduce the size of the desktop on this monitor"
+msgstr "Reduce the size of the desktop on this monitor"
+
+#: ../data/piwiz.ui.h:40
+msgid "Turn on to shrink the desktop to fit the monitor"
+msgstr "Turn on to shrink the desktop to fit the monitor"
 
 #: ../data/piwiz.ui.h:41
+msgid "Reduce the size of the desktop on the second monitor"
+msgstr "Reduce the size of the desktop on the second monitor"
+
+#: ../data/piwiz.ui.h:42
+msgid "Turn on to shrink the desktop to fit the second monitor"
+msgstr "Turn on to shrink the desktop to fit the second monitor"
+
+#: ../data/piwiz.ui.h:43
+msgid "Press 'Next' when the screen looks correct."
+msgstr "Press 'Next' when the screen looks correct."
+
+#: ../data/piwiz.ui.h:44
 msgid "<b>Select WiFi Network</b>"
 msgstr "<b>Select Wireless Network</b>"
 
-#: ../data/piwiz.ui.h:42
+#: ../data/piwiz.ui.h:45
 msgid "Select your WiFi network from the list."
 msgstr "Select your wireless network from the list."
 
-#: ../data/piwiz.ui.h:43
+#: ../data/piwiz.ui.h:46
 msgid "Click the name of your network to select it"
 msgstr "Click the name of your network to select it"
 
-#: ../data/piwiz.ui.h:44
+#: ../data/piwiz.ui.h:47
 msgid "Press 'Next' to connect, or 'Skip' to continue without connecting."
 msgstr "Press 'Next' to connect, or 'Skip' to continue without connecting."
 
-#: ../data/piwiz.ui.h:45
+#: ../data/piwiz.ui.h:48
 msgid "<b>Enter WiFi Password</b>"
 msgstr "<b>Enter Wireless Network Password</b>"
 
-#: ../data/piwiz.ui.h:46
+#: ../data/piwiz.ui.h:49
 msgid "Enter the password for your WiFi network."
 msgstr "Enter the password for your wireless network."
 
-#: ../data/piwiz.ui.h:47
+#: ../data/piwiz.ui.h:50
 msgid "Password:"
 msgstr "Password:"
 
-#: ../data/piwiz.ui.h:48
+#: ../data/piwiz.ui.h:51
 msgid "Enter the password for your network"
 msgstr "Enter the password for your wireless network"
 
-#: ../data/piwiz.ui.h:49
+#: ../data/piwiz.ui.h:52
 msgid "<b>Update Software</b>"
 msgstr "<b>Update Software</b>"
 
-#: ../data/piwiz.ui.h:50
+#: ../data/piwiz.ui.h:53
 msgid ""
 "The operating system and applications will now be checked and updated if "
 "necessary. This may involve a large download.\n"
@@ -483,24 +546,61 @@ msgstr ""
 "Press 'Next' to check and update software, or 'Skip' to continue without "
 "checking."
 
-#: ../data/piwiz.ui.h:53
+#: ../data/piwiz.ui.h:56
 msgid "<b>Setup Complete</b>"
 msgstr "<b>Setup Complete</b>"
 
-#: ../data/piwiz.ui.h:54
+#: ../data/piwiz.ui.h:57
 msgid "Your Raspberry Pi is now set up and ready to go."
 msgstr "Your Raspberry Pi is now set up and ready to go."
 
-#: ../data/piwiz.ui.h:55
-msgid ""
-"To run applications, click the raspberry icon in the top left corner of the "
-"screen to open the menu."
-msgstr ""
-"To run applications, click the raspberry icon in the top left corner of the "
-"screen to open the menu."
-
-#: ../data/piwiz.ui.h:56
+#: ../data/piwiz.ui.h:58
 msgid ""
 "Press 'Restart' to restart your Pi so the new settings will take effect."
 msgstr ""
 "Press 'Restart' to restart your Raspberry Pi and launch the desktop."
+
+#~ msgid "_Later"
+#~ msgstr "_Later"
+
+#, c-format
+#~ msgid "%s: Received scan results"
+#~ msgstr "%s: Received scan results"
+
+#~ msgid ""
+#~ "The default 'pi' user account currently has the password 'raspberry'. It "
+#~ "is strongly recommended that you change this to a different password that "
+#~ "only you know."
+#~ msgstr ""
+#~ "The default 'pi' user account currently has the password 'raspberry'. It "
+#~ "is strongly recommended that you change this to a different password that "
+#~ "only you know."
+
+#~ msgid ""
+#~ "You should be able to see the taskbar along the top of the screen.\n"
+#~ "Tick the box if some or all of it does not fit on the screen."
+#~ msgstr ""
+#~ "You should be able to see the taskbar along the top of the screen.\n"
+#~ "Tick the box if some or all of it does not fit on the screen."
+
+#~ msgid "The taskbar does not fit onto the screen"
+#~ msgstr "The taskbar does not fit onto the screen"
+
+#~ msgid "Tick this box if the taskbar is not completely visible"
+#~ msgstr "Tick this box if the taskbar is not completely visible"
+
+#~ msgid ""
+#~ "The change will take effect when the Pi is restarted.\n"
+#~ "\n"
+#~ "Press 'Next' to save your setting."
+#~ msgstr ""
+#~ "The change will take effect when the Pi is restarted.\n"
+#~ "\n"
+#~ "Press 'Next' to save your setting."
+
+#~ msgid ""
+#~ "To run applications, click the raspberry icon in the top left corner of "
+#~ "the screen to open the menu."
+#~ msgstr ""
+#~ "To run applications, click the raspberry icon in the top left corner of "
+#~ "the screen to open the menu."
