@@ -6,7 +6,7 @@ case "${1}" in
 [Desktop Entry]
 Type=Application
 Name=Raspberry Pi First-Run Wizard
-Exec=sh -c 'gsettings set org.gnome.mutter center-new-windows true; sudo -AE piwiz'
+Exec=sudo -AE piwiz
 StartupNotify=true
 EOF
     ;;

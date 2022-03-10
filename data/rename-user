@@ -4,9 +4,6 @@ echo "Preparing to run wizard - please wait..."
 
 # create the first boot user
 sudo adduser rpi-first-boot-wizard --gecos ',,,,' --add_extra_groups --quiet --disabled-password > /dev/null
-sudo adduser rpi-first-boot-wizard adm --quiet > /dev/null
-sudo adduser rpi-first-boot-wizard sudo --quiet > /dev/null
-sudo adduser rpi-first-boot-wizard input --quiet > /dev/null
 sudo adduser rpi-first-boot-wizard netdev --quiet > /dev/null
 echo "rpi-first-boot-wizard ALL=(ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers.d/010_wiz-nopasswd > /dev/null
 
