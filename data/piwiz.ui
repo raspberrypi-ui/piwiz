@@ -5,6 +5,7 @@
   <object class="GtkWindow" id="error">
     <property name="name">pixbox</property>
     <property name="can-focus">False</property>
+    <property name="resizable">False</property>
     <property name="modal">True</property>
     <property name="window-position">center-on-parent</property>
     <property name="default-width">340</property>
@@ -83,6 +84,7 @@
   <object class="GtkWindow" id="modal">
     <property name="name">pixbox</property>
     <property name="can-focus">False</property>
+    <property name="resizable">False</property>
     <property name="modal">True</property>
     <property name="window-position">center-on-parent</property>
     <property name="default-width">340</property>

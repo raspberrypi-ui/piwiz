@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: piwiz 1.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-10 11:38+0000\n"
+"POT-Creation-Date: 2022-03-15 09:45+0000\n"
 "PO-Revision-Date: 2019-02-18 15:13+0000\n"
 "Last-Translator: Simon Long <simon@raspberrypi.org>\n"
 "Language-Team: English (British)\n"
@@ -102,7 +102,7 @@ msgstr ""
 msgid "Finding languages - please wait..."
 msgstr "Finding languages - please wait..."
 
-#: ../src/piwiz.c:1469 ../src/piwiz.c:1737
+#: ../src/piwiz.c:1469 ../src/piwiz.c:1747
 msgid "Checking for updates - please wait..."
 msgstr "Checking for updates - please wait..."
 
@@ -177,22 +177,32 @@ msgid "The username is blank."
 msgstr "The username is blank."
 
 #: ../src/piwiz.c:1632
+msgid "The username must be 32 characters or shorter."
+msgstr "The username must be 32 characters or shorter."
+
+#: ../src/piwiz.c:1637
 msgid "The first character of the username must be a lower-case letter."
 msgstr "The first character of the username must be a lower-case letter."
 
-#: ../src/piwiz.c:1641
+#: ../src/piwiz.c:1642
+msgid ""
+"This username is used by the system and cannot be used for a user account."
+msgstr ""
+"This username is used by the system and cannot be used for a user account."
+
+#: ../src/piwiz.c:1651
 msgid "Usernames can only contain lower-case letters, digits and hyphens."
 msgstr "Usernames can only contain lower-case letters, digits and hyphens."
 
-#: ../src/piwiz.c:1646
+#: ../src/piwiz.c:1656
 msgid "The password is blank."
 msgstr "The password is blank."
 
-#: ../src/piwiz.c:1651
+#: ../src/piwiz.c:1661
 msgid "The two passwords entered do not match."
 msgstr "The two passwords entered do not match."
 
-#: ../src/piwiz.c:1656
+#: ../src/piwiz.c:1666
 msgid ""
 "You have used a known default value for the username or password.\n"
 "\n"
@@ -202,28 +212,28 @@ msgstr ""
 "\n"
 "We strongly recommend you go back and choose something else."
 
-#: ../src/piwiz.c:1690
+#: ../src/piwiz.c:1700
 #, c-format
 msgid "Enter the password for the WiFi network \"%s\"."
 msgstr "Enter the password for the wireless network \"%s\"."
 
-#: ../src/piwiz.c:1704 ../src/piwiz.c:1715
+#: ../src/piwiz.c:1714 ../src/piwiz.c:1725
 msgid "Connecting to WiFi network - please wait..."
 msgstr "Connecting to wireless network - please wait..."
 
-#: ../src/piwiz.c:1707 ../src/piwiz.c:1718
+#: ../src/piwiz.c:1717 ../src/piwiz.c:1728
 msgid "Could not connect to this network"
 msgstr "Could not connect to this network"
 
-#: ../src/piwiz.c:1742
+#: ../src/piwiz.c:1752
 msgid "Synchronising clock - please wait..."
 msgstr "Synchronising clock - please wait..."
 
-#: ../src/piwiz.c:1747
+#: ../src/piwiz.c:1757
 msgid "No network connection found - unable to check for updates"
 msgstr "No network connection found - unable to check for updates"
 
-#: ../src/piwiz.c:1858
+#: ../src/piwiz.c:1868
 #, c-format
 msgid "<span font_desc=\"10.0\">IP : %s</span>"
 msgstr "<span font_desc=\"10.0\">IP : %s</span>"
@@ -557,8 +567,7 @@ msgstr "Your Raspberry Pi is now set up and ready to go."
 #: ../data/piwiz.ui.h:58
 msgid ""
 "Press 'Restart' to restart your Pi so the new settings will take effect."
-msgstr ""
-"Press 'Restart' to restart your Raspberry Pi and launch the desktop."
+msgstr "Press 'Restart' to restart your Raspberry Pi and launch the desktop."
 
 #~ msgid "_Later"
 #~ msgstr "_Later"

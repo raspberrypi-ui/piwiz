@@ -1627,9 +1627,19 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                 message (_("The username is blank."), 1, 0, -1, FALSE);
                                 break;
                             }
+                            if (strlen (ccptr) > 32)
+                            {
+                                message (_("The username must be 32 characters or shorter."), 1, 0, -1, FALSE);
+                                break;
+                            }
                             if (*ccptr < 'a' || *ccptr > 'z')
                             {
                                 message (_("The first character of the username must be a lower-case letter."), 1, 0, -1, FALSE);
+                                break;
+                            }
+                            if (!g_strcmp0 (gtk_entry_get_text (GTK_ENTRY (user_te)), "rpi-first-boot-wizard"))
+                            {
+                                message (_("This username is used by the system and cannot be used for a user account."), 1, 0, -1, FALSE);
                                 break;
                             }
                             while (*++ccptr)
