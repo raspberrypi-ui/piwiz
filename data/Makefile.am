@@ -2,10 +2,7 @@ uidir = $(datadir)/piwiz
 
 ui_in_files = 	piwiz.ui \
 				raspberry-pi-logo.png \
-				srprompt.wav \
-				rename-user \
-				cancel-rename \
-				mvuser
+				srprompt.wav
 
 ui_DATA = $(ui_in_files)
 

@@ -1734,7 +1734,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Web Browser\nIcon=applications-internet\nURL=/usr/share/applications/chromium-browser.desktop\" > /home/%s/Desktop/chromium-browser.desktop", user);
 #endif
                             // rename the pi user to the new user and set the password
-                            vsystem ("/usr/bin/mvuser %s %s %s", chuser ? chuser : "pi", user, pw);
+                            vsystem ("/usr/lib/userconf-pi/userconf %s %s %s", chuser ? chuser : "pi", user, pw);
 
                             if (reboot) vsystem ("sync;reboot");
                             gtk_main_quit ();
