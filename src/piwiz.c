@@ -1736,6 +1736,9 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             // rename the pi user to the new user and set the password
                             vsystem ("/usr/lib/userconf-pi/userconf %s %s %s", chuser ? chuser : "pi", user, pw);
 
+                            // set an autostart to set HDMI audio on reboot as new user
+                            if (chuser == NULL) vsystem ("echo \"[Desktop Entry]\nType=Application\nName=Select HDMI Audio\nExec=sh -c '/usr/bin/hdmi-audio-select; sudo rm /etc/xdg/autostart/hdmiaudio.desktop'\" > /etc/xdg/autostart/hdmiaudio.desktop", user);
+
                             if (reboot) vsystem ("sync;reboot");
                             gtk_main_quit ();
                             break;
@@ -1958,11 +1961,7 @@ int main (int argc, char *argv[])
     if (system ("raspi-config nonint is_pi")) is_pi = FALSE;
 
     // set the audio output to HDMI if there is one, otherwise the analog jack
-    system ("SINKS=$(sudo -u $SUDO_USER XDG_RUNTIME_DIR=/run/user/$SUDO_UID pactl list short sinks) ; \
-        DOUT=$(echo $SINKS | grep -oE bcm2835_audio\\.digital\\-stereo) ; \
-        HOUT=$(echo $SINKS | grep -oE [0-9a-f]{8}\\.hdmi\\.[0-9a-z]+\\-stereo | head -n 1) ; \
-        if ! [ -z $DOUT ] ; then OUTPUT=$DOUT ; elif ! [ -z $HOUT ] ; then OUTPUT=$HOUT ; else OUTPUT=bcm2835_audio.analog-stereo ; fi ; \
-        sudo -u $SUDO_USER XDG_RUNTIME_DIR=/run/user/$SUDO_UID pactl set-default-sink alsa_output.platform-$OUTPUT");
+    vsystem ("hdmi-audio-select");
 
     // read country code from Pi keyboard, if any
     kbd = get_pi_keyboard ();
