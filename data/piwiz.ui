@@ -232,6 +232,21 @@ Press 'Next' to get started. </property>
                   </packing>
                 </child>
                 <child>
+                  <object class="GtkLabel" id="p0prompt">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">If you are using a Bluetooth keyboard or mouse, put them into pairing mode and wait for them to connect.</property>
+                    <property name="wrap">True</property>
+                    <property name="max-width-chars">50</property>
+                    <property name="xalign">0</property>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
+                <child>
                   <object class="GtkLabel" id="p0ip">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -243,7 +258,7 @@ Press 'Next' to get started. </property>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
-                    <property name="position">2</property>
+                    <property name="position">3</property>
                   </packing>
                 </child>
               </object>

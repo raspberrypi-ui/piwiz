@@ -96,7 +96,7 @@ static GtkWidget *main_dlg, *msg_dlg, *msg_msg, *msg_pb, *msg_btn;
 static GtkWidget *err_dlg, *err_msg, *err_btn;
 static GtkWidget *wizard_nb, *next_btn, *prev_btn, *skip_btn;
 static GtkWidget *country_cb, *language_cb, *timezone_cb;
-static GtkWidget *ap_tv, *psk_label, *prompt, *ip_label;
+static GtkWidget *ap_tv, *psk_label, *prompt, *ip_label, *bt_prompt;
 static GtkWidget *user_te, *pwd1_te, *pwd2_te, *psk_te;
 static GtkWidget *pwd_hide, *psk_hide, *eng_chk, *uskey_chk, *uscan1_sw, *uscan2_sw, *uscan2_box;
 static GtkWidget *rename_title, *rename_info, *rename_prompt;
@@ -1565,6 +1565,12 @@ static void next_page (GtkButton* btn, gpointer ptr)
     last_btn = NEXT_BTN;
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
     {
+        case PAGE_INTRO :   // disable Bluetooth autoconnect after first page
+                            if (!system ("rfkill list bluetooth | grep -q Bluetooth"))
+                                system ("lxpanelctl command bluetooth apstop");
+                            gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
+                            break;
+
         case PAGE_LOCALE :  // get the combo entries and look up relevant codes in database
                             model = gtk_combo_box_get_model (GTK_COMBO_BOX (language_cb));
                             gtk_combo_box_get_active_iter (GTK_COMBO_BOX (language_cb), &iter);
@@ -2006,6 +2012,7 @@ int main (int argc, char *argv[])
     skip_btn = (GtkWidget *) gtk_builder_get_object (builder, "skip_btn");
     g_signal_connect (skip_btn, "clicked", G_CALLBACK (skip_page), NULL);
 
+    bt_prompt = (GtkWidget *) gtk_builder_get_object (builder, "p0prompt");
     ip_label = (GtkWidget *) gtk_builder_get_object (builder, "p0ip");
     user_te = (GtkWidget *) gtk_builder_get_object (builder, "p2user");
     pwd1_te = (GtkWidget *) gtk_builder_get_object (builder, "p2pwd1");
@@ -2091,6 +2098,9 @@ int main (int argc, char *argv[])
     gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (ap_tv), 2, "Signal", col, "pixbuf", 2, NULL);
     gtk_tree_view_column_set_sizing (gtk_tree_view_get_column (GTK_TREE_VIEW (ap_tv), 2), GTK_TREE_VIEW_COLUMN_FIXED);
     gtk_tree_view_column_set_fixed_width (gtk_tree_view_get_column (GTK_TREE_VIEW (ap_tv), 2), 30);
+
+    // hide Bluetooth autoconnect prompt if no Bluetooth detected
+    if (system ("rfkill list bluetooth | grep -q Bluetooth")) gtk_widget_hide (bt_prompt);
 
     /* start timed event to detect IP address being available */
     g_timeout_add (1000, (GSourceFunc) show_ip, NULL);
