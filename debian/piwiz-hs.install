@@ -1,7 +1,4 @@
 #!/usr/bin/dh-exec
 src/piwizhs => /usr/bin/piwiz
-po/en_GB.gmo => /usr/share/locale/en_GB/LC_MESSAGES/piwiz.mo
-data/piwiz.ui usr/share/piwiz
-data/raspberry-pi-logo.png usr/share/piwiz
-data/srprompt.wav usr/share/piwiz
-data/hdmi-audio-select usr/bin
+src/hdmi-audio-select => /usr/bin/hdmi-audio-select
+usr/share/* usr/share

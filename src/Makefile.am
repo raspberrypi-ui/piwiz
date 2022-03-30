@@ -1,6 +1,8 @@
 bin_PROGRAMS = piwiz \
 			   piwizhs
 
+dist_bin_SCRIPTS = hdmi-audio-select
+
 piwiz_CFLAGS = \
 	-I$(top_srcdir) \
 	-DPACKAGE_LIB_DIR=\""$(libdir)"\" \
