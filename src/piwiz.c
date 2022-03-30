@@ -670,11 +670,7 @@ static gboolean loc_done (gpointer data)
         putenv (language);
         putenv (lcall);
 
-#ifdef HOMESCHOOL
-        execl ("/usr/bin/piwizhs", "piwizhs", "--langset", lc, cc, NULL);
-#else
         execl ("/usr/bin/piwiz", "piwiz", "--langset", lc, cc, NULL);
-#endif
         exit (0);
     }
     else
@@ -1736,8 +1732,12 @@ static void next_page (GtkButton* btn, gpointer ptr)
 
         case PAGE_DONE :
 #ifdef HOMESCHOOL
-                            vsystem ("cp /usr/share/applications/chromium-browser.desktop /etc/xdg/autostart/");
-                            vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Web Browser\nIcon=applications-internet\nURL=/usr/share/applications/chromium-browser.desktop\" > /home/%s/Desktop/chromium-browser.desktop", user);
+                            if (chuser == NULL)
+                            {
+                                vsystem ("cp /usr/share/applications/chromium-browser.desktop /etc/xdg/autostart/");
+                                vsystem ("mkdir -p /home/pi/Desktop");
+                                vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Web Browser\nIcon=applications-internet\nURL=/usr/share/applications/chromium-browser.desktop\" > /home/pi/Desktop/chromium-browser.desktop");
+                            }
 #endif
                             // rename the pi user to the new user and set the password
                             vsystem ("/usr/lib/userconf-pi/userconf %s %s %s", chuser ? chuser : "pi", user, pw);
