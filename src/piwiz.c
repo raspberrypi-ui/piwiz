@@ -1740,7 +1740,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             }
 #endif
                             // rename the pi user to the new user and set the password
-                            vsystem ("/usr/lib/userconf-pi/userconf %s %s %s", chuser ? chuser : "pi", user, pw);
+                            vsystem ("/usr/lib/userconf-pi/userconf %s %s '%s'", chuser ? chuser : "pi", user, pw);
 
                             // set an autostart to set HDMI audio on reboot as new user
                             if (chuser == NULL) vsystem ("echo \"[Desktop Entry]\nType=Application\nName=Select HDMI Audio\nExec=sh -c '/usr/bin/hdmi-audio-select; sudo rm /etc/xdg/autostart/hdmiaudio.desktop'\" > /etc/xdg/autostart/hdmiaudio.desktop", user);
