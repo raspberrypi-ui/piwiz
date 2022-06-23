@@ -1,8 +1,14 @@
-piwiz (0.40) bullseye; urgency=medium
+piwiz (0.41) bullseye; urgency=medium
 
   * Do not allow 'root' as a user name
 
  -- Simon Long <simon@raspberrypi.com>  Thu, 23 Jun 2022 17:22:18 +0100
+
+piwiz (0.40) bullseye; urgency=medium
+
+  * Updated Italian translation
+
+ -- Simon Long <simon@raspberrypi.com>  Tue, 19 Apr 2022 10:40:17 +0100
 
 piwiz (0.39) bullseye; urgency=medium
 
