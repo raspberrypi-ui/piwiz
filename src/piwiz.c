@@ -1644,6 +1644,11 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                 message (_("This username is used by the system and cannot be used for a user account."), 1, 0, -1, FALSE);
                                 break;
                             }
+                            if (!g_strcmp0 (gtk_entry_get_text (GTK_ENTRY (user_te)), "root"))
+                            {
+                                message (_("This username is used by the system and cannot be used for a user account."), 1, 0, -1, FALSE);
+                                break;
+                            }
                             while (*++ccptr)
                             {
                                 if ((*ccptr < 'a' || *ccptr > 'z') && (*ccptr < '0' || *ccptr > '9') && *ccptr != '-') break;
