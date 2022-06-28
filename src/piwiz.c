@@ -1068,6 +1068,7 @@ static void scans_add (char *str, int match, int secure, int signal, int connect
     GdkPixbuf *sec_icon = NULL, *sig_icon = NULL;
     char *icon;
     int dsig;
+
     gtk_list_store_append (ap_list, &iter);
     if (secure)
         sec_icon = gtk_icon_theme_load_icon (gtk_icon_theme_get_default(), "network-wireless-encrypted", 16, 0, NULL);
@@ -1345,11 +1346,11 @@ static void nm_ap_changed (NMDeviceWifi *device, NMAccessPoint *ap, gpointer use
     const GPtrArray *aps = nm_device_wifi_get_access_points (device);
     for (int i = 0; aps && i < aps->len; i++)
     {
-		NMAccessPoint *ap = g_ptr_array_index (aps, i);
+        NMAccessPoint *ap = g_ptr_array_index (aps, i);
 
         char *ssid_utf8 = NULL;
-		GBytes *ssid = nm_access_point_get_ssid (ap);
-		if (ssid)
+        GBytes *ssid = nm_access_point_get_ssid (ap);
+        if (ssid)
         {
             ssid_utf8 = nm_utils_ssid_to_utf8 (g_bytes_get_data (ssid, NULL), g_bytes_get_size (ssid));
             if (ssid_utf8)
