@@ -49,6 +49,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <libintl.h>
 #include <crypt.h>
 
+#include <NetworkManager.h>
+
 #include "dhcpcd.h"
 #include "dhcpcd-gtk.h"
 
@@ -78,6 +80,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TL_CITY  0
 #define TL_ZONE  1
 #define TL_CCODE 2  // must be the same as LL_CCODE to allow match_country to be used for both
+
+#define AP_SSID      0
+#define AP_SEC_ICON  1
+#define AP_SIG_ICON  2
+#define AP_SECURE    3
+#define AP_CONNECTED 4
+#define AP_FLAGS     5
+#define AP_MODE      6
+#define AP_WPA_FLAGS 7
+#define AP_RSN_FLAGS 8
 
 #define FLAGFILE "/tmp/.wlflag"
 
@@ -122,6 +134,9 @@ gint conn_timeout = 0, pulse_timer = 0;
 gboolean reboot = TRUE, is_pi = TRUE;
 int last_btn = NEXT_BTN;
 int calls;
+
+NMClient *nm_client = NULL;
+gint scan_timer = 0;
 
 /* Map from country code to keyboard */
 
@@ -1053,7 +1068,6 @@ static void scans_add (char *str, int match, int secure, int signal, int connect
     GdkPixbuf *sec_icon = NULL, *sig_icon = NULL;
     char *icon;
     int dsig;
-
     gtk_list_store_append (ap_list, &iter);
     if (secure)
         sec_icon = gtk_icon_theme_load_icon (gtk_icon_theme_get_default(), "network-wireless-encrypted", 16, 0, NULL);
@@ -1069,10 +1083,12 @@ static void scans_add (char *str, int match, int secure, int signal, int connect
         sig_icon = gtk_icon_theme_load_icon (gtk_icon_theme_get_default(), icon, 16, 0, NULL);
         g_free (icon);
     }
-    gtk_list_store_set (ap_list, &iter, 0, str, 1, sec_icon, 2, sig_icon, 3, secure, 4, connected, -1);
+    gtk_list_store_set (ap_list, &iter, AP_SSID, str, AP_SEC_ICON, sec_icon, AP_SIG_ICON, sig_icon, AP_SECURE, secure, AP_CONNECTED, connected, -1);
 
     if (match)
         gtk_tree_selection_select_iter (gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv)), &iter);
+
+    gtk_tree_view_set_model (GTK_TREE_VIEW (ap_tv), GTK_TREE_MODEL (ap_list));
 }
 
 static int find_line (char **lssid, int *secure, int *connected)
@@ -1084,7 +1100,7 @@ static int find_line (char **lssid, int *secure, int *connected)
     sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv));
     if (sel && gtk_tree_selection_get_selected (sel, &model, &iter))
     {
-        gtk_tree_model_get (model, &iter, 0, lssid, 3, secure, 4, connected, -1);
+        gtk_tree_model_get (model, &iter, AP_SSID, lssid, AP_SECURE, secure, AP_CONNECTED, connected, -1);
         if (g_strcmp0 (*lssid, _("Searching for networks - please wait..."))) return 1;
     } 
     return 0;
@@ -1212,6 +1228,147 @@ static char *find_psk_for_network (char *ssid)
     g_free (seek);
     return ret;
 }
+
+/* Network Manager */
+
+static gboolean nm_request_scan (void)
+{
+    const GPtrArray *devices = nm_client_get_devices (nm_client);
+    for (int i = 0; devices && i < devices->len; i++)
+    {
+        NMDevice *device = g_ptr_array_index (devices, i);
+        if (NM_IS_DEVICE_WIFI (device))
+            nm_device_wifi_request_scan ((NMDeviceWifi *) device, NULL, NULL);
+    }
+    return TRUE;
+}
+
+static gboolean nm_find_dup_ap (GtkTreeModel *model, GtkTreeIter *iter, gpointer data)
+{
+    char *str1 = NULL, *str2 = NULL;
+    guint mode1, flags1, wpa1, rsn1, mode2, flags2, wpa2, rsn2;
+    gboolean res = TRUE;
+    GtkTreeIter it2 = *iter;
+
+    gtk_tree_model_get (model, iter, AP_SSID, &str1, AP_MODE, &mode1, AP_FLAGS, &flags1, AP_WPA_FLAGS, &wpa1, AP_RSN_FLAGS, &rsn1, -1);
+    while (gtk_tree_model_iter_previous (model, &it2))
+    {
+        gtk_tree_model_get (model, &it2, AP_SSID, &str2, AP_MODE, &mode2, AP_FLAGS, &flags2, AP_WPA_FLAGS, &wpa2, AP_RSN_FLAGS, &rsn2, -1);
+        if (!g_strcmp0 (str1, str2) && mode1 == mode2 && flags1 == flags2 && wpa1 == wpa2 && rsn1 == rsn2) res = FALSE;
+        else res = TRUE;
+        g_free (str2);
+        if (!res) break;
+    }
+
+    g_free (str1);
+    return res;
+}
+
+static void nm_scans_add (char *str, int signal, guint ap_mode, guint ap_flags, guint ap_wpa, guint ap_rsn)
+{
+    GtkTreeIter iter, fiter, siter;
+    GtkTreeModel *sap, *fap;
+    GdkPixbuf *sec_icon = NULL, *sig_icon = NULL;
+    char *icon;
+    int dsig;
+
+    gtk_list_store_append (ap_list, &iter);
+    if ((ap_flags & NM_802_11_AP_FLAGS_PRIVACY) || ap_wpa || ap_rsn)
+        sec_icon = gtk_icon_theme_load_icon (gtk_icon_theme_get_default(), "network-wireless-encrypted", 16, 0, NULL);
+    if (signal >= 0)
+    {
+        if (signal > 80) dsig = 100;
+        else if (signal > 55) dsig = 75;
+        else if (signal > 30) dsig = 50;
+        else if (signal > 5) dsig = 25;
+        else dsig = 0;
+
+        icon = g_strdup_printf ("network-wireless-connected-%02d", dsig);
+        sig_icon = gtk_icon_theme_load_icon (gtk_icon_theme_get_default(), icon, 16, 0, NULL);
+        g_free (icon);
+    }
+    gtk_list_store_set (ap_list, &iter, AP_SSID, str, AP_SEC_ICON, sec_icon, AP_SIG_ICON, sig_icon, AP_MODE, ap_mode, 
+        AP_FLAGS, ap_flags, AP_WPA_FLAGS, ap_wpa, AP_RSN_FLAGS, ap_rsn, -1);
+
+    sap = gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (ap_list));
+    gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (sap), AP_SSID, GTK_SORT_ASCENDING);
+    fap = gtk_tree_model_filter_new (GTK_TREE_MODEL (sap), NULL);
+    gtk_tree_model_filter_set_visible_func (GTK_TREE_MODEL_FILTER (fap), (GtkTreeModelFilterVisibleFunc) nm_find_dup_ap, NULL, NULL);
+    gtk_tree_view_set_model (GTK_TREE_VIEW (ap_tv), fap);
+}
+
+static gboolean nm_match_ssid (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer data)
+{
+    char *lssid, *match;
+    guint ap_mode, ap_flags, ap_wpa, ap_rsn;
+    gboolean res = FALSE;
+
+    gtk_tree_model_get (model, iter, AP_SSID, &lssid, AP_MODE, &ap_mode,
+        AP_FLAGS, &ap_flags, AP_WPA_FLAGS, &ap_wpa, AP_RSN_FLAGS, &ap_rsn, -1);
+
+    match = g_strdup_printf ("%s:%lx:%lx:%lx:%lx", lssid, ap_mode, ap_flags, ap_wpa, ap_rsn);
+    if (!g_strcmp0 ((char *) data, match))
+    {
+        GtkTreeSelection *sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv));
+        gtk_tree_selection_select_iter (sel, iter);
+        res = TRUE;
+    }
+
+    g_free (match);
+    g_free (lssid);
+    return res;
+}
+
+static void nm_ap_changed (NMDeviceWifi *device, NMAccessPoint *ap, gpointer user_data)
+{
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+    GtkTreeSelection *sel;
+    char *lssid = NULL, *match;
+    guint ap_mode, ap_flags, ap_wpa, ap_rsn;
+
+    // get the selected line in the list of SSIDs
+    sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv));
+    if (sel && gtk_tree_selection_get_selected (sel, &model, &iter))
+    {
+        gtk_tree_model_get (model, &iter, AP_SSID, &lssid, AP_MODE, &ap_mode, 
+            AP_FLAGS, &ap_flags, AP_WPA_FLAGS, &ap_wpa, AP_RSN_FLAGS, &ap_rsn, -1);
+        if (!g_strcmp0 (lssid, _("Searching for networks - please wait...")))
+        {
+            g_free (lssid);
+            lssid = NULL;
+        }
+    }
+
+    // delete and recreate the list
+    gtk_list_store_clear (ap_list);
+    const GPtrArray *aps = nm_device_wifi_get_access_points (device);
+    for (int i = 0; aps && i < aps->len; i++)
+    {
+		NMAccessPoint *ap = g_ptr_array_index (aps, i);
+
+        char *ssid_utf8 = NULL;
+		GBytes *ssid = nm_access_point_get_ssid (ap);
+		if (ssid)
+        {
+            ssid_utf8 = nm_utils_ssid_to_utf8 (g_bytes_get_data (ssid, NULL), g_bytes_get_size (ssid));
+            if (ssid_utf8)
+                nm_scans_add (ssid_utf8, nm_access_point_get_strength (ap), nm_access_point_get_mode (ap),
+                    nm_access_point_get_flags (ap), nm_access_point_get_wpa_flags (ap),
+                    nm_access_point_get_rsn_flags (ap));
+        }
+    }
+
+    // reselect the selected line
+    if (lssid)
+    {
+        match = g_strdup_printf ("%s:%lx:%lx:%lx:%lx", lssid, ap_mode, ap_flags, ap_wpa, ap_rsn);
+        gtk_tree_model_foreach (gtk_tree_view_get_model (ap_tv), nm_match_ssid, match);
+        g_free (match);
+        g_free (lssid);
+    }
+}
+
 
 /* Updates */
 
@@ -1524,7 +1681,28 @@ static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, g
                             }
                             break;
 
-        case PAGE_WIFIAP :  if (!con)
+        case PAGE_WIFIAP :  if (nm_client)
+                            {
+                                gtk_list_store_clear (ap_list);
+                                nm_scans_add (_("Searching for networks - please wait..."), -1, 0, 0, 0, 0);
+                                if (!scan_timer)
+                                {
+                                    const GPtrArray *devices = nm_client_get_devices (nm_client);
+                                    for (int i = 0; devices && i < devices->len; i++)
+                                    {
+                                        NMDevice *device = g_ptr_array_index (devices, i);
+                                        if (NM_IS_DEVICE_WIFI (device))
+                                        {
+                                            g_signal_connect (device, "access-point-added", G_CALLBACK (nm_ap_changed), NULL);
+                                            g_signal_connect (device, "access-point-removed", G_CALLBACK (nm_ap_changed), NULL);
+                                        }
+                                    }
+
+                                    nm_request_scan ();
+                                    scan_timer =  g_timeout_add (2500, (GSourceFunc) nm_request_scan, NULL);
+                                }
+                            }
+                            else if (!con)
                             {
                                 init_dhcpcd ();
                                 gtk_list_store_clear (ap_list);
@@ -1953,6 +2131,24 @@ static void uscan_toggle (GtkSwitch *sw, gpointer ptr)
         vsystem ("raspi-config nonint do_overscan_kms 1 %d", enable);
 }
 
+static int check_service (char *name)
+{
+    int res;
+    char *buf;
+
+    buf = g_strdup_printf ("systemctl status %s 2> /dev/null | grep -qw Active:", name);
+    res = system (buf);
+    g_free (buf);
+
+    if (res) return 0;
+
+    buf = g_strdup_printf ("systemctl status %s 2> /dev/null | grep -w Active: | grep -qw inactive", name);
+    res = system (buf);
+    g_free (buf);
+
+    return res;
+}
+
 /* The dialog... */
 
 int main (int argc, char *argv[])
@@ -1970,6 +2166,8 @@ int main (int argc, char *argv[])
 #endif
 
     if (system ("raspi-config nonint is_pi")) is_pi = FALSE;
+
+    if (check_service ("NetworkManager")) nm_client = nm_client_new (NULL, NULL);
 
     // set the audio output to HDMI if there is one, otherwise the analog jack
     vsystem ("hdmi-audio-select");
@@ -1995,7 +2193,7 @@ int main (int argc, char *argv[])
     locale_list = gtk_list_store_new (4, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
     country_list = gtk_list_store_new (2, G_TYPE_STRING, G_TYPE_STRING);
     tz_list = gtk_list_store_new (3, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
-    ap_list = gtk_list_store_new (5, G_TYPE_STRING, GDK_TYPE_PIXBUF, GDK_TYPE_PIXBUF, G_TYPE_INT, G_TYPE_INT);
+    ap_list = gtk_list_store_new (9, G_TYPE_STRING, GDK_TYPE_PIXBUF, GDK_TYPE_PIXBUF, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT);
 
     // build the UI
     builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/piwiz.ui");
@@ -2094,7 +2292,6 @@ int main (int argc, char *argv[])
     gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (ap_tv), 0, "AP", col, "text", 0, NULL);
     gtk_tree_view_column_set_expand (gtk_tree_view_get_column (GTK_TREE_VIEW (ap_tv), 0), TRUE);
     gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (ap_tv), FALSE);
-    gtk_tree_view_set_model (GTK_TREE_VIEW (ap_tv), GTK_TREE_MODEL (ap_list));
 
     col = gtk_cell_renderer_pixbuf_new ();
     gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (ap_tv), 1, "Security", col, "pixbuf", 1, NULL);
