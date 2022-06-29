@@ -86,10 +86,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AP_SIG_ICON  2
 #define AP_SECURE    3
 #define AP_CONNECTED 4
-#define AP_FLAGS     5
-#define AP_MODE      6
-#define AP_WPA_FLAGS 7
-#define AP_RSN_FLAGS 8
+#define AP_DEVICE    5
+#define AP_AP        6
 
 #define FLAGFILE "/tmp/.wlflag"
 
@@ -137,6 +135,8 @@ int calls;
 
 NMClient *nm_client = NULL;
 gint scan_timer = 0;
+NMDevice *nm_dev;
+NMAccessPoint *nm_ap;
 
 /* Map from country code to keyboard */
 
@@ -1101,7 +1101,7 @@ static int find_line (char **lssid, int *secure, int *connected)
     sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv));
     if (sel && gtk_tree_selection_get_selected (sel, &model, &iter))
     {
-        gtk_tree_model_get (model, &iter, AP_SSID, lssid, AP_SECURE, secure, AP_CONNECTED, connected, -1);
+        gtk_tree_model_get (model, &iter, AP_SSID, lssid, AP_SECURE, secure, AP_CONNECTED, connected, AP_DEVICE, &nm_dev, AP_AP, &nm_ap, -1);
         if (g_strcmp0 (*lssid, _("Searching for networks - please wait..."))) return 1;
     } 
     return 0;
@@ -1163,12 +1163,20 @@ static gboolean select_ssid (char *lssid, const char *psk)
 
 void menu_update_scans (WI_SCAN *wi, DHCPCD_WI_SCAN *scans)
 {
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+    GtkTreeSelection *sel;
     DHCPCD_WI_SCAN *s;
     char *lssid = NULL;
-    int active, selected, connected;
+    int active, selected = 0, connected;
 
-    // get the selected line in the list of SSIDs - values in active and connected are ignored here
-    selected = find_line (&lssid, &active, &connected);
+    // get the selected line in the list of SSIDs
+    sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv));
+    if (sel && gtk_tree_selection_get_selected (sel, &model, &iter))
+    {
+        gtk_tree_model_get (model, &iter, AP_SSID, &lssid, -1);
+        if (g_strcmp0 (lssid, _("Searching for networks - please wait..."))) selected = 1;
+    }
 
     // erase the current list
     gtk_list_store_clear (ap_list);
@@ -1250,11 +1258,25 @@ static gboolean nm_find_dup_ap (GtkTreeModel *model, GtkTreeIter *iter, gpointer
     guint mode1, flags1, wpa1, rsn1, mode2, flags2, wpa2, rsn2;
     gboolean res = TRUE;
     GtkTreeIter it2 = *iter;
+    NMAccessPoint *ap;
 
-    gtk_tree_model_get (model, iter, AP_SSID, &str1, AP_MODE, &mode1, AP_FLAGS, &flags1, AP_WPA_FLAGS, &wpa1, AP_RSN_FLAGS, &rsn1, -1);
+    gtk_tree_model_get (model, iter, AP_SSID, &str1, AP_AP, &ap, -1);
+    if (ap)
+    {
+        mode1 = nm_access_point_get_mode (ap);
+        flags1 = nm_access_point_get_flags (ap);
+        wpa1 = nm_access_point_get_wpa_flags (ap);
+        rsn1 = nm_access_point_get_rsn_flags (ap);
+    }
+
     while (gtk_tree_model_iter_previous (model, &it2))
     {
-        gtk_tree_model_get (model, &it2, AP_SSID, &str2, AP_MODE, &mode2, AP_FLAGS, &flags2, AP_WPA_FLAGS, &wpa2, AP_RSN_FLAGS, &rsn2, -1);
+        gtk_tree_model_get (model, &it2, AP_SSID, &str2, AP_AP, &ap, -1);
+        mode2 = nm_access_point_get_mode (ap);
+        flags2 = nm_access_point_get_flags (ap);
+        wpa2 = nm_access_point_get_wpa_flags (ap);
+        rsn2 = nm_access_point_get_rsn_flags (ap);
+
         if (!g_strcmp0 (str1, str2) && mode1 == mode2 && flags1 == flags2 && wpa1 == wpa2 && rsn1 == rsn2) res = FALSE;
         else res = TRUE;
         g_free (str2);
@@ -1265,17 +1287,31 @@ static gboolean nm_find_dup_ap (GtkTreeModel *model, GtkTreeIter *iter, gpointer
     return res;
 }
 
-static void nm_scans_add (char *str, int signal, guint ap_mode, guint ap_flags, guint ap_wpa, guint ap_rsn)
+static void nm_scans_add (char *str, NMDeviceWifi *dev, NMAccessPoint *ap)
 {
     GtkTreeIter iter, fiter, siter;
     GtkTreeModel *sap, *fap;
     GdkPixbuf *sec_icon = NULL, *sig_icon = NULL;
     char *icon;
-    int dsig;
+    int dsig, secure = 0;
+    int signal = -1;
+    guint ap_mode = 0, ap_flags = 0, ap_wpa = 0, ap_rsn = 0;
+
+    if (ap)
+    {
+        signal = nm_access_point_get_strength (ap);
+        ap_mode = nm_access_point_get_mode (ap);
+        ap_flags = nm_access_point_get_flags (ap);
+        ap_wpa = nm_access_point_get_wpa_flags (ap);
+        ap_rsn = nm_access_point_get_rsn_flags (ap);
+    }
 
     gtk_list_store_append (ap_list, &iter);
     if ((ap_flags & NM_802_11_AP_FLAGS_PRIVACY) || ap_wpa || ap_rsn)
+    {
         sec_icon = gtk_icon_theme_load_icon (gtk_icon_theme_get_default(), "network-wireless-encrypted", 16, 0, NULL);
+        secure = 1;
+    }
     if (signal >= 0)
     {
         if (signal > 80) dsig = 100;
@@ -1288,8 +1324,7 @@ static void nm_scans_add (char *str, int signal, guint ap_mode, guint ap_flags, 
         sig_icon = gtk_icon_theme_load_icon (gtk_icon_theme_get_default(), icon, 16, 0, NULL);
         g_free (icon);
     }
-    gtk_list_store_set (ap_list, &iter, AP_SSID, str, AP_SEC_ICON, sec_icon, AP_SIG_ICON, sig_icon, AP_MODE, ap_mode, 
-        AP_FLAGS, ap_flags, AP_WPA_FLAGS, ap_wpa, AP_RSN_FLAGS, ap_rsn, -1);
+    gtk_list_store_set (ap_list, &iter, AP_SSID, str, AP_SEC_ICON, sec_icon, AP_SIG_ICON, sig_icon, AP_SECURE, secure, AP_DEVICE, dev, AP_AP, ap, -1);
 
     sap = gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (ap_list));
     gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (sap), AP_SSID, GTK_SORT_ASCENDING);
@@ -1303,9 +1338,14 @@ static gboolean nm_match_ssid (GtkTreeModel *model, GtkTreePath *path, GtkTreeIt
     char *lssid, *match;
     guint ap_mode, ap_flags, ap_wpa, ap_rsn;
     gboolean res = FALSE;
+    NMAccessPoint *ap;
 
-    gtk_tree_model_get (model, iter, AP_SSID, &lssid, AP_MODE, &ap_mode,
-        AP_FLAGS, &ap_flags, AP_WPA_FLAGS, &ap_wpa, AP_RSN_FLAGS, &ap_rsn, -1);
+    gtk_tree_model_get (model, iter, AP_SSID, &lssid, AP_AP, &ap, -1);
+
+    ap_mode = nm_access_point_get_mode (ap);
+    ap_flags = nm_access_point_get_flags (ap);
+    ap_wpa = nm_access_point_get_wpa_flags (ap);
+    ap_rsn = nm_access_point_get_rsn_flags (ap);
 
     match = g_strdup_printf ("%s:%lx:%lx:%lx:%lx", lssid, ap_mode, ap_flags, ap_wpa, ap_rsn);
     if (!g_strcmp0 ((char *) data, match))
@@ -1320,24 +1360,31 @@ static gboolean nm_match_ssid (GtkTreeModel *model, GtkTreePath *path, GtkTreeIt
     return res;
 }
 
-static void nm_ap_changed (NMDeviceWifi *device, NMAccessPoint *ap, gpointer user_data)
+static void nm_ap_changed (NMDeviceWifi *device, NMAccessPoint *unused, gpointer user_data)
 {
     GtkTreeModel *model;
     GtkTreeIter iter;
     GtkTreeSelection *sel;
     char *lssid = NULL, *match;
+    NMAccessPoint *ap;
     guint ap_mode, ap_flags, ap_wpa, ap_rsn;
 
     // get the selected line in the list of SSIDs
     sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv));
     if (sel && gtk_tree_selection_get_selected (sel, &model, &iter))
     {
-        gtk_tree_model_get (model, &iter, AP_SSID, &lssid, AP_MODE, &ap_mode, 
-            AP_FLAGS, &ap_flags, AP_WPA_FLAGS, &ap_wpa, AP_RSN_FLAGS, &ap_rsn, -1);
+        gtk_tree_model_get (model, &iter, AP_SSID, &lssid, AP_AP, &ap, -1);
         if (!g_strcmp0 (lssid, _("Searching for networks - please wait...")))
         {
             g_free (lssid);
             lssid = NULL;
+        }
+        else
+        {
+            ap_mode = nm_access_point_get_mode (ap);
+            ap_flags = nm_access_point_get_flags (ap);
+            ap_wpa = nm_access_point_get_wpa_flags (ap);
+            ap_rsn = nm_access_point_get_rsn_flags (ap);
         }
     }
 
@@ -1346,17 +1393,14 @@ static void nm_ap_changed (NMDeviceWifi *device, NMAccessPoint *ap, gpointer use
     const GPtrArray *aps = nm_device_wifi_get_access_points (device);
     for (int i = 0; aps && i < aps->len; i++)
     {
-        NMAccessPoint *ap = g_ptr_array_index (aps, i);
+        ap = g_ptr_array_index (aps, i);
 
         char *ssid_utf8 = NULL;
         GBytes *ssid = nm_access_point_get_ssid (ap);
         if (ssid)
         {
             ssid_utf8 = nm_utils_ssid_to_utf8 (g_bytes_get_data (ssid, NULL), g_bytes_get_size (ssid));
-            if (ssid_utf8)
-                nm_scans_add (ssid_utf8, nm_access_point_get_strength (ap), nm_access_point_get_mode (ap),
-                    nm_access_point_get_flags (ap), nm_access_point_get_wpa_flags (ap),
-                    nm_access_point_get_rsn_flags (ap));
+            if (ssid_utf8) nm_scans_add (ssid_utf8, device, ap);
         }
     }
 
@@ -1364,10 +1408,56 @@ static void nm_ap_changed (NMDeviceWifi *device, NMAccessPoint *ap, gpointer use
     if (lssid)
     {
         match = g_strdup_printf ("%s:%lx:%lx:%lx:%lx", lssid, ap_mode, ap_flags, ap_wpa, ap_rsn);
-        gtk_tree_model_foreach (gtk_tree_view_get_model (ap_tv), nm_match_ssid, match);
+        gtk_tree_model_foreach (gtk_tree_view_get_model (GTK_TREE_VIEW (ap_tv)), nm_match_ssid, match);
         g_free (match);
         g_free (lssid);
     }
+}
+
+static gboolean nm_check_connection (gpointer data)
+{
+    NMActiveConnection *active = (NMActiveConnection *) data;
+    NMActiveConnectionState state = nm_active_connection_get_state (active);
+
+    if (state == NM_ACTIVE_CONNECTION_STATE_ACTIVATED)
+    {
+        g_object_unref (active);
+        connect_success ();
+        return FALSE;
+    }
+    return TRUE;
+}
+
+void nm_connection_added_cb (GObject *client, GAsyncResult *result, gpointer user_data)
+{
+    NMActiveConnection *active;
+    GError *error = NULL;
+
+    active = nm_client_add_and_activate_connection_finish (NM_CLIENT (client), result, &error);
+
+    if (error)
+    {
+        g_print ("Error adding connection: %s", error->message);
+        g_error_free (error);
+        connect_failure (NULL);
+    }
+    else g_timeout_add (1000, nm_check_connection, active);
+}
+
+void nm_connect_wifi (const char *password)
+{
+    NMConnection *connection = nm_simple_connection_new ();
+
+    if (password)
+    {
+        NMSettingWirelessSecurity *sec = (NMSettingWirelessSecurity *) nm_setting_wireless_security_new ();
+        g_object_set (G_OBJECT (sec), NM_SETTING_WIRELESS_SECURITY_KEY_MGMT, "wpa-psk",
+            NM_SETTING_WIRELESS_SECURITY_PSK, password, NULL);
+        nm_connection_add_setting (connection, NM_SETTING (sec));
+    }
+
+    nm_client_add_and_activate_connection_async (nm_client, connection, nm_dev,
+        nm_object_get_path (NM_OBJECT (nm_ap)), NULL, nm_connection_added_cb, NULL);
 }
 
 
@@ -1685,7 +1775,7 @@ static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, g
         case PAGE_WIFIAP :  if (nm_client)
                             {
                                 gtk_list_store_clear (ap_list);
-                                nm_scans_add (_("Searching for networks - please wait..."), -1, 0, 0, 0, 0);
+                                nm_scans_add (_("Searching for networks - please wait..."), NULL, NULL);
                                 if (!scan_timer)
                                 {
                                     const GPtrArray *devices = nm_client_get_devices (nm_client);
@@ -1733,6 +1823,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
 {
     GtkTreeModel *model;
     GtkTreeIter iter;
+    GtkTreeSelection *sel;
     const char *ccptr;
     char *wc, *text;
     int secure, connected;
@@ -1872,7 +1963,19 @@ static void next_page (GtkButton* btn, gpointer ptr)
 
         case PAGE_WIFIAP :  if (ssid) g_free (ssid);
                             ssid = NULL;
-                            if (!find_line (&ssid, &secure, &connected))
+
+                            sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv));
+                            if (sel && gtk_tree_selection_get_selected (sel, &model, &iter))
+                            {
+                                gtk_tree_model_get (model, &iter, AP_SSID, &ssid, AP_SECURE, &secure, AP_CONNECTED, &connected, AP_DEVICE, &nm_dev, AP_AP, &nm_ap, -1);
+                                if (!g_strcmp0 (ssid, _("Searching for networks - please wait...")))
+                                {
+                                    g_free (ssid);
+                                    ssid = NULL;
+                                }
+                            }
+
+                            if (!ssid)
                                 gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
                             else
                             {
@@ -1895,23 +1998,41 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                 }
                                 else
                                 {
-                                    if (select_ssid (ssid, NULL))
+                                    if (nm_client)
                                     {
                                         message (_("Connecting to WiFi network - please wait..."), 0, 0, -1, TRUE);
                                         conn_timeout = g_timeout_add (30000, connect_failure, NULL);
+                                        nm_connect_wifi (NULL);
                                     }
-                                    else message (_("Could not connect to this network"), 1, 0, -1, FALSE);
+                                    else
+                                    {
+                                        if (select_ssid (ssid, NULL))
+                                        {
+                                            message (_("Connecting to WiFi network - please wait..."), 0, 0, -1, TRUE);
+                                            conn_timeout = g_timeout_add (30000, connect_failure, NULL);
+                                        }
+                                        else message (_("Could not connect to this network"), 1, 0, -1, FALSE);
+                                    }
                                 }
                             }
                             break;
 
         case PAGE_WIFIPSK : ccptr = gtk_entry_get_text (GTK_ENTRY (psk_te));
-                            if (select_ssid (ssid, ccptr))
+                            if (nm_client)
                             {
                                 message (_("Connecting to WiFi network - please wait..."), 0, 0, -1, TRUE);
                                 conn_timeout = g_timeout_add (30000, connect_failure, NULL);
+                                nm_connect_wifi (ccptr);
                             }
-                            else message (_("Could not connect to this network"), 1, 0, -1, FALSE);
+                            else
+                            {
+                                if (select_ssid (ssid, ccptr))
+                                {
+                                    message (_("Connecting to WiFi network - please wait..."), 0, 0, -1, TRUE);
+                                    conn_timeout = g_timeout_add (30000, connect_failure, NULL);
+                                }
+                                else message (_("Could not connect to this network"), 1, 0, -1, FALSE);
+                            }
                             break;
 
         case PAGE_DONE :
@@ -2194,7 +2315,7 @@ int main (int argc, char *argv[])
     locale_list = gtk_list_store_new (4, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
     country_list = gtk_list_store_new (2, G_TYPE_STRING, G_TYPE_STRING);
     tz_list = gtk_list_store_new (3, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
-    ap_list = gtk_list_store_new (9, G_TYPE_STRING, GDK_TYPE_PIXBUF, GDK_TYPE_PIXBUF, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT);
+    ap_list = gtk_list_store_new (7, G_TYPE_STRING, GDK_TYPE_PIXBUF, GDK_TYPE_PIXBUF, G_TYPE_INT, G_TYPE_INT, G_TYPE_POINTER, G_TYPE_POINTER);
 
     // build the UI
     builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/piwiz.ui");
