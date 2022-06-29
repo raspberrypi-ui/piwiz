@@ -137,6 +137,7 @@ NMClient *nm_client = NULL;
 gint scan_timer = 0;
 NMDevice *nm_dev;
 NMAccessPoint *nm_ap;
+gboolean nm_init = FALSE;
 
 /* Map from country code to keyboard */
 
@@ -1825,10 +1826,14 @@ static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, g
 
         case PAGE_WIFIAP :  if (nm_client)
                             {
-                                gtk_list_store_clear (ap_list);
-                                nm_scans_add (_("Searching for networks - please wait..."), NULL, NULL);
+                                if (!nm_init)
+                                {
+                                    gtk_list_store_clear (ap_list);
+                                    nm_scans_add (_("Searching for networks - please wait..."), NULL, NULL);
+                                    gtk_widget_set_sensitive (ap_tv, FALSE);
+                                    nm_init = TRUE;
+                                }
                                 nm_start_scan ();
-                                gtk_widget_set_sensitive (ap_tv, FALSE);
                             }
                             else if (!con)
                             {
