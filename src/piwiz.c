@@ -133,11 +133,11 @@ gboolean reboot = TRUE, is_pi = TRUE;
 int last_btn = NEXT_BTN;
 int calls;
 
+gboolean use_nm;
 NMClient *nm_client = NULL;
 gint nm_scan_timer = 0;
 NMDevice *nm_dev;
 NMAccessPoint *nm_ap;
-gboolean nm_init = FALSE;
 
 /* Map from country code to keyboard */
 
@@ -1824,22 +1824,25 @@ static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, g
                             }
                             break;
 
-        case PAGE_WIFIAP :  if (nm_client)
+        case PAGE_WIFIAP :  if (use_nm)
                             {
-                                if (!nm_init)
+                                if (!nm_client)
                                 {
+                                    nm_client = nm_client_new (NULL, NULL);
                                     gtk_list_store_clear (ap_list);
                                     nm_scans_add (_("Searching for networks - please wait..."), NULL, NULL);
                                     gtk_widget_set_sensitive (ap_tv, FALSE);
-                                    nm_init = TRUE;
                                 }
                                 nm_start_scan ();
                             }
-                            else if (!con)
+                            else
                             {
-                                init_dhcpcd ();
-                                gtk_list_store_clear (ap_list);
-                                scans_add (_("Searching for networks - please wait..."), 0, 0, -1, 0);
+                                if (!con)
+                                {
+                                    init_dhcpcd ();
+                                    gtk_list_store_clear (ap_list);
+                                    scans_add (_("Searching for networks - please wait..."), 0, 0, -1, 0);
+                                }
                             }
                             gtk_widget_show (skip_btn);
                             break;
@@ -2005,7 +2008,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
 
         case PAGE_WIFIAP :  if (ssid) g_free (ssid);
                             ssid = NULL;
-                            if (nm_client) nm_stop_scan ();
+                            if (use_nm) nm_stop_scan ();
 
                             sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv));
                             if (sel && gtk_tree_selection_get_selected (sel, &model, &iter))
@@ -2041,7 +2044,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                 }
                                 else
                                 {
-                                    if (nm_client)
+                                    if (use_nm)
                                     {
                                         message (_("Connecting to WiFi network - please wait..."), 0, 0, -1, TRUE);
                                         conn_timeout = g_timeout_add (30000, connect_failure, NULL);
@@ -2061,7 +2064,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             break;
 
         case PAGE_WIFIPSK : ccptr = gtk_entry_get_text (GTK_ENTRY (psk_te));
-                            if (nm_client)
+                            if (use_nm)
                             {
                                 message (_("Connecting to WiFi network - please wait..."), 0, 0, -1, TRUE);
                                 conn_timeout = g_timeout_add (30000, connect_failure, NULL);
@@ -2168,7 +2171,7 @@ static void skip_page (GtkButton* btn, gpointer ptr)
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
     {
         case PAGE_WIFIAP :  gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
-                            if (nm_client) nm_stop_scan ();
+                            if (use_nm) nm_stop_scan ();
                             break;
 
         case PAGE_UPDATE :  gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_DONE);
@@ -2297,7 +2300,7 @@ static void uscan_toggle (GtkSwitch *sw, gpointer ptr)
         vsystem ("raspi-config nonint do_overscan_kms 1 %d", enable);
 }
 
-static int check_service (char *name)
+static gboolean check_service (char *name)
 {
     int res;
     char *buf;
@@ -2306,13 +2309,13 @@ static int check_service (char *name)
     res = system (buf);
     g_free (buf);
 
-    if (res) return 0;
+    if (res) return FALSE;
 
     buf = g_strdup_printf ("systemctl status %s 2> /dev/null | grep -w Active: | grep -qw inactive", name);
     res = system (buf);
     g_free (buf);
 
-    return res;
+    return !!res;
 }
 
 /* The dialog... */
@@ -2333,7 +2336,7 @@ int main (int argc, char *argv[])
 
     if (system ("raspi-config nonint is_pi")) is_pi = FALSE;
 
-    if (check_service ("NetworkManager")) nm_client = nm_client_new (NULL, NULL);
+    use_nm = check_service ("NetworkManager");
 
     // set the audio output to HDMI if there is one, otherwise the analog jack
     vsystem ("hdmi-audio-select");
