@@ -1323,6 +1323,8 @@ static void nm_scans_add (char *str, NMDeviceWifi *dev, NMAccessPoint *ap)
     fap = gtk_tree_model_filter_new (GTK_TREE_MODEL (sap), NULL);
     gtk_tree_model_filter_set_visible_func (GTK_TREE_MODEL_FILTER (fap), (GtkTreeModelFilterVisibleFunc) nm_find_dup_ap, NULL, NULL);
     gtk_tree_view_set_model (GTK_TREE_VIEW (ap_tv), fap);
+
+    gtk_widget_set_sensitive (ap_tv, TRUE);
 }
 
 static gboolean nm_match_ssid (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer data)
@@ -1826,6 +1828,7 @@ static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, g
                                 gtk_list_store_clear (ap_list);
                                 nm_scans_add (_("Searching for networks - please wait..."), NULL, NULL);
                                 nm_start_scan ();
+                                gtk_widget_set_sensitive (ap_tv, FALSE);
                             }
                             else if (!con)
                             {
