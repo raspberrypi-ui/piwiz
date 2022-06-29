@@ -1283,6 +1283,7 @@ static void nm_scans_add (char *str, NMDeviceWifi *dev, NMAccessPoint *ap)
     char *icon;
     int dsig, secure = 0;
     int signal = -1;
+    int connected = 0;
     guint ap_mode = 0, ap_flags = 0, ap_wpa = 0, ap_rsn = 0;
 
     if (ap)
@@ -1292,6 +1293,7 @@ static void nm_scans_add (char *str, NMDeviceWifi *dev, NMAccessPoint *ap)
         ap_flags = nm_access_point_get_flags (ap);
         ap_wpa = nm_access_point_get_wpa_flags (ap);
         ap_rsn = nm_access_point_get_rsn_flags (ap);
+        if (nm_device_wifi_get_active_access_point (dev) == ap) connected = 1;
     }
 
     gtk_list_store_append (ap_list, &iter);
@@ -1312,7 +1314,9 @@ static void nm_scans_add (char *str, NMDeviceWifi *dev, NMAccessPoint *ap)
         sig_icon = gtk_icon_theme_load_icon (gtk_icon_theme_get_default(), icon, 16, 0, NULL);
         g_free (icon);
     }
-    gtk_list_store_set (ap_list, &iter, AP_SSID, str, AP_SEC_ICON, sec_icon, AP_SIG_ICON, sig_icon, AP_SECURE, secure, AP_DEVICE, dev, AP_AP, ap, -1);
+
+    gtk_list_store_set (ap_list, &iter, AP_SSID, str, AP_SEC_ICON, sec_icon, AP_SIG_ICON, sig_icon, AP_SECURE, secure,
+        AP_CONNECTED, connected, AP_DEVICE, dev, AP_AP, ap, -1);
 
     sap = gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (ap_list));
     gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (sap), AP_SSID, GTK_SORT_ASCENDING);
@@ -1390,6 +1394,16 @@ static void nm_ap_changed (NMDeviceWifi *device, NMAccessPoint *unused, gpointer
             ssid_utf8 = nm_utils_ssid_to_utf8 (g_bytes_get_data (ssid, NULL), g_bytes_get_size (ssid));
             if (ssid_utf8) nm_scans_add (ssid_utf8, device, ap);
         }
+
+        // if there is no selected AP, but this one is active, then select it...
+        if (!lssid && nm_device_wifi_get_active_access_point (device) == ap)
+        {
+            lssid = g_strdup (ssid_utf8);
+            ap_mode = nm_access_point_get_mode (ap);
+            ap_flags = nm_access_point_get_flags (ap);
+            ap_wpa = nm_access_point_get_wpa_flags (ap);
+            ap_rsn = nm_access_point_get_rsn_flags (ap);
+       }
     }
 
     // reselect the selected line
@@ -1442,10 +1456,7 @@ static void nm_stop_scan (void)
         for (int i = 0; devices && i < devices->len; i++)
         {
             NMDevice *device = g_ptr_array_index (devices, i);
-            if (NM_IS_DEVICE_WIFI (device))
-            {
-                printf ("%d disconnected\n", g_signal_handlers_disconnect_by_func (device, G_CALLBACK (nm_ap_changed), NULL));
-            }
+            if (NM_IS_DEVICE_WIFI (device)) g_signal_handlers_disconnect_by_func (device, G_CALLBACK (nm_ap_changed), NULL);
         }
         g_source_remove (scan_timer);
         scan_timer = 0;
