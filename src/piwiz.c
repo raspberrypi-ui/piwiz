@@ -1240,18 +1240,6 @@ static char *find_psk_for_network (char *ssid)
 
 /* Network Manager */
 
-static gboolean nm_request_scan (void)
-{
-    const GPtrArray *devices = nm_client_get_devices (nm_client);
-    for (int i = 0; devices && i < devices->len; i++)
-    {
-        NMDevice *device = g_ptr_array_index (devices, i);
-        if (NM_IS_DEVICE_WIFI (device))
-            nm_device_wifi_request_scan ((NMDeviceWifi *) device, NULL, NULL);
-    }
-    return TRUE;
-}
-
 static gboolean nm_find_dup_ap (GtkTreeModel *model, GtkTreeIter *iter, gpointer data)
 {
     char *str1 = NULL, *str2 = NULL;
@@ -1411,6 +1399,56 @@ static void nm_ap_changed (NMDeviceWifi *device, NMAccessPoint *unused, gpointer
         gtk_tree_model_foreach (gtk_tree_view_get_model (GTK_TREE_VIEW (ap_tv)), nm_match_ssid, match);
         g_free (match);
         g_free (lssid);
+    }
+}
+
+static gboolean nm_request_scan (void)
+{
+    const GPtrArray *devices = nm_client_get_devices (nm_client);
+    for (int i = 0; devices && i < devices->len; i++)
+    {
+        NMDevice *device = g_ptr_array_index (devices, i);
+        if (NM_IS_DEVICE_WIFI (device))
+            nm_device_wifi_request_scan ((NMDeviceWifi *) device, NULL, NULL);
+    }
+    return TRUE;
+}
+
+static void nm_start_scan (void)
+{
+    if (!scan_timer)
+    {
+        const GPtrArray *devices = nm_client_get_devices (nm_client);
+        for (int i = 0; devices && i < devices->len; i++)
+        {
+            NMDevice *device = g_ptr_array_index (devices, i);
+            if (NM_IS_DEVICE_WIFI (device))
+            {
+                g_signal_connect (device, "access-point-added", G_CALLBACK (nm_ap_changed), NULL);
+                g_signal_connect (device, "access-point-removed", G_CALLBACK (nm_ap_changed), NULL);
+            }
+        }
+
+        nm_request_scan ();
+        scan_timer =  g_timeout_add (2500, (GSourceFunc) nm_request_scan, NULL);
+    }
+}
+
+static void nm_stop_scan (void)
+{
+    if (scan_timer)
+    {
+        const GPtrArray *devices = nm_client_get_devices (nm_client);
+        for (int i = 0; devices && i < devices->len; i++)
+        {
+            NMDevice *device = g_ptr_array_index (devices, i);
+            if (NM_IS_DEVICE_WIFI (device))
+            {
+                printf ("%d disconnected\n", g_signal_handlers_disconnect_by_func (device, G_CALLBACK (nm_ap_changed), NULL));
+            }
+        }
+        g_source_remove (scan_timer);
+        scan_timer = 0;
     }
 }
 
@@ -1776,22 +1814,7 @@ static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, g
                             {
                                 gtk_list_store_clear (ap_list);
                                 nm_scans_add (_("Searching for networks - please wait..."), NULL, NULL);
-                                if (!scan_timer)
-                                {
-                                    const GPtrArray *devices = nm_client_get_devices (nm_client);
-                                    for (int i = 0; devices && i < devices->len; i++)
-                                    {
-                                        NMDevice *device = g_ptr_array_index (devices, i);
-                                        if (NM_IS_DEVICE_WIFI (device))
-                                        {
-                                            g_signal_connect (device, "access-point-added", G_CALLBACK (nm_ap_changed), NULL);
-                                            g_signal_connect (device, "access-point-removed", G_CALLBACK (nm_ap_changed), NULL);
-                                        }
-                                    }
-
-                                    nm_request_scan ();
-                                    scan_timer =  g_timeout_add (2500, (GSourceFunc) nm_request_scan, NULL);
-                                }
+                                nm_start_scan ();
                             }
                             else if (!con)
                             {
@@ -1963,6 +1986,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
 
         case PAGE_WIFIAP :  if (ssid) g_free (ssid);
                             ssid = NULL;
+                            if (nm_client) nm_stop_scan ();
 
                             sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv));
                             if (sel && gtk_tree_selection_get_selected (sel, &model, &iter))
@@ -2125,6 +2149,7 @@ static void skip_page (GtkButton* btn, gpointer ptr)
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
     {
         case PAGE_WIFIAP :  gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
+                            if (nm_client) nm_stop_scan ();
                             break;
 
         case PAGE_UPDATE :  gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_DONE);
