@@ -134,7 +134,7 @@ int last_btn = NEXT_BTN;
 int calls;
 
 NMClient *nm_client = NULL;
-gint scan_timer = 0;
+gint nm_scan_timer = 0;
 NMDevice *nm_dev;
 NMAccessPoint *nm_ap;
 gboolean nm_init = FALSE;
@@ -1433,7 +1433,7 @@ static gboolean nm_request_scan (void)
 
 static void nm_start_scan (void)
 {
-    if (!scan_timer)
+    if (!nm_scan_timer)
     {
         const GPtrArray *devices = nm_client_get_devices (nm_client);
         for (int i = 0; devices && i < devices->len; i++)
@@ -1447,13 +1447,13 @@ static void nm_start_scan (void)
         }
 
         nm_request_scan ();
-        scan_timer =  g_timeout_add (2500, (GSourceFunc) nm_request_scan, NULL);
+        nm_scan_timer =  g_timeout_add (2500, (GSourceFunc) nm_request_scan, NULL);
     }
 }
 
 static void nm_stop_scan (void)
 {
-    if (scan_timer)
+    if (nm_scan_timer)
     {
         const GPtrArray *devices = nm_client_get_devices (nm_client);
         for (int i = 0; devices && i < devices->len; i++)
@@ -1461,8 +1461,8 @@ static void nm_stop_scan (void)
             NMDevice *device = g_ptr_array_index (devices, i);
             if (NM_IS_DEVICE_WIFI (device)) g_signal_handlers_disconnect_by_func (device, G_CALLBACK (nm_ap_changed), NULL);
         }
-        g_source_remove (scan_timer);
-        scan_timer = 0;
+        g_source_remove (nm_scan_timer);
+        nm_scan_timer = 0;
     }
 }
 
