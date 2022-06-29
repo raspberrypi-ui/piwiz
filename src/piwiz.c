@@ -1906,7 +1906,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             // set wifi country - this is quick, so no need for warning
                             if (wifi_if[0])
                             {
-                                vsystem ("raspi-config nonint do_wifi_country %s", wc);
+                                vsystem ("raspi-config nonint do_wifi_country %s > /dev/null", wc);
                             }
                             g_free (wc);
 
