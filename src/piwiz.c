@@ -1278,37 +1278,44 @@ static gboolean nm_find_dup_ap (GtkTreeModel *model, GtkTreeIter *iter, gpointer
     return TRUE;
 }
 
-static void nm_scans_add (char *ssid, NMDeviceWifi *dev, NMAccessPoint *ap)
+static void nm_scans_add (NMDeviceWifi *dev, NMAccessPoint *ap)
 {
     GtkTreeIter iter;
     GdkPixbuf *sec_icon = NULL, *sig_icon = NULL;
-    char *icon;
+    char *icon, *ssid_txt;
     int signal, dsig, secure = 0;
+    GBytes *ssid;
 
-    if (ap)
+    if (!NM_IS_ACCESS_POINT (ap)) return;
+
+    ssid = nm_access_point_get_ssid (ap);
+    if (!ssid) return;
+
+    ssid_txt = nm_utils_ssid_to_utf8 (g_bytes_get_data (ssid, NULL), g_bytes_get_size (ssid));
+    if (!ssid_txt) return;
+
+    if ((nm_access_point_get_flags (ap) & NM_802_11_AP_FLAGS_PRIVACY) || nm_access_point_get_wpa_flags (ap)
+        || nm_access_point_get_rsn_flags (ap))
     {
-        if ((nm_access_point_get_flags (ap) & NM_802_11_AP_FLAGS_PRIVACY) || nm_access_point_get_wpa_flags (ap)
-            || nm_access_point_get_rsn_flags (ap))
-        {
-            sec_icon = gtk_icon_theme_load_icon (gtk_icon_theme_get_default (), "network-wireless-encrypted", 16, 0, NULL);
-            secure = 1;
-        }
-
-        signal = nm_access_point_get_strength (ap);
-        if (signal > 80) dsig = 100;
-        else if (signal > 55) dsig = 75;
-        else if (signal > 30) dsig = 50;
-        else if (signal > 5) dsig = 25;
-        else dsig = 0;
-
-        icon = g_strdup_printf ("network-wireless-connected-%02d", dsig);
-        sig_icon = gtk_icon_theme_load_icon (gtk_icon_theme_get_default (), icon, 16, 0, NULL);
-        g_free (icon);
+        sec_icon = gtk_icon_theme_load_icon (gtk_icon_theme_get_default (), "network-wireless-encrypted", 16, 0, NULL);
+        secure = 1;
     }
 
+    signal = nm_access_point_get_strength (ap);
+    if (signal > 80) dsig = 100;
+    else if (signal > 55) dsig = 75;
+    else if (signal > 30) dsig = 50;
+    else if (signal > 5) dsig = 25;
+    else dsig = 0;
+
+    icon = g_strdup_printf ("network-wireless-connected-%02d", dsig);
+    sig_icon = gtk_icon_theme_load_icon (gtk_icon_theme_get_default (), icon, 16, 0, NULL);
+    g_free (icon);
+
     gtk_list_store_append (ap_list, &iter);
-    gtk_list_store_set (ap_list, &iter, AP_SSID, ssid, AP_SEC_ICON, sec_icon, AP_SIG_ICON, sig_icon,
+    gtk_list_store_set (ap_list, &iter, AP_SSID, ssid_txt, AP_SEC_ICON, sec_icon, AP_SIG_ICON, sig_icon,
         AP_SECURE, secure, AP_DEVICE, dev, AP_AP, ap, -1);
+    g_free (ssid_txt);
 }
 
 static gboolean nm_match_ssid (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer data)
@@ -1360,15 +1367,7 @@ static void nm_ap_changed (NMDeviceWifi *device, NMAccessPoint *unused, gpointer
     for (int i = 0; aps && i < aps->len; i++)
     {
         ap = g_ptr_array_index (aps, i);
-
-        char *ssid_utf8 = NULL;
-        GBytes *ssid = nm_access_point_get_ssid (ap);
-        if (ssid)
-        {
-            ssid_utf8 = nm_utils_ssid_to_utf8 (g_bytes_get_data (ssid, NULL), g_bytes_get_size (ssid));
-            if (ssid_utf8) nm_scans_add (ssid_utf8, device, ap);
-            g_free (ssid_utf8);
-        }
+        nm_scans_add (device, ap);
     }
 
     // if no selection has been made, select the active AP - always select the active AP after a connection...
@@ -1803,9 +1802,12 @@ static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, g
                             {
                                 if (!nm_client)
                                 {
+                                    GtkTreeIter iter;
                                     nm_client = nm_client_new (NULL, NULL);
                                     gtk_list_store_clear (ap_list);
-                                    nm_scans_add (_("Searching for networks - please wait..."), NULL, NULL);
+                                    gtk_list_store_append (ap_list, &iter);
+                                    gtk_list_store_set (ap_list, &iter, AP_SSID, _("Searching for networks - please wait..."), 
+                                        AP_SEC_ICON, NULL, AP_SIG_ICON, NULL, AP_AP, NULL, -1);
                                     gtk_widget_set_sensitive (ap_tv, FALSE);
                                 }
                                 nm_start_scan ();
