@@ -135,7 +135,7 @@ int calls;
 
 gboolean use_nm;
 NMClient *nm_client = NULL;
-gint nm_scan_timer = 0;
+gboolean nm_scanning = FALSE;
 NMDevice *nm_dev;
 NMAccessPoint *nm_ap;
 
@@ -1406,7 +1406,7 @@ static void nm_ap_changed (NMDeviceWifi *device, NMAccessPoint *unused, gpointer
             ap_flags = nm_access_point_get_flags (ap);
             ap_wpa = nm_access_point_get_wpa_flags (ap);
             ap_rsn = nm_access_point_get_rsn_flags (ap);
-       }
+        }
     }
 
     // reselect the selected line
@@ -1419,21 +1419,21 @@ static void nm_ap_changed (NMDeviceWifi *device, NMAccessPoint *unused, gpointer
     }
 }
 
-static gboolean nm_request_scan (void)
+static void nm_scan_cb (GObject *device, GAsyncResult *result, gpointer user_data)
 {
-    const GPtrArray *devices = nm_client_get_devices (nm_client);
-    for (int i = 0; devices && i < devices->len; i++)
-    {
-        NMDevice *device = g_ptr_array_index (devices, i);
-        if (NM_IS_DEVICE_WIFI (device))
-            nm_device_wifi_request_scan ((NMDeviceWifi *) device, NULL, NULL);
-    }
-    return TRUE;
+    GError *error;
+    nm_device_wifi_request_scan_finish (NM_DEVICE_WIFI (device), result, &error);
+}
+
+static void nm_scan_done (GObject *object, GParamSpec *property, gpointer user_data)
+{
+    NMDeviceWifi *device = NM_DEVICE_WIFI (object);
+    nm_device_wifi_request_scan_async (device, NULL, nm_scan_cb, NULL);
 }
 
 static void nm_start_scan (void)
 {
-    if (!nm_scan_timer)
+    if (!nm_scanning)
     {
         const GPtrArray *devices = nm_client_get_devices (nm_client);
         for (int i = 0; devices && i < devices->len; i++)
@@ -1443,26 +1443,26 @@ static void nm_start_scan (void)
             {
                 g_signal_connect (device, "access-point-added", G_CALLBACK (nm_ap_changed), NULL);
                 g_signal_connect (device, "access-point-removed", G_CALLBACK (nm_ap_changed), NULL);
+                g_signal_connect (device, "notify::last-scan", G_CALLBACK (nm_scan_done), NULL);
+                nm_device_wifi_request_scan_async ((NMDeviceWifi *) device, NULL, nm_scan_cb, NULL);
             }
         }
-
-        nm_request_scan ();
-        nm_scan_timer =  g_timeout_add (2500, (GSourceFunc) nm_request_scan, NULL);
+        nm_scanning = TRUE;
     }
 }
 
 static void nm_stop_scan (void)
 {
-    if (nm_scan_timer)
+    if (nm_scanning)
     {
         const GPtrArray *devices = nm_client_get_devices (nm_client);
         for (int i = 0; devices && i < devices->len; i++)
         {
             NMDevice *device = g_ptr_array_index (devices, i);
             if (NM_IS_DEVICE_WIFI (device)) g_signal_handlers_disconnect_by_func (device, G_CALLBACK (nm_ap_changed), NULL);
+            if (NM_IS_DEVICE_WIFI (device)) g_signal_handlers_disconnect_by_func (device, G_CALLBACK (nm_scan_done), NULL);
         }
-        g_source_remove (nm_scan_timer);
-        nm_scan_timer = 0;
+        nm_scanning = FALSE;
     }
 }
 
@@ -2148,7 +2148,8 @@ static void prev_page (GtkButton* btn, gpointer ptr)
                             }
                             break;
 
-        case PAGE_WIFIAP :  if (is_pi)
+        case PAGE_WIFIAP :  if (use_nm) nm_stop_scan ();
+                            if (is_pi)
                                 gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
                             else
                                 gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
@@ -2170,8 +2171,8 @@ static void skip_page (GtkButton* btn, gpointer ptr)
     last_btn = SKIP_BTN;
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
     {
-        case PAGE_WIFIAP :  gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
-                            if (use_nm) nm_stop_scan ();
+        case PAGE_WIFIAP :  if (use_nm) nm_stop_scan ();
+                            gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
                             break;
 
         case PAGE_UPDATE :  gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_DONE);
