@@ -1261,8 +1261,6 @@ static gboolean nm_ap_same (NMAccessPoint *ap1, NMAccessPoint *ap2)
 
 static gboolean nm_find_dup_ap (GtkTreeModel *model, GtkTreeIter *iter, gpointer data)
 {
-    GBytes *ssid1, *ssid2;
-    guint mode1, flags1, wpa1, rsn1, mode2, flags2, wpa2, rsn2;
     GtkTreeIter it2 = *iter;
     NMAccessPoint *ap1, *ap2;
 
@@ -1806,7 +1804,7 @@ static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, g
                                     nm_client = nm_client_new (NULL, NULL);
                                     gtk_list_store_clear (ap_list);
                                     gtk_list_store_append (ap_list, &iter);
-                                    gtk_list_store_set (ap_list, &iter, AP_SSID, _("Searching for networks - please wait..."), 
+                                    gtk_list_store_set (ap_list, &iter, AP_SSID, _("Searching for networks - please wait..."),
                                         AP_SEC_ICON, NULL, AP_SIG_ICON, NULL, AP_AP, NULL, -1);
                                     gtk_widget_set_sensitive (ap_tv, FALSE);
                                 }
