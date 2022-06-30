@@ -121,6 +121,7 @@ GtkTreeModelFilter *fcount, *fcity;
 /* List of APs */
 
 GtkListStore *ap_list;
+GtkTreeModel *sap, *fap;
 
 /* Globals */
 
@@ -1279,7 +1280,6 @@ static gboolean nm_find_dup_ap (GtkTreeModel *model, GtkTreeIter *iter, gpointer
 static void nm_scans_add (char *str, NMDeviceWifi *dev, NMAccessPoint *ap)
 {
     GtkTreeIter iter, fiter, siter;
-    GtkTreeModel *sap, *fap;
     GdkPixbuf *sec_icon = NULL, *sig_icon = NULL;
     char *icon;
     int dsig, secure = 0;
@@ -1318,14 +1318,6 @@ static void nm_scans_add (char *str, NMDeviceWifi *dev, NMAccessPoint *ap)
 
     gtk_list_store_set (ap_list, &iter, AP_SSID, str, AP_SEC_ICON, sec_icon, AP_SIG_ICON, sig_icon, AP_SECURE, secure,
         AP_CONNECTED, connected, AP_DEVICE, dev, AP_AP, ap, -1);
-
-    sap = gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (ap_list));
-    gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (sap), AP_SSID, GTK_SORT_ASCENDING);
-    fap = gtk_tree_model_filter_new (GTK_TREE_MODEL (sap), NULL);
-    gtk_tree_model_filter_set_visible_func (GTK_TREE_MODEL_FILTER (fap), (GtkTreeModelFilterVisibleFunc) nm_find_dup_ap, NULL, NULL);
-    gtk_tree_view_set_model (GTK_TREE_VIEW (ap_tv), fap);
-
-    gtk_widget_set_sensitive (ap_tv, TRUE);
 }
 
 static gboolean nm_match_ssid (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer data)
@@ -1417,6 +1409,9 @@ static void nm_ap_changed (NMDeviceWifi *device, NMAccessPoint *unused, gpointer
         g_free (match);
         g_free (lssid);
     }
+
+    gtk_tree_model_filter_refilter (GTK_TREE_MODEL_FILTER (fap));
+    if (gtk_tree_model_iter_n_children (fap, NULL)) gtk_widget_set_sensitive (ap_tv, TRUE);
 }
 
 static void nm_scan_cb (GObject *device, GAsyncResult *result, gpointer user_data)
@@ -2462,6 +2457,11 @@ int main (int argc, char *argv[])
     gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (ap_tv), 0, "AP", col, "text", 0, NULL);
     gtk_tree_view_column_set_expand (gtk_tree_view_get_column (GTK_TREE_VIEW (ap_tv), 0), TRUE);
     gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (ap_tv), FALSE);
+    sap = gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (ap_list));
+    gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (sap), AP_SSID, GTK_SORT_ASCENDING);
+    fap = gtk_tree_model_filter_new (GTK_TREE_MODEL (sap), NULL);
+    gtk_tree_model_filter_set_visible_func (GTK_TREE_MODEL_FILTER (fap), (GtkTreeModelFilterVisibleFunc) nm_find_dup_ap, NULL, NULL);
+    gtk_tree_view_set_model (GTK_TREE_VIEW (ap_tv), fap);
 
     col = gtk_cell_renderer_pixbuf_new ();
     gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (ap_tv), 1, "Security", col, "pixbuf", 1, NULL);
