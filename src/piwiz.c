@@ -1476,7 +1476,14 @@ static gboolean nm_check_connection (gpointer data)
 
     if (state == NM_ACTIVE_CONNECTION_STATE_ACTIVATED)
     {
+        const GPtrArray *devices = nm_active_connection_get_devices (active);
+        for (int i = 0; devices && i < devices->len; i++)
+        {
+            NMDevice *device = g_ptr_array_index (devices, i);
+            nm_ap_changed (NM_DEVICE_WIFI (device), NULL, NULL);
+        }
         g_object_unref (active);
+
         connect_success ();
         return FALSE;
     }
