@@ -1462,8 +1462,11 @@ static void nm_stop_scan (void)
         for (int i = 0; devices && i < devices->len; i++)
         {
             NMDevice *device = g_ptr_array_index (devices, i);
-            if (NM_IS_DEVICE_WIFI (device)) g_signal_handlers_disconnect_by_func (device, G_CALLBACK (nm_ap_changed), NULL);
-            if (NM_IS_DEVICE_WIFI (device)) g_signal_handlers_disconnect_by_func (device, G_CALLBACK (nm_scan_done), NULL);
+            if (NM_IS_DEVICE_WIFI (device))
+            {
+                g_signal_handlers_disconnect_by_func (device, G_CALLBACK (nm_ap_changed), NULL);
+                g_signal_handlers_disconnect_by_func (device, G_CALLBACK (nm_scan_done), NULL);
+            }
         }
         nm_scanning = FALSE;
     }
