@@ -1297,34 +1297,23 @@ static gboolean nm_find_dup_ap (GtkTreeModel *model, GtkTreeIter *iter, gpointer
     return res;
 }
 
-static void nm_scans_add (char *str, NMDeviceWifi *dev, NMAccessPoint *ap)
+static void nm_scans_add (char *ssid, NMDeviceWifi *dev, NMAccessPoint *ap)
 {
-    GtkTreeIter iter, fiter, siter;
+    GtkTreeIter iter;
     GdkPixbuf *sec_icon = NULL, *sig_icon = NULL;
     char *icon;
-    int dsig, secure = 0;
-    int signal = -1;
-    int connected = 0;
-    guint ap_mode = 0, ap_flags = 0, ap_wpa = 0, ap_rsn = 0;
+    int signal, dsig, secure = 0;
 
     if (ap)
     {
-        signal = nm_access_point_get_strength (ap);
-        ap_mode = nm_access_point_get_mode (ap);
-        ap_flags = nm_access_point_get_flags (ap);
-        ap_wpa = nm_access_point_get_wpa_flags (ap);
-        ap_rsn = nm_access_point_get_rsn_flags (ap);
-        if (nm_device_wifi_get_active_access_point (dev) == ap) connected = 1;
-    }
+        if ((nm_access_point_get_flags (ap) & NM_802_11_AP_FLAGS_PRIVACY) || nm_access_point_get_wpa_flags (ap)
+            || nm_access_point_get_rsn_flags (ap))
+        {
+            sec_icon = gtk_icon_theme_load_icon (gtk_icon_theme_get_default (), "network-wireless-encrypted", 16, 0, NULL);
+            secure = 1;
+        }
 
-    gtk_list_store_append (ap_list, &iter);
-    if ((ap_flags & NM_802_11_AP_FLAGS_PRIVACY) || ap_wpa || ap_rsn)
-    {
-        sec_icon = gtk_icon_theme_load_icon (gtk_icon_theme_get_default(), "network-wireless-encrypted", 16, 0, NULL);
-        secure = 1;
-    }
-    if (signal >= 0)
-    {
+        signal = nm_access_point_get_strength (ap);
         if (signal > 80) dsig = 100;
         else if (signal > 55) dsig = 75;
         else if (signal > 30) dsig = 50;
@@ -1332,12 +1321,13 @@ static void nm_scans_add (char *str, NMDeviceWifi *dev, NMAccessPoint *ap)
         else dsig = 0;
 
         icon = g_strdup_printf ("network-wireless-connected-%02d", dsig);
-        sig_icon = gtk_icon_theme_load_icon (gtk_icon_theme_get_default(), icon, 16, 0, NULL);
+        sig_icon = gtk_icon_theme_load_icon (gtk_icon_theme_get_default (), icon, 16, 0, NULL);
         g_free (icon);
     }
 
-    gtk_list_store_set (ap_list, &iter, AP_SSID, str, AP_SEC_ICON, sec_icon, AP_SIG_ICON, sig_icon, AP_SECURE, secure,
-        AP_CONNECTED, connected, AP_DEVICE, dev, AP_AP, ap, -1);
+    gtk_list_store_append (ap_list, &iter);
+    gtk_list_store_set (ap_list, &iter, AP_SSID, ssid, AP_SEC_ICON, sec_icon, AP_SIG_ICON, sig_icon,
+        AP_SECURE, secure, AP_DEVICE, dev, AP_AP, ap, -1);
 }
 
 static gboolean nm_match_ssid (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer data)
