@@ -1090,8 +1090,6 @@ static void scans_add (char *str, int match, int secure, int signal, int connect
 
     if (match)
         gtk_tree_selection_select_iter (gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv)), &iter);
-
-    gtk_tree_view_set_model (GTK_TREE_VIEW (ap_tv), GTK_TREE_MODEL (ap_list));
 }
 
 static int find_line (char **lssid, int *secure, int *connected)
