@@ -1264,37 +1264,34 @@ static char *nm_match_string (NMAccessPoint *ap)
 
 static gboolean nm_find_dup_ap (GtkTreeModel *model, GtkTreeIter *iter, gpointer data)
 {
-    char *str1 = NULL, *str2 = NULL;
+    GBytes *ssid1, *ssid2;
     guint mode1, flags1, wpa1, rsn1, mode2, flags2, wpa2, rsn2;
-    gboolean res = TRUE;
     GtkTreeIter it2 = *iter;
     NMAccessPoint *ap;
 
-    gtk_tree_model_get (model, iter, AP_SSID, &str1, AP_AP, &ap, -1);
-    if (ap)
-    {
-        mode1 = nm_access_point_get_mode (ap);
-        flags1 = nm_access_point_get_flags (ap);
-        wpa1 = nm_access_point_get_wpa_flags (ap);
-        rsn1 = nm_access_point_get_rsn_flags (ap);
-    }
+    gtk_tree_model_get (model, iter, AP_AP, &ap, -1);
+    if (!ap) return TRUE;
+
+    ssid1 = nm_access_point_get_ssid (ap);
+    mode1 = nm_access_point_get_mode (ap);
+    flags1 = nm_access_point_get_flags (ap);
+    wpa1 = nm_access_point_get_wpa_flags (ap);
+    rsn1 = nm_access_point_get_rsn_flags (ap);
 
     while (gtk_tree_model_iter_previous (model, &it2))
     {
-        gtk_tree_model_get (model, &it2, AP_SSID, &str2, AP_AP, &ap, -1);
+        gtk_tree_model_get (model, &it2, AP_AP, &ap, -1);
+        ssid2 = nm_access_point_get_ssid (ap);
         mode2 = nm_access_point_get_mode (ap);
         flags2 = nm_access_point_get_flags (ap);
         wpa2 = nm_access_point_get_wpa_flags (ap);
         rsn2 = nm_access_point_get_rsn_flags (ap);
 
-        if (!g_strcmp0 (str1, str2) && mode1 == mode2 && flags1 == flags2 && wpa1 == wpa2 && rsn1 == rsn2) res = FALSE;
-        else res = TRUE;
-        g_free (str2);
-        if (!res) break;
+        if (nm_utils_same_ssid (g_bytes_get_data (ssid1, NULL), g_bytes_get_size (ssid1), g_bytes_get_data (ssid2, NULL), g_bytes_get_size (ssid2), FALSE)
+            && mode1 == mode2 && flags1 == flags2 && wpa1 == wpa2 && rsn1 == rsn2) return FALSE;
     }
 
-    g_free (str1);
-    return res;
+    return TRUE;
 }
 
 static void nm_scans_add (char *ssid, NMDeviceWifi *dev, NMAccessPoint *ap)
@@ -1447,7 +1444,7 @@ static void nm_start_scan (void)
                 g_signal_connect (device, "access-point-added", G_CALLBACK (nm_ap_changed), NULL);
                 g_signal_connect (device, "access-point-removed", G_CALLBACK (nm_ap_changed), NULL);
                 g_signal_connect (device, "notify::last-scan", G_CALLBACK (nm_scan_done), NULL);
-                nm_device_wifi_request_scan_async ((NMDeviceWifi *) device, NULL, nm_scan_cb, NULL);
+                nm_device_wifi_request_scan_async (NM_DEVICE_WIFI (device), NULL, nm_scan_cb, NULL);
             }
         }
         nm_scanning = TRUE;
