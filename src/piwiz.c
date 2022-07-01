@@ -1066,7 +1066,7 @@ static void set_init (GtkTreeModel *model, GtkWidget *cb, int pos, const char *i
 
 static void scans_add (char *str, int match, int secure, int signal, int connected)
 {
-    GtkTreeIter iter;
+    GtkTreeIter iter, siter, fiter;
     GdkPixbuf *sec_icon = NULL, *sig_icon = NULL;
     char *icon;
     int dsig;
@@ -1089,7 +1089,11 @@ static void scans_add (char *str, int match, int secure, int signal, int connect
     gtk_list_store_set (ap_list, &iter, AP_SSID, str, AP_SEC_ICON, sec_icon, AP_SIG_ICON, sig_icon, AP_SECURE, secure, AP_CONNECTED, connected, -1);
 
     if (match)
-        gtk_tree_selection_select_iter (gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv)), &iter);
+    {
+        gtk_tree_model_sort_convert_child_iter_to_iter (GTK_TREE_MODEL_SORT (sap), &siter, &iter);
+        gtk_tree_model_filter_convert_child_iter_to_iter (GTK_TREE_MODEL_FILTER (fap), &fiter, &siter);
+        gtk_tree_selection_select_iter (gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv)), &fiter);
+    }
 }
 
 static int find_line (char **lssid, int *secure, int *connected)
