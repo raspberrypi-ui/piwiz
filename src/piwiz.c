@@ -1163,20 +1163,12 @@ static gboolean select_ssid (char *lssid, const char *psk)
 
 void menu_update_scans (WI_SCAN *wi, DHCPCD_WI_SCAN *scans)
 {
-    GtkTreeModel *model;
-    GtkTreeIter iter;
-    GtkTreeSelection *sel;
     DHCPCD_WI_SCAN *s;
     char *lssid = NULL;
-    int active, selected = 0, connected;
+    int active, selected, connected;
 
-    // get the selected line in the list of SSIDs
-    sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv));
-    if (sel && gtk_tree_selection_get_selected (sel, &model, &iter))
-    {
-        gtk_tree_model_get (model, &iter, AP_SSID, &lssid, -1);
-        if (g_strcmp0 (lssid, _("Searching for networks - please wait..."))) selected = 1;
-    }
+    // get the selected line in the list of SSIDs - values in active and connected are ignored here
+    selected = find_line (&lssid, &active, &connected);
 
     // erase the current list
     gtk_list_store_clear (ap_list);
@@ -1247,7 +1239,7 @@ static gboolean nm_ap_same (NMAccessPoint *ap1, NMAccessPoint *ap2)
     ssid1 = nm_access_point_get_ssid (ap1);
     ssid2 = nm_access_point_get_ssid (ap2);
 
-    if (!nm_utils_same_ssid (g_bytes_get_data (ssid1, NULL), g_bytes_get_size (ssid1), 
+    if (!nm_utils_same_ssid (g_bytes_get_data (ssid1, NULL), g_bytes_get_size (ssid1),
         g_bytes_get_data (ssid2, NULL), g_bytes_get_size (ssid2), FALSE))
             return FALSE;
     if (nm_access_point_get_mode (ap1) != nm_access_point_get_mode (ap2)) return FALSE;
@@ -1841,7 +1833,6 @@ static void next_page (GtkButton* btn, gpointer ptr)
 {
     GtkTreeModel *model;
     GtkTreeIter iter;
-    GtkTreeSelection *sel;
     const char *ccptr;
     char *wc, *text;
     int secure, connected;
@@ -1983,18 +1974,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             ssid = NULL;
                             if (use_nm) nm_stop_scan ();
 
-                            sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv));
-                            if (sel && gtk_tree_selection_get_selected (sel, &model, &iter))
-                            {
-                                gtk_tree_model_get (model, &iter, AP_SSID, &ssid, AP_SECURE, &secure, AP_CONNECTED, &connected, AP_DEVICE, &nm_dev, AP_AP, &nm_ap, -1);
-                                if (!g_strcmp0 (ssid, _("Searching for networks - please wait...")))
-                                {
-                                    g_free (ssid);
-                                    ssid = NULL;
-                                }
-                            }
-
-                            if (!ssid)
+                            if (!find_line (&ssid, &secure, &connected))
                                 gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
                             else
                             {
