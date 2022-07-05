@@ -374,6 +374,7 @@ static void nm_connection_active_cb (GObject *client, GAsyncResult *result, gpoi
 static gboolean nm_check_connection (gpointer data);
 static gboolean nm_ap_same (NMAccessPoint *ap1, NMAccessPoint *ap2);
 static gboolean nm_filter_dup_ap (GtkTreeModel *model, GtkTreeIter *iter, gpointer data);
+static char *nm_find_psk_for_network (char *ssid);
 static void progress (PkProgress *progress, PkProgressType *type, gpointer data);
 static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data);
 static gboolean filter_fn (PkPackage *package, gpointer user_data);
@@ -404,7 +405,7 @@ static char *get_shell_string (char *cmd, gboolean all)
     size_t len = 0;
     FILE *fp = popen (cmd, "r");
 
-    if (fp == NULL) return g_strdup ("");
+    if (fp == NULL) return NULL;
     if (getline (&line, &len, fp) > 0)
     {
         g_strdelimit (line, "\n\r", 0);
@@ -417,7 +418,7 @@ static char *get_shell_string (char *cmd, gboolean all)
     }
     pclose (fp);
     g_free (line);
-    return res ? res : g_strdup ("");
+    return res;
 }
 
 static char *get_string (char *cmd)
@@ -1037,12 +1038,13 @@ static void read_inits (void)
 
     wifi_if = get_string ("for dir in /sys/class/net/*/wireless; do if [ -d \"$dir\" ] ; then basename \"$(dirname \"$dir\")\" ; fi ; done | head -n 1");
     init_tz = get_string ("cat /etc/timezone");
-    init_kb = get_string ("grep XKBLAYOUT /etc/default/keyboard | cut -d = -f 2 | tr -d '\"\n'");
-    init_var = get_string ("grep XKBVARIANT /etc/default/keyboard | cut -d = -f 2 | tr -d '\"\n'");
-    buffer = get_string ("grep LC_ALL /etc/default/locale | cut -d = -f 2");
-    if (!buffer[0]) buffer = get_string ("grep LANGUAGE /etc/default/locale | cut -d = -f 2");
-    if (!buffer[0]) buffer = get_string ("grep LANG /etc/default/locale | cut -d = -f 2");
-    if (buffer[0])
+    init_kb = get_string ("grep XKBLAYOUT /etc/default/keyboard 2> /dev/null | cut -d = -f 2 | tr -d '\"\n'");
+    init_var = get_string ("grep XKBVARIANT /etc/default/keyboard 2> /dev/null | cut -d = -f 2 | tr -d '\"\n'");
+    if (init_kb && !init_var) init_var = g_strdup ("");
+    buffer = get_string ("grep LC_ALL /etc/default/locale 2> /dev/null | cut -d = -f 2");
+    if (!buffer) buffer = get_string ("grep LANGUAGE /etc/default/locale 2> /dev/null | cut -d = -f 2");
+    if (!buffer) buffer = get_string ("grep LANG /etc/default/locale 2> /dev/null | cut -d = -f 2");
+    if (buffer)
     {
         llc = strtok (buffer, "_");
         lcc = strtok (NULL, ":. ");
@@ -1052,6 +1054,11 @@ static void read_inits (void)
             init_lang = g_strdup (llc);
         }
         g_free (buffer);
+    }
+    else
+    {
+        init_country = g_strdup ("GB");
+        init_lang = g_strdup ("en");
     }
 }
 
@@ -1509,6 +1516,26 @@ static gboolean nm_filter_dup_ap (GtkTreeModel *model, GtkTreeIter *iter, gpoint
     return TRUE;
 }
 
+// extract PSK for already-known SSID
+static char *nm_find_psk_for_network (char *ssid)
+{
+    char *cmd, *fname, *res;
+
+    // find the file with a matching SSID
+    cmd = g_strdup_printf ("grep 'ssid=%s$' /etc/NetworkManager/system-connections/*.nmconnection 2> /dev/null | cut -d : -f 1", ssid);
+    fname = get_shell_string (cmd, TRUE);
+    g_free (cmd);
+
+    if (!fname) return NULL;
+
+    cmd = g_strdup_printf ("grep 'psk=' '%s' | cut -d = -f 2", fname);
+    res = get_shell_string (cmd, TRUE);
+    g_free (cmd);
+    g_free (fname);
+
+    return res;
+}
+
 
 /* Updates */
 
@@ -1698,29 +1725,29 @@ static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data)
 
     buf = g_strdup_printf ("check-language-support -l %s_%s", lc, cc);
     lpack = get_shell_string (buf, TRUE);
+    g_free (buf);
 
     if (!g_strcmp0 (lc, "ja"))
     {
-        tmp = g_strdup_printf ("%s%s%s", JAPAN_FONTS, strlen(lpack) ? " " : "", lpack);
+        tmp = g_strdup_printf ("%s%s%s", JAPAN_FONTS, lpack ? " " : "", lpack);
         g_free (lpack);
         lpack = tmp;
     }
 
-    if (strlen (lpack))
+    if (lpack)
     {
         pack_array = g_strsplit (lpack, " ", -1);
 
         thread_message (_("Finding languages - please wait..."), -1);
         pk_client_resolve_async (PK_CLIENT (task), 0, pack_array, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) resolve_lang_done, NULL);
         g_strfreev (pack_array);
+        g_free (lpack);
     }
     else
     {
         thread_message (_("Comparing versions - please wait..."), -1);
         pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
     }
-    g_free (buf);
-    g_free (lpack);
 }
 
 static gpointer refresh_update_cache (gpointer data)
@@ -2025,9 +2052,10 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                     gtk_label_set_text (GTK_LABEL (psk_label), text);
                                     g_free (text);
 
-                                    text = find_psk_for_network (ssid);
+                                    if (use_nm) text = nm_find_psk_for_network (ssid);
+                                    else text = find_psk_for_network (ssid);
                                     gtk_entry_set_text (GTK_ENTRY (psk_te), text ? text : "");
-                                    g_free (text);
+                                    if (text) g_free (text);
 
                                     gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIPSK);
                                 }
