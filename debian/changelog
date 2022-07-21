@@ -1,3 +1,9 @@
+piwiz (0.42) bullseye; urgency=medium
+
+  * Network Manager support
+
+ -- Simon Long <simon@raspberrypi.com>  Thu, 21 Jul 2022 10:42:51 +0100
+
 piwiz (0.41) bullseye; urgency=medium
 
   * Do not allow 'root' as a user name
