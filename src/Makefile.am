@@ -13,7 +13,8 @@ piwiz_CFLAGS = \
 	-I$(srcdir)/libdhcpcd \
 	-I$(srcdir)/dhcpcd-gtk \
 	$(PACKAGE_CFLAGS) \
-	$(G_CAST_CHECKS)
+	$(G_CAST_CHECKS) \
+	-Wall
 
 piwiz_SOURCES = piwiz.c \
 		libdhcpcd/config.c \
@@ -46,7 +47,8 @@ piwizhs_CFLAGS = \
 	-I$(srcdir)/libdhcpcd \
 	-I$(srcdir)/dhcpcd-gtk \
 	$(PACKAGE_CFLAGS) \
-	$(G_CAST_CHECKS)
+	$(G_CAST_CHECKS) \
+	-Wall
 
 piwizhs_SOURCES = piwiz.c \
 		libdhcpcd/config.c \

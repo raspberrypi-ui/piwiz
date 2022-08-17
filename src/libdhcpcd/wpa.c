@@ -351,7 +351,7 @@ dhcpcd_wpa_scans_read(DHCPCD_WPA *wpa)
 {
 	size_t i;
 	ssize_t bytes, dl;
-	DHCPCD_WI_SCAN *wis, *w, *l;
+	DHCPCD_WI_SCAN *wis, *w, *l = NULL;
 	char *s, *p, buf[32];
 	char wssid[sizeof(w->ssid)];
 	const char *proto;

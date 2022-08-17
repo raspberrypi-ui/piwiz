@@ -41,7 +41,9 @@ static NotifyNotification *nn;
 #include "dhcpcd.h"
 #include "dhcpcd-gtk.h"
 
+#if 0
 static GtkStatusIcon *status_icon;
+#endif
 static guint ani_timer;
 static int ani_counter;
 static bool online;
@@ -61,11 +63,11 @@ WI_SCANS wi_scans;
 /*!!!!!!!!!!*/
 DHCPCD_CONNECTION *con;
 extern void connect_success (void);
-#define gtk_status_icon_set_from_icon_name(a,b) (0)
-#define gtk_status_icon_set_tooltip_text(a,b) (0)
-#define prefs_abort() (0)
-#define menu_abort() (0)
-#define menu_remove_if(a) (0)
+#define gtk_status_icon_set_from_icon_name(a,b)
+#define gtk_status_icon_set_tooltip_text(a,b)
+#define prefs_abort()
+#define menu_abort()
+#define menu_remove_if(a)
 /*!!!!!!!!!!*/
 
 static gboolean dhcpcd_try_open(gpointer data);
@@ -122,7 +124,7 @@ get_strongest_scan()
 static gboolean
 animate_carrier(_unused gpointer data)
 {
-	const char *icon;
+	_unused const char *icon;
 	DHCPCD_WI_SCAN *scan;
 
 	if (ani_timer == 0)
@@ -169,7 +171,7 @@ animate_carrier(_unused gpointer data)
 static gboolean
 animate_online(_unused gpointer data)
 {
-	const char *icon;
+	_unused const char *icon;
 	DHCPCD_WI_SCAN *scan;
 
 	if (ani_timer == 0)
@@ -247,7 +249,7 @@ update_online(DHCPCD_CONNECTION *con, bool showif)
 			    "network-offline");
 		}
 	} else {
-		const char *icon;
+		_unused const char *icon;
 		DHCPCD_WI_SCAN *scan;
 
 		scan = get_strongest_scan();
@@ -405,7 +407,7 @@ dhcpcd_status_cb(DHCPCD_CONNECTION *con,
     unsigned int status, const char *status_msg, _unused void *data)
 {
 	static unsigned int last = DHC_UNKNOWN;
-	const char *msg;
+	_unused const char *msg;
 	bool refresh;
 	WI_SCAN *w;
 
@@ -500,7 +502,7 @@ dhcpcd_if_cb(DHCPCD_IF *i, _unused void *data)
 {
 	DHCPCD_CONNECTION *con;
 	char *msg;
-	const char *icon;
+	_unused const char *icon;
 	bool new_msg;
 
 	/* We should ignore renew and stop so we don't annoy the user */
@@ -597,7 +599,7 @@ dhcpcd_wpa_scan_cb(DHCPCD_WPA *wpa, _unused void *data)
 	DHCPCD_IF *i;
 	WI_SCAN *w;
 	DHCPCD_WI_SCAN *scans, *s1, *s2;
-	const char *msg;
+	_unused const char *msg;
 	int lerrno, fd;
 
 	/* This could be a new WPA so watch it */

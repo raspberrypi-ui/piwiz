@@ -1318,9 +1318,7 @@ static void nm_ap_changed_cb (NMDeviceWifi *device, NMAccessPoint *unused, gpoin
     GtkTreeModel *model;
     GtkTreeIter iter;
     GtkTreeSelection *sel;
-    char *lssid = NULL, *match = NULL;
     NMAccessPoint *sel_ap, *ap, *active_ap;
-    guint ap_mode, ap_flags, ap_wpa, ap_rsn;
 
     active_ap = nm_device_wifi_get_active_access_point (device);
     if (!NM_IS_ACCESS_POINT (active_ap)) active_ap = NULL;
@@ -1574,7 +1572,7 @@ static void progress (PkProgress *progress, PkProgressType *type, gpointer data)
 static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
 {
     GError *error = NULL;
-    PkResults *results = pk_task_generic_finish (task, res, &error);
+    pk_task_generic_finish (task, res, &error);
 
     if (error != NULL)
     {
@@ -1639,7 +1637,7 @@ static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
 static void install_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
 {
     GError *error = NULL;
-    PkResults *results = pk_task_generic_finish (task, res, &error);
+    pk_task_generic_finish (task, res, &error);
 
     if (error != NULL)
     {
@@ -1679,7 +1677,7 @@ static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
     {
         item = g_ptr_array_index (array, i);
         g_object_get (item, "package-id", &package_id, NULL);
-        if (arch = strstr (package_id, "arm64"))
+        if ((arch = strstr (package_id, "arm64")))
         {
             *(arch + 3) = 'h';
             *(arch + 4) = 'f';
@@ -1711,7 +1709,7 @@ static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
 static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data)
 {
     GError *error = NULL;
-    PkResults *results = pk_task_generic_finish (task, res, &error);
+    pk_task_generic_finish (task, res, &error);
     gchar **pack_array;
     gchar *lpack, *buf, *tmp;
 
@@ -2341,7 +2339,6 @@ static gboolean check_service (char *name)
 int main (int argc, char *argv[])
 {
     GtkBuilder *builder;
-    GtkWidget *wid;
     GtkCellRenderer *col;
     int res, kbd;
 
@@ -2444,7 +2441,6 @@ int main (int argc, char *argv[])
 
     // set up the locale combo boxes
     read_locales ();
-    wid = (GtkWidget *) gtk_builder_get_object (builder, "p1table");
     country_cb = (GtkWidget *) gtk_builder_get_object (builder, "p1comb1");
     language_cb = (GtkWidget *) gtk_builder_get_object (builder, "p1comb2");
     timezone_cb = (GtkWidget *) gtk_builder_get_object (builder, "p1comb3");
