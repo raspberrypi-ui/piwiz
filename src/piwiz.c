@@ -414,7 +414,10 @@ static char *get_shell_string (char *cmd, gboolean all)
             res = line;
             while (*res++) if (g_ascii_isspace (*res)) *res = 0;
         }
-        res = g_strdup (line);
+        if (line[0])
+            res = g_strdup (line);
+        else
+            res = NULL;
     }
     pclose (fp);
     g_free (line);
