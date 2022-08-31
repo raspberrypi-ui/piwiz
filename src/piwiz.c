@@ -139,6 +139,7 @@ NMClient *nm_client = NULL;
 gboolean nm_scanning = FALSE;
 NMDevice *nm_dev;
 NMAccessPoint *nm_ap;
+NMConnection *nm_wcon;
 
 /* Map from country code to keyboard */
 
@@ -370,7 +371,9 @@ static void nm_ap_add (NMDeviceWifi *dev, NMAccessPoint *ap);
 static gboolean nm_select_matched_ssid (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer data);
 static gboolean nm_set_connected_flag (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer data);
 static void nm_connect_wifi (const char *password);
+static void nm_find_conn (gpointer data, gpointer user_data);
 static void nm_connection_active_cb (GObject *client, GAsyncResult *result, gpointer data);
+static void nm_changes_committed_cb (GObject *connection, GAsyncResult *result, gpointer data);
 static gboolean nm_check_connection (gpointer data);
 static gboolean nm_ap_same (NMAccessPoint *ap1, NMAccessPoint *ap2);
 static gboolean nm_filter_dup_ap (GtkTreeModel *model, GtkTreeIter *iter, gpointer data);
@@ -1428,18 +1431,62 @@ static gboolean nm_set_connected_flag (GtkTreeModel *model, GtkTreePath *path, G
 // request a connection to the AP stored in the nm_ap global
 static void nm_connect_wifi (const char *password)
 {
-    NMConnection *connection = nm_simple_connection_new ();
+    NMSettingWirelessSecurity *sec = NULL;
+    GPtrArray *conns;
 
+    /* create the security object from the password */
     if (password)
     {
-        NMSettingWirelessSecurity *sec = NM_SETTING_WIRELESS_SECURITY (nm_setting_wireless_security_new ());
+        sec = NM_SETTING_WIRELESS_SECURITY (nm_setting_wireless_security_new ());
         g_object_set (G_OBJECT (sec), NM_SETTING_WIRELESS_SECURITY_KEY_MGMT, "wpa-psk",
             NM_SETTING_WIRELESS_SECURITY_PSK, password, NULL);
-        nm_connection_add_setting (connection, NM_SETTING (sec));
     }
 
-    nm_client_add_and_activate_connection_async (nm_client, connection, nm_dev,
-        nm_object_get_path (NM_OBJECT (nm_ap)), NULL, nm_connection_active_cb, NULL);
+    /* do we already have a connection to the desired AP from a previous failed attempt? */
+    nm_wcon = NULL;
+    conns = (GPtrArray*) nm_client_get_connections (nm_client);
+    g_ptr_array_foreach (conns, nm_find_conn, NULL);
+
+    if (nm_wcon)
+    {
+        /* pre-existing connection - update security and try again */
+        if (sec)
+        {
+            nm_connection_add_setting (nm_wcon, NM_SETTING (sec));
+            nm_remote_connection_commit_changes_async (NM_REMOTE_CONNECTION (nm_wcon), TRUE, NULL, nm_changes_committed_cb, NULL);
+        }
+        else
+            nm_client_activate_connection_async (nm_client, nm_wcon, nm_dev,
+                nm_object_get_path (NM_OBJECT (nm_ap)), NULL, nm_connection_active_cb, (gpointer) 1);
+    }
+    else
+    {
+        /* new connection */
+        nm_wcon = nm_simple_connection_new ();
+        if (sec) nm_connection_add_setting (nm_wcon, NM_SETTING (sec));
+        nm_client_add_and_activate_connection_async (nm_client, nm_wcon, nm_dev,
+            nm_object_get_path (NM_OBJECT (nm_ap)), NULL, nm_connection_active_cb, (gpointer) 0);
+    }
+}
+
+// find existing connection so it can be edited and reused
+static void nm_find_conn (gpointer data, gpointer user_data)
+{
+    NMConnection *conn = (NMConnection *) data;
+    NMSettingWireless *wset = nm_connection_get_setting_wireless (conn);
+    if (wset)
+    {
+        GBytes *ssid1, *ssid2;
+
+        ssid1 = nm_setting_wireless_get_ssid (wset);
+        ssid2 = nm_access_point_get_ssid (nm_ap);
+
+        if (ssid1 && ssid2 && !nm_utils_same_ssid (g_bytes_get_data (ssid1, NULL), g_bytes_get_size (ssid1),
+            g_bytes_get_data (ssid2, NULL), g_bytes_get_size (ssid2), FALSE))
+        {
+            nm_wcon = conn;
+        }
+    }
 }
 
 // callback to end async add_and_activate_connection call
@@ -1448,7 +1495,10 @@ static void nm_connection_active_cb (GObject *client, GAsyncResult *result, gpoi
     NMActiveConnection *active;
     GError *error = NULL;
 
-    active = nm_client_add_and_activate_connection_finish (NM_CLIENT (client), result, &error);
+    if (data)
+        active = nm_client_activate_connection_finish (NM_CLIENT (client), result, &error);
+    else
+        active = nm_client_add_and_activate_connection_finish (NM_CLIENT (client), result, &error);
 
     if (error)
     {
@@ -1457,6 +1507,22 @@ static void nm_connection_active_cb (GObject *client, GAsyncResult *result, gpoi
         connect_failure (NULL);
     }
     else g_timeout_add (1000, nm_check_connection, active);
+}
+
+// callback to end async commit_changes call
+static void nm_changes_committed_cb (GObject *connection, GAsyncResult *result, gpointer data)
+{
+    GError *error = NULL;
+
+    if (nm_remote_connection_commit_changes_finish (NM_REMOTE_CONNECTION (connection), result, &error))
+        nm_client_activate_connection_async (nm_client, NM_CONNECTION (connection), nm_dev,
+            nm_object_get_path (NM_OBJECT (nm_ap)), NULL, nm_connection_active_cb, (gpointer) 1);
+    else
+    {
+        g_print ("Error committing changes: %s", error->message);
+        g_error_free (error);
+        connect_failure (NULL);
+    }
 }
 
 // polled function to check that a newly-activated connection has actually become active
