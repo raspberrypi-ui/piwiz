@@ -365,7 +365,6 @@ static char *find_psk_for_network (char *ssid);
 static void nm_start_scan (void);
 static void nm_stop_scan (void);
 static void nm_req_scan_finish_cb (GObject *device, GAsyncResult *result, gpointer data);
-static void nm_scan_done_cb (GObject *object, GParamSpec *property, gpointer data);
 static void nm_ap_changed_cb (NMDeviceWifi *device, NMAccessPoint *unused, gpointer data);
 static void nm_ap_add (NMDeviceWifi *dev, NMAccessPoint *ap);
 static gboolean nm_select_matched_ssid (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer data);
@@ -1278,7 +1277,6 @@ static void nm_start_scan (void)
             {
                 g_signal_connect (device, "access-point-added", G_CALLBACK (nm_ap_changed_cb), NULL);
                 g_signal_connect (device, "access-point-removed", G_CALLBACK (nm_ap_changed_cb), NULL);
-                g_signal_connect (device, "notify::last-scan", G_CALLBACK (nm_scan_done_cb), NULL);
                 nm_device_wifi_request_scan_async (NM_DEVICE_WIFI (device), NULL, nm_req_scan_finish_cb, NULL);
             }
         }
@@ -1298,7 +1296,6 @@ static void nm_stop_scan (void)
             if (NM_IS_DEVICE_WIFI (device))
             {
                 g_signal_handlers_disconnect_by_func (device, G_CALLBACK (nm_ap_changed_cb), NULL);
-                g_signal_handlers_disconnect_by_func (device, G_CALLBACK (nm_scan_done_cb), NULL);
             }
         }
         nm_scanning = FALSE;
@@ -1310,13 +1307,6 @@ static void nm_req_scan_finish_cb (GObject *device, GAsyncResult *result, gpoint
 {
     GError *error;
     nm_device_wifi_request_scan_finish (NM_DEVICE_WIFI (device), result, &error);
-}
-
-// callback when the last-scan time is updated, indicating a scan has completed
-static void nm_scan_done_cb (GObject *object, GParamSpec *property, gpointer data)
-{
-    NMDeviceWifi *device = NM_DEVICE_WIFI (object);
-    nm_device_wifi_request_scan_async (device, NULL, nm_req_scan_finish_cb, NULL);
 }
 
 // callback generated during scan indicating that the list of APs has changed - update the list store
@@ -1887,11 +1877,11 @@ static void resync (void)
 {
     if (system ("test -e /usr/sbin/ntpd") == 0)
     {
-        system ("/etc/init.d/ntp stop; ntpd -gq; /etc/init.d/ntp start");
+        vsystem ("/etc/init.d/ntp stop; ntpd -gq; /etc/init.d/ntp start");
     }
     else
     {
-        system ("systemctl -q stop systemd-timesyncd 2> /dev/null; systemctl -q start systemd-timesyncd 2> /dev/null");
+        vsystem ("systemctl -q stop systemd-timesyncd 2> /dev/null; systemctl -q start systemd-timesyncd 2> /dev/null");
     }
 }
 
@@ -2018,7 +2008,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
     {
         case PAGE_INTRO :   // disable Bluetooth autoconnect after first page
                             if (!system ("rfkill list bluetooth | grep -q Bluetooth"))
-                                system ("lxpanelctl command bluetooth apstop");
+                                vsystem ("lxpanelctl command bluetooth apstop");
                             gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
                             break;
 
