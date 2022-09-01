@@ -138,7 +138,7 @@ gboolean use_nm;
 NMClient *nm_client = NULL;
 gboolean nm_scanning = FALSE;
 NMDevice *nm_dev;
-NMAccessPoint *nm_ap;
+char *nm_ap;
 NMConnection *nm_wcon;
 
 /* Map from country code to keyboard */
@@ -375,7 +375,8 @@ static void nm_find_conn (gpointer data, gpointer user_data);
 static void nm_connection_active_cb (GObject *client, GAsyncResult *result, gpointer data);
 static void nm_changes_committed_cb (GObject *connection, GAsyncResult *result, gpointer data);
 static gboolean nm_check_connection (gpointer data);
-static gboolean nm_ap_same (NMAccessPoint *ap1, NMAccessPoint *ap2);
+static char *nm_ap_get_id (NMAccessPoint *ap);
+static const char *nm_ap_get_path (char *id, GBytes **ssid);
 static gboolean nm_filter_dup_ap (GtkTreeModel *model, GtkTreeIter *iter, gpointer data);
 static char *nm_find_psk_for_network (char *ssid);
 static void progress (PkProgress *progress, PkProgressType *type, gpointer data);
@@ -1324,10 +1325,12 @@ static void nm_ap_changed_cb (NMDeviceWifi *device, NMAccessPoint *unused, gpoin
     GtkTreeModel *model;
     GtkTreeIter iter;
     GtkTreeSelection *sel;
-    NMAccessPoint *sel_ap, *ap, *active_ap;
+    NMAccessPoint *ap;
+    char *sel_ap, *active_ap;
 
-    active_ap = nm_device_wifi_get_active_access_point (device);
-    if (!NM_IS_ACCESS_POINT (active_ap)) active_ap = NULL;
+    ap = nm_device_wifi_get_active_access_point (device);
+    if (NM_IS_ACCESS_POINT (ap)) active_ap = nm_ap_get_id (ap);
+    else active_ap = NULL;
 
     // get the selected line in the list of SSIDs
     sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv));
@@ -1348,10 +1351,18 @@ static void nm_ap_changed_cb (NMDeviceWifi *device, NMAccessPoint *unused, gpoin
     if (data || (!sel_ap && active_ap)) sel_ap = active_ap;
 
     // reselect the selected line
-    if (sel_ap) gtk_tree_model_foreach (gtk_tree_view_get_model (GTK_TREE_VIEW (ap_tv)), nm_select_matched_ssid, sel_ap);
+    if (sel_ap)
+    {
+        gtk_tree_model_foreach (gtk_tree_view_get_model (GTK_TREE_VIEW (ap_tv)), nm_select_matched_ssid, sel_ap);
+        g_free (sel_ap);
+    }
 
     // update connection state for the non-active entries in the list
-    if (active_ap) gtk_tree_model_foreach (GTK_TREE_MODEL (ap_list), nm_set_connected_flag, active_ap);
+    if (active_ap)
+    {
+        gtk_tree_model_foreach (GTK_TREE_MODEL (ap_list), nm_set_connected_flag, active_ap);
+        if (active_ap != sel_ap) g_free (active_ap);
+    }
 
     gtk_tree_model_filter_refilter (GTK_TREE_MODEL_FILTER (fap));
     if (gtk_tree_model_iter_n_children (fap, NULL)) gtk_widget_set_sensitive (ap_tv, TRUE);
@@ -1362,7 +1373,7 @@ static void nm_ap_add (NMDeviceWifi *dev, NMAccessPoint *ap)
 {
     GtkTreeIter iter;
     GdkPixbuf *sec_icon = NULL, *sig_icon = NULL;
-    char *icon, *ssid_txt;
+    char *icon, *ssid_txt, *id;
     int signal, dsig, secure = 0;
     GBytes *ssid;
 
@@ -1373,6 +1384,8 @@ static void nm_ap_add (NMDeviceWifi *dev, NMAccessPoint *ap)
 
     ssid_txt = nm_utils_ssid_to_utf8 (g_bytes_get_data (ssid, NULL), g_bytes_get_size (ssid));
     if (!ssid_txt) return;
+
+    id = nm_ap_get_id (ap);
 
     if ((nm_access_point_get_flags (ap) & NM_802_11_AP_FLAGS_PRIVACY) || nm_access_point_get_wpa_flags (ap)
         || nm_access_point_get_rsn_flags (ap))
@@ -1394,34 +1407,38 @@ static void nm_ap_add (NMDeviceWifi *dev, NMAccessPoint *ap)
 
     gtk_list_store_append (ap_list, &iter);
     gtk_list_store_set (ap_list, &iter, AP_SSID, ssid_txt, AP_SEC_ICON, sec_icon, AP_SIG_ICON, sig_icon,
-        AP_SECURE, secure, AP_DEVICE, dev, AP_AP, ap, -1);
+        AP_SECURE, secure, AP_DEVICE, dev, AP_AP, id, -1);
     g_free (ssid_txt);
+    g_free (id);
 }
 
 // selects a list store item if it matches the supplied AP
 static gboolean nm_select_matched_ssid (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer data)
 {
-    NMAccessPoint *ap;
+    char *ap;
+    gboolean res = FALSE;
 
     gtk_tree_model_get (model, iter, AP_AP, &ap, -1);
 
-    if (nm_ap_same (ap, NM_ACCESS_POINT (data)))
+    if (!g_strcmp0 (ap, (char *) data))
     {
         gtk_tree_selection_select_iter (gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv)), iter);
-        return TRUE;
+        res = TRUE;
     }
-    return FALSE;
+    g_free (ap);
+    return res;
 }
 
 // sets the connected flag for a list store item if it matches the supplied AP
 static gboolean nm_set_connected_flag (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer data)
 {
-    NMAccessPoint *ap;
+    char *ap;
 
     gtk_tree_model_get (model, iter, AP_AP, &ap, -1);
 
-    if (nm_ap_same (ap, NM_ACCESS_POINT (data))) gtk_list_store_set (GTK_LIST_STORE (model), iter, AP_CONNECTED, 1, -1);
+    if (!g_strcmp0 (ap, (char *) data)) gtk_list_store_set (GTK_LIST_STORE (model), iter, AP_CONNECTED, 1, -1);
 
+    g_free (ap);
     return FALSE;
 }
 
@@ -1433,6 +1450,9 @@ static void nm_connect_wifi (const char *password)
 {
     NMSettingWirelessSecurity *sec = NULL;
     GPtrArray *conns;
+    GBytes *ssid = NULL;
+
+    const char *path = nm_ap_get_path (nm_ap, &ssid);
 
     /* create the security object from the password */
     if (password)
@@ -1445,7 +1465,7 @@ static void nm_connect_wifi (const char *password)
     /* do we already have a connection to the desired AP from a previous failed attempt? */
     nm_wcon = NULL;
     conns = (GPtrArray*) nm_client_get_connections (nm_client);
-    g_ptr_array_foreach (conns, nm_find_conn, NULL);
+    g_ptr_array_foreach (conns, nm_find_conn, ssid);
 
     if (nm_wcon)
     {
@@ -1453,11 +1473,11 @@ static void nm_connect_wifi (const char *password)
         if (sec)
         {
             nm_connection_add_setting (nm_wcon, NM_SETTING (sec));
-            nm_remote_connection_commit_changes_async (NM_REMOTE_CONNECTION (nm_wcon), TRUE, NULL, nm_changes_committed_cb, NULL);
+            nm_remote_connection_commit_changes_async (NM_REMOTE_CONNECTION (nm_wcon), TRUE, NULL, nm_changes_committed_cb, (gpointer) path);
         }
         else
             nm_client_activate_connection_async (nm_client, nm_wcon, nm_dev,
-                nm_object_get_path (NM_OBJECT (nm_ap)), NULL, nm_connection_active_cb, (gpointer) 1);
+                path, NULL, nm_connection_active_cb, (gpointer) 1);
     }
     else
     {
@@ -1465,7 +1485,7 @@ static void nm_connect_wifi (const char *password)
         nm_wcon = nm_simple_connection_new ();
         if (sec) nm_connection_add_setting (nm_wcon, NM_SETTING (sec));
         nm_client_add_and_activate_connection_async (nm_client, nm_wcon, nm_dev,
-            nm_object_get_path (NM_OBJECT (nm_ap)), NULL, nm_connection_active_cb, (gpointer) 0);
+            path, NULL, nm_connection_active_cb, (gpointer) 0);
     }
 }
 
@@ -1479,9 +1499,9 @@ static void nm_find_conn (gpointer data, gpointer user_data)
         GBytes *ssid1, *ssid2;
 
         ssid1 = nm_setting_wireless_get_ssid (wset);
-        ssid2 = nm_access_point_get_ssid (nm_ap);
+        ssid2 = (GBytes *) user_data;
 
-        if (ssid1 && ssid2 && !nm_utils_same_ssid (g_bytes_get_data (ssid1, NULL), g_bytes_get_size (ssid1),
+        if (ssid1 && ssid2 && nm_utils_same_ssid (g_bytes_get_data (ssid1, NULL), g_bytes_get_size (ssid1),
             g_bytes_get_data (ssid2, NULL), g_bytes_get_size (ssid2), FALSE))
         {
             nm_wcon = conn;
@@ -1516,7 +1536,7 @@ static void nm_changes_committed_cb (GObject *connection, GAsyncResult *result, 
 
     if (nm_remote_connection_commit_changes_finish (NM_REMOTE_CONNECTION (connection), result, &error))
         nm_client_activate_connection_async (nm_client, NM_CONNECTION (connection), nm_dev,
-            nm_object_get_path (NM_OBJECT (nm_ap)), NULL, nm_connection_active_cb, (gpointer) 1);
+            (char *) data, NULL, nm_connection_active_cb, (gpointer) 1);
     else
     {
         g_print ("Error committing changes: %s", error->message);
@@ -1547,40 +1567,66 @@ static gboolean nm_check_connection (gpointer data)
     return TRUE;
 }
 
-// helper function to determine if two AP objects refer to the same AP
-static gboolean nm_ap_same (NMAccessPoint *ap1, NMAccessPoint *ap2)
+// helper function to create unique string for an AP
+static char *nm_ap_get_id (NMAccessPoint *ap)
 {
-    GBytes *ssid1, *ssid2;
+    GBytes *ssid = nm_access_point_get_ssid (ap);
+    if (!ssid) return NULL;
+    char *ssid_txt = nm_utils_ssid_to_utf8 (g_bytes_get_data (ssid, NULL), g_bytes_get_size (ssid));
+    if (!ssid_txt) return NULL;
 
-    ssid1 = nm_access_point_get_ssid (ap1);
-    ssid2 = nm_access_point_get_ssid (ap2);
+    NM80211Mode mode = nm_access_point_get_mode (ap);
+    NM80211ApFlags flags = nm_access_point_get_flags (ap);
+    NM80211ApSecurityFlags wpa_flags = nm_access_point_get_wpa_flags (ap);
+    NM80211ApSecurityFlags rsn_flags = nm_access_point_get_rsn_flags (ap);
 
-    if (!nm_utils_same_ssid (g_bytes_get_data (ssid1, NULL), g_bytes_get_size (ssid1),
-        g_bytes_get_data (ssid2, NULL), g_bytes_get_size (ssid2), FALSE))
-            return FALSE;
-    if (nm_access_point_get_mode (ap1) != nm_access_point_get_mode (ap2)) return FALSE;
-    if (nm_access_point_get_flags (ap1) != nm_access_point_get_flags (ap2)) return FALSE;
-    if (nm_access_point_get_wpa_flags (ap1) != nm_access_point_get_wpa_flags (ap2)) return FALSE;
-    if (nm_access_point_get_rsn_flags (ap1) != nm_access_point_get_rsn_flags (ap2)) return FALSE;
-    return TRUE;
+    char *res = g_strdup_printf ("%s_%d_%d_%d_%d", ssid_txt, mode, flags, wpa_flags, rsn_flags);
+    g_free (ssid_txt);
+    return res;
+}
+
+// helper function to get the object path for the AP with the supplied ID
+static const char *nm_ap_get_path (char *id, GBytes **ssid)
+{
+    NMAccessPoint *ap;
+    char *ap_id;
+
+    const GPtrArray *aps = nm_device_wifi_get_access_points (NM_DEVICE_WIFI (nm_dev));
+    for (int i = 0; aps && i < aps->len; i++)
+    {
+        ap = NM_ACCESS_POINT (g_ptr_array_index (aps, i));
+        ap_id = nm_ap_get_id (ap);
+        if (!g_strcmp0 (ap_id, id))
+        {
+            *ssid = nm_access_point_get_ssid (ap);
+            g_free (ap_id);
+            return nm_object_get_path (NM_OBJECT (ap));
+        }
+        else g_free (ap_id);
+    }
+    return NULL;
 }
 
 // filter function used to determine if an AP is already in the list store
 static gboolean nm_filter_dup_ap (GtkTreeModel *model, GtkTreeIter *iter, gpointer data)
 {
     GtkTreeIter it2 = *iter;
-    NMAccessPoint *ap1, *ap2;
+    char *ap1, *ap2;
+    gboolean res = TRUE;
 
     gtk_tree_model_get (model, iter, AP_AP, &ap1, -1);
-    if (!ap1) return TRUE;
+    if (!ap1) return res;
 
     while (gtk_tree_model_iter_previous (model, &it2))
     {
         gtk_tree_model_get (model, &it2, AP_AP, &ap2, -1);
-        if (nm_ap_same (ap1, ap2)) return FALSE;
+        if (!g_strcmp0 (ap1, ap2)) res = FALSE;
+        g_free (ap2);
+        if (!res) break;
     }
 
-    return TRUE;
+    g_free (ap1);
+    return res;
 }
 
 // extract PSK for already-known SSID
@@ -2446,7 +2492,7 @@ int main (int argc, char *argv[])
     locale_list = gtk_list_store_new (4, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
     country_list = gtk_list_store_new (2, G_TYPE_STRING, G_TYPE_STRING);
     tz_list = gtk_list_store_new (3, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
-    ap_list = gtk_list_store_new (7, G_TYPE_STRING, GDK_TYPE_PIXBUF, GDK_TYPE_PIXBUF, G_TYPE_INT, G_TYPE_INT, G_TYPE_POINTER, G_TYPE_POINTER);
+    ap_list = gtk_list_store_new (7, G_TYPE_STRING, GDK_TYPE_PIXBUF, GDK_TYPE_PIXBUF, G_TYPE_INT, G_TYPE_INT, G_TYPE_POINTER, G_TYPE_STRING);
 
     // build the UI
     builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/piwiz.ui");
