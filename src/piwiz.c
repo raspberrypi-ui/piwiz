@@ -138,7 +138,7 @@ gboolean use_nm;
 NMClient *nm_client = NULL;
 gboolean nm_scanning = FALSE;
 NMDevice *nm_dev;
-char *nm_ap;
+char *nm_ap_id = NULL;
 NMConnection *nm_wcon;
 
 /* Map from country code to keyboard */
@@ -375,7 +375,7 @@ static void nm_connection_active_cb (GObject *client, GAsyncResult *result, gpoi
 static void nm_changes_committed_cb (GObject *connection, GAsyncResult *result, gpointer data);
 static gboolean nm_check_connection (gpointer data);
 static char *nm_ap_get_id (NMAccessPoint *ap);
-static const char *nm_ap_get_path (char *id, GBytes **ssid);
+static const char *nm_ap_get_path (char *id);
 static gboolean nm_filter_dup_ap (GtkTreeModel *model, GtkTreeIter *iter, gpointer data);
 static char *nm_find_psk_for_network (char *ssid);
 static void progress (PkProgress *progress, PkProgressType *type, gpointer data);
@@ -1131,7 +1131,8 @@ static int find_line (char **lssid, int *secure, int *connected)
     sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv));
     if (sel && gtk_tree_selection_get_selected (sel, &model, &iter))
     {
-        gtk_tree_model_get (model, &iter, AP_SSID, lssid, AP_SECURE, secure, AP_CONNECTED, connected, AP_DEVICE, &nm_dev, AP_AP, &nm_ap, -1);
+        if (nm_ap_id) g_free (nm_ap_id);
+        gtk_tree_model_get (model, &iter, AP_SSID, lssid, AP_SECURE, secure, AP_CONNECTED, connected, AP_DEVICE, &nm_dev, AP_AP, &nm_ap_id, -1);
         if (g_strcmp0 (*lssid, _("Searching for networks - please wait..."))) return 1;
     } 
     return 0;
@@ -1440,9 +1441,18 @@ static void nm_connect_wifi (const char *password)
 {
     NMSettingWirelessSecurity *sec = NULL;
     GPtrArray *conns;
-    GBytes *ssid = NULL;
+    const char *path = nm_ap_get_path (nm_ap_id);
 
-    const char *path = nm_ap_get_path (nm_ap, &ssid);
+    if (!path)
+    {
+        if (conn_timeout)
+        {
+            g_source_remove (conn_timeout);
+            conn_timeout = 0;
+        }
+        message (_("Failed to connect - access point not available."), 1, 0, -1, FALSE);
+        return;
+    }
 
     /* create the security object from the password */
     if (password)
@@ -1455,7 +1465,7 @@ static void nm_connect_wifi (const char *password)
     /* do we already have a connection to the desired AP from a previous failed attempt? */
     nm_wcon = NULL;
     conns = (GPtrArray*) nm_client_get_connections (nm_client);
-    g_ptr_array_foreach (conns, nm_find_conn, ssid);
+    g_ptr_array_foreach (conns, nm_find_conn, nm_ap_id);
 
     if (nm_wcon)
     {
@@ -1466,36 +1476,43 @@ static void nm_connect_wifi (const char *password)
             nm_remote_connection_commit_changes_async (NM_REMOTE_CONNECTION (nm_wcon), TRUE, NULL, nm_changes_committed_cb, (gpointer) path);
         }
         else
-            nm_client_activate_connection_async (nm_client, nm_wcon, nm_dev,
-                path, NULL, nm_connection_active_cb, (gpointer) 1);
+            nm_client_activate_connection_async (nm_client, nm_wcon, nm_dev, path, NULL, nm_connection_active_cb, (gpointer) 1);
     }
     else
     {
         /* new connection */
         nm_wcon = nm_simple_connection_new ();
         if (sec) nm_connection_add_setting (nm_wcon, NM_SETTING (sec));
-        nm_client_add_and_activate_connection_async (nm_client, nm_wcon, nm_dev,
-            path, NULL, nm_connection_active_cb, (gpointer) 0);
+        nm_client_add_and_activate_connection_async (nm_client, nm_wcon, nm_dev, path, NULL, nm_connection_active_cb, (gpointer) 0);
     }
 }
 
 // find existing connection so it can be edited and reused
 static void nm_find_conn (gpointer data, gpointer user_data)
 {
+    const char *mode;
+    char *ssid_txt, *id;
     NMConnection *conn = (NMConnection *) data;
     NMSettingWireless *wset = nm_connection_get_setting_wireless (conn);
     if (wset)
     {
-        GBytes *ssid1, *ssid2;
+        GBytes *ssid = nm_setting_wireless_get_ssid (wset);
+        if (!ssid) return;
+        ssid_txt = nm_utils_ssid_to_utf8 (g_bytes_get_data (ssid, NULL), g_bytes_get_size (ssid));
+        if (!ssid_txt) return;
 
-        ssid1 = nm_setting_wireless_get_ssid (wset);
-        ssid2 = (GBytes *) user_data;
+        mode = nm_setting_wireless_get_mode (wset);
+        NM80211Mode nm = NM_802_11_MODE_INFRA;
+        if (!g_strcmp0 (mode, "adhoc")) nm = NM_802_11_MODE_ADHOC;
+        if (!g_strcmp0 (mode, "ap")) nm = NM_802_11_MODE_AP;
+        if (!g_strcmp0 (mode, "mesh")) nm = NM_802_11_MODE_MESH;
 
-        if (ssid1 && ssid2 && nm_utils_same_ssid (g_bytes_get_data (ssid1, NULL), g_bytes_get_size (ssid1),
-            g_bytes_get_data (ssid2, NULL), g_bytes_get_size (ssid2), FALSE))
-        {
-            nm_wcon = conn;
-        }
+        id = g_strdup_printf ("%s_%d", ssid_txt, nm);
+
+        if (!strncmp (id, (char *) user_data, strlen (id))) nm_wcon = conn;
+
+        g_free (ssid_txt);
+        g_free (id);
     }
 }
 
@@ -1576,7 +1593,7 @@ static char *nm_ap_get_id (NMAccessPoint *ap)
 }
 
 // helper function to get the object path for the AP with the supplied ID
-static const char *nm_ap_get_path (char *id, GBytes **ssid)
+static const char *nm_ap_get_path (char *id)
 {
     NMAccessPoint *ap;
     char *ap_id;
@@ -1588,7 +1605,6 @@ static const char *nm_ap_get_path (char *id, GBytes **ssid)
         ap_id = nm_ap_get_id (ap);
         if (!g_strcmp0 (ap_id, id))
         {
-            *ssid = nm_access_point_get_ssid (ap);
             g_free (ap_id);
             return nm_object_get_path (NM_OBJECT (ap));
         }
