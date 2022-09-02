@@ -1131,8 +1131,12 @@ static int find_line (char **lssid, int *secure, int *connected)
     sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv));
     if (sel && gtk_tree_selection_get_selected (sel, &model, &iter))
     {
-        if (nm_ap_id) g_free (nm_ap_id);
-        gtk_tree_model_get (model, &iter, AP_SSID, lssid, AP_SECURE, secure, AP_CONNECTED, connected, AP_DEVICE, &nm_dev, AP_AP, &nm_ap_id, -1);
+        if (use_nm)
+        {
+            if (nm_ap_id) g_free (nm_ap_id);
+            gtk_tree_model_get (model, &iter, AP_SSID, lssid, AP_SECURE, secure, AP_CONNECTED, connected, AP_DEVICE, &nm_dev, AP_AP, &nm_ap_id, -1);
+        }
+        else gtk_tree_model_get (model, &iter, AP_SSID, lssid, AP_SECURE, secure, AP_CONNECTED, connected, -1);
         if (g_strcmp0 (*lssid, _("Searching for networks - please wait..."))) return 1;
     } 
     return 0;
