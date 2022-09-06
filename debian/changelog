@@ -1,3 +1,9 @@
+piwiz (0.43) bullseye; urgency=medium
+
+  * Fix wi-fi test
+
+ -- Simon Long <simon@raspberrypi.com>  Tue, 06 Sep 2022 09:11:37 +0100
+
 piwiz (0.42) bullseye; urgency=medium
 
   * Network Manager support

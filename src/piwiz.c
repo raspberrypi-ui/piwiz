@@ -2062,7 +2062,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             else lookup_keyboard (cc, lc, &lay, &var);
 
                             // set wifi country - this is quick, so no need for warning
-                            if (wifi_if[0])
+                            if (wifi_if)
                             {
                                 vsystem ("raspi-config nonint do_wifi_country %s > /dev/null", wc);
                             }
@@ -2143,14 +2143,14 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             else if (is_pi) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
                             else
                             {
-                                if (!wifi_if[0])
+                                if (!wifi_if)
                                     gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
                                 else
                                     gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIAP);
                             }
                             break;
 
-        case PAGE_OSCAN :   if (!wifi_if[0])
+        case PAGE_OSCAN :   if (!wifi_if)
                                 gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
                             else
                                 gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIAP);
@@ -2278,7 +2278,7 @@ static void prev_page (GtkButton* btn, gpointer ptr)
                                 gtk_notebook_prev_page (GTK_NOTEBOOK (wizard_nb));
                             break;
 
-        case PAGE_UPDATE :  if (wifi_if[0]) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIAP);
+        case PAGE_UPDATE :  if (wifi_if) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIAP);
                             else
                             {
                                 if (is_pi)
