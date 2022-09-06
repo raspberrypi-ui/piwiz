@@ -3,6 +3,7 @@ Copyright (c) 2018 Raspberry Pi (Trading) Ltd.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
+Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
@@ -2355,7 +2356,7 @@ static gboolean show_ip (void)
 
     // display the ip address on the first page
     ip = get_string ("hostname -I | tr ' ' \\\\n | grep \\\\. | tr \\\\n ','");
-    if (ip && strlen (ip))
+    if (ip)
     {
         buf = ip;
         do
@@ -2399,7 +2400,7 @@ static gboolean net_available (void)
     ip = get_string ("hostname -I | tr ' ' \\\\n | grep \\\\. | tr \\\\n ','");
     if (ip)
     {
-        if (strlen (ip)) val = TRUE;
+        val = TRUE;
         g_free (ip);
     }
     return val;
