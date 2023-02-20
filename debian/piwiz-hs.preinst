@@ -6,7 +6,7 @@ case "${1}" in
 [Desktop Entry]
 Type=Application
 Name=Raspberry Pi First-Run Wizard
-Exec=sudo -AE piwiz
+Exec=sudo -AE dbus-launch piwiz
 StartupNotify=true
 EOF
     ;;
