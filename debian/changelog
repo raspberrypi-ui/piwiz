@@ -1,3 +1,9 @@
+piwiz (0.44) bookworm; urgency=medium
+
+  * Modify for bookworm and wayfire
+
+ -- Simon Long <simon@raspberrypi.com>  Mon, 20 Feb 2023 09:11:00 +0000
+
 piwiz (0.43) bullseye; urgency=medium
 
   * Fix wi-fi test

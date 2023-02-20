@@ -134,6 +134,7 @@ gint conn_timeout = 0, pulse_timer = 0;
 gboolean reboot = TRUE, is_pi = TRUE;
 int last_btn = NEXT_BTN;
 int calls;
+gboolean wayfire = FALSE;
 
 gboolean use_nm;
 NMClient *nm_client = NULL;
@@ -2029,7 +2030,10 @@ static void next_page (GtkButton* btn, gpointer ptr)
     {
         case PAGE_INTRO :   // disable Bluetooth autoconnect after first page
                             if (!system ("rfkill list bluetooth | grep -q Bluetooth"))
-                                vsystem ("lxpanelctl command bluetooth apstop");
+                            {
+                                if (wayfire) vsystem ("wfpanelctl bluetooth apstop");
+                                else vsystem ("lxpanelctl command bluetooth apstop");
+                            }
                             gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
                             break;
 
@@ -2460,6 +2464,15 @@ static gboolean check_service (char *name)
     return !!res;
 }
 
+static int num_screens (void)
+{
+    if (wayfire)
+        return get_status ("wlr-randr | grep -cv '^ '");
+    else
+        return get_status ("xrandr -q | grep -cw connected");
+}
+
+
 /* The dialog... */
 
 int main (int argc, char *argv[])
@@ -2476,6 +2489,7 @@ int main (int argc, char *argv[])
 #endif
 
     if (system ("raspi-config nonint is_pi")) is_pi = FALSE;
+    if (!system ("ps ax | grep wayfire | grep -qv grep")) wayfire = TRUE;
 
     use_nm = check_service ("NetworkManager");
 
@@ -2563,7 +2577,7 @@ int main (int argc, char *argv[])
     gtk_switch_set_active (GTK_SWITCH (uscan2_sw), !get_status ("raspi-config nonint get_overscan_kms 2"));
     g_signal_connect (uscan1_sw, "state-set", G_CALLBACK (uscan_toggle), NULL);
     g_signal_connect (uscan2_sw, "state-set", G_CALLBACK (uscan_toggle), NULL);
-    if (get_status ("xrandr -q | grep -cw connected") != 2) gtk_widget_hide (uscan2_box);
+    if (num_screens () != 2) gtk_widget_hide (uscan2_box);
 
     // set up the locale combo boxes
     read_locales ();
@@ -2646,6 +2660,7 @@ int main (int argc, char *argv[])
     g_object_unref (builder);
 
     gtk_widget_show (main_dlg);
+    gtk_window_set_decorated (GTK_WINDOW (main_dlg), FALSE);
     gtk_main ();
     gtk_widget_destroy (main_dlg);
 
