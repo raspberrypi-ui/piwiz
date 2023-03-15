@@ -329,6 +329,13 @@ static const char kb_tzs[MAX_KBS][20] = {
     "Asia/Seoul"
 };
 
+#define WF_CONFIGS 3
+static const char wf_kbd_files[WF_CONFIGS][30] = {
+    "/etc/wayfire/defaults.ini",
+    "/etc/wayfire/greeter.ini",
+    "/etc/wayfire/wizard.ini"
+};
+
 /* In dhcpcd-gtk/main.c */
 
 void init_dhcpcd (void);
@@ -780,16 +787,16 @@ static gpointer set_locale (gpointer data)
         }
 
         // Wayfire settings
-        for (i = 0; i < 2; i++)
+        for (i = 0; i < WF_CONFIGS; i++)
         {
             kf = g_key_file_new ();
-            g_key_file_load_from_file (kf, i ? "/etc/wayfire/greeter.ini" : "/etc/wayfire/defaults.ini", G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, NULL);
+            g_key_file_load_from_file (kf, wf_kbd_files[i], G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, NULL);
 
             if (g_strcmp0 (lay, init_kb)) g_key_file_set_string (kf, "input", "xkb_layout", lay);
             if (g_strcmp0 (var, init_var)) g_key_file_set_string (kf, "input", "xkb_variant", var);
 
             str = g_key_file_to_data (kf, &len, NULL);
-            g_file_set_contents (i ? "/etc/wayfire/greeter.ini" : "/etc/wayfire/defaults.ini", str, len, NULL);
+            g_file_set_contents (wf_kbd_files[i], str, len, NULL);
             g_free (str);
 
             g_key_file_free (kf);
