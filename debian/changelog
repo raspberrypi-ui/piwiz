@@ -1,3 +1,9 @@
+piwiz (0.46) bookworm; urgency=medium
+
+  * Make Wayland keyboard settings as well as X
+
+ -- Simon Long <simon@raspberrypi.com>  Wed, 15 Mar 2023 09:57:11 +0000
+
 piwiz (0.45) bookworm; urgency=medium
 
   * Remove pre and post install scripts

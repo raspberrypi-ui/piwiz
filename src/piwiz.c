@@ -743,6 +743,10 @@ static void lookup_keyboard (char *country, char *language, char **layout, char 
 static gpointer set_locale (gpointer data)
 {
     FILE *fp;
+    char *str;
+    GKeyFile *kf;
+    gsize len;
+    int i;
 
     // set timezone
     if (g_strcmp0 (init_tz, city))
@@ -766,13 +770,33 @@ static gpointer set_locale (gpointer data)
     if (g_strcmp0 (init_kb, lay) || g_strcmp0 (init_var, var))
     {
         reboot = TRUE;
+
+        // X settings
         fp = fopen ("/etc/default/keyboard", "wb");
         if (fp)
         {
             fprintf (fp, "XKBMODEL=pc105\nXKBLAYOUT=%s\nXKBVARIANT=%s\nXKBOPTIONS=\nBACKSPACE=guess", lay, var);
             fclose (fp);
         }
-        vsystem ("setxkbmap -layout %s -variant \"%s\" -option \"\"", lay, var);
+
+        // Wayfire settings
+        for (i = 0; i < 2; i++)
+        {
+            kf = g_key_file_new ();
+            g_key_file_load_from_file (kf, i ? "/etc/wayfire/greeter.ini" : "/etc/wayfire/defaults.ini", G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, NULL);
+
+            if (g_strcmp0 (lay, init_kb)) g_key_file_set_string (kf, "input", "xkb_layout", lay);
+            if (g_strcmp0 (var, init_var)) g_key_file_set_string (kf, "input", "xkb_variant", var);
+
+            str = g_key_file_to_data (kf, &len, NULL);
+            g_file_set_contents (i ? "/etc/wayfire/greeter.ini" : "/etc/wayfire/defaults.ini", str, len, NULL);
+            g_free (str);
+
+            g_key_file_free (kf);
+        }
+
+        if (!wayfire) vsystem ("setxkbmap -layout %s -variant \"%s\" -option \"\"", lay, var);
+
         if (init_kb)
         {
             g_free (init_kb);
