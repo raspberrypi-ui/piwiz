@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: piwiz 1.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-22 15:15+0000\n"
-"PO-Revision-Date: 2023-03-18 10:43+0900\n"
+"PO-Revision-Date: 2023-03-18 10:49+0900\n"
 "Language-Team: English (British)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,7 +24,7 @@ msgstr "네트워크를 찾는 중 - 잠시만 기다려주세요..."
 
 #: ../src/piwiz.c:1112
 msgid "Failed to connect to network."
-msgstr "네트워크 연결 실패"
+msgstr "네트워크 연결에 실패했습니다."
 
 #: ../src/piwiz.c:1233
 msgid "Reading update list - please wait..."
@@ -53,7 +53,7 @@ msgstr ""
 
 #: ../src/piwiz.c:1272 ../src/piwiz.c:1312
 msgid "System is up to date"
-msgstr "최신 상태의 시스템"
+msgstr "시스템이 최신 상태임"
 
 #: ../src/piwiz.c:1290
 #, c-format
@@ -266,7 +266,7 @@ msgstr "dhcpcd 연결이 해제됨"
 
 #: ../src/dhcpcd-gtk/main.c:520
 msgid "Network event"
-msgstr "네트워크 "
+msgstr "네트워크 이벤트"
 
 #: ../src/dhcpcd-gtk/main.c:561
 #, c-format
@@ -283,7 +283,7 @@ msgstr "새 액세스 지점"
 
 #: ../src/dhcpcd-gtk/main.c:738
 msgid "Connecting to dhcpcd ..."
-msgstr "dhcpcd 연결 중 ..."
+msgstr "네트워크 dhcpcd 연결 중 ..."
 
 #: ../src/dhcpcd-gtk/main.c:746 ../src/dhcpcd-gtk/main.c:777
 msgid "Connecting ..."
@@ -323,7 +323,7 @@ msgid ""
 "\n"
 "You should add update_config=1 to /etc/wpa_supplicant.conf."
 msgstr ""
-"wpa_supplicant 설정을 저장하지 못했습니다.\n"
+"설정한 wpa_supplicant 값을 저장하지 못했습니다.\n"
 "\n"
 "/etc/wpa_supplicant.conf 파일에 update_config=1 명령을 추가해야 합니다."
 
@@ -391,7 +391,7 @@ msgstr "국가:"
 
 #: ../data/piwiz.ui.h:15
 msgid "Set the country in which you are using your Pi"
-msgstr "사용하시는 국가를 설정해주세요."
+msgstr "사용하는 국가를 설정"
 
 #: ../data/piwiz.ui.h:16
 msgid "Language:"
