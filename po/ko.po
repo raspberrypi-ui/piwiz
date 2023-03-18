@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: piwiz 1.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-22 15:15+0000\n"
-"PO-Revision-Date: 2023-03-18 10:51+0900\n"
+"PO-Revision-Date: 2023-03-18 10:56+0900\n"
 "Language-Team: English (British)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -382,8 +382,8 @@ msgid ""
 "Enter the details of your location. This is used to set the language, time "
 "zone, keyboard and other international settings."
 msgstr ""
-"위치 세부 정보를 입력합니다. 언어, 시간대, 자판 및 기타 국제 설정을 설정하"
-"는 데 사용됩니다."
+"위치 세부 정보를 입력합니다. 언어, 시간대, 자판 및 기타 국제 설정에 사용됩니"
+"다."
 
 #: ../data/piwiz.ui.h:14
 msgid "Country:"
@@ -491,7 +491,7 @@ msgid ""
 "On some monitors, the desktop is larger than the screen and the edges are "
 "cut off. You can adjust this here."
 msgstr ""
-"일부 모니터에서는 바탕 화면이 화면보다 크고 가장자리가 잘립니다. 여기에서 조"
+"일부 모니터에서는 데스크톱이 화면보다 크고 가장자리가 잘립니다. 여기에서 조"
 "정할 수 있습니다."
 
 #: ../data/piwiz.ui.h:40
@@ -508,7 +508,7 @@ msgstr "보조 모니터에서 화면 크기 축소"
 
 #: ../data/piwiz.ui.h:43
 msgid "Turn on to shrink the desktop to fit the second monitor"
-msgstr "보조 모니터 화면을 화면에 맞게 축소"
+msgstr "보조 모니터 화면을 모니터에 맞게 축소"
 
 #: ../data/piwiz.ui.h:44
 msgid "Press 'Next' when the screen looks correct."
