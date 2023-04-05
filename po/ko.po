@@ -1,0 +1,621 @@
+# English translations for piwiz package.
+# Copyright (C) 2019 Raspberry Pi Ltd
+# This file is distributed under the same license as the piwiz package.
+# Simon Long <simon@raspberrypi.org>, 2019.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: piwiz 1.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-03-22 15:15+0000\n"
+"PO-Revision-Date: 2023-03-18 10:56+0900\n"
+"Language-Team: English (British)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 2.4.2\n"
+"Last-Translator: Yi Yunseok <ironyunseok@protonmail.com>\n"
+"Language: ko\n"
+
+#: ../src/piwiz.c:1092 ../src/piwiz.c:1535
+msgid "Searching for networks - please wait..."
+msgstr "네트워크를 찾는 중 - 잠시만 기다려주세요..."
+
+#: ../src/piwiz.c:1112
+msgid "Failed to connect to network."
+msgstr "네트워크 연결에 실패했습니다."
+
+#: ../src/piwiz.c:1233
+msgid "Reading update list - please wait..."
+msgstr "판올림 목록 읽는 중 - 잠시만 기다려주세요..."
+
+#: ../src/piwiz.c:1235
+msgid "Downloading updates - please wait..."
+msgstr "판올림을 내려받는 중 - 잠시만 기다려주세요..."
+
+#: ../src/piwiz.c:1242
+msgid "Installing updates - please wait..."
+msgstr "판올림 설치 중 - 잠시만 기다려주세요..."
+
+#: ../src/piwiz.c:1244 ../src/piwiz.c:1375
+msgid "Installing languages - please wait..."
+msgstr "언어팩 설치 중 - 잠시만 기다려주세요..."
+
+#: ../src/piwiz.c:1261
+#, c-format
+msgid ""
+"Error getting updates.\n"
+"%s"
+msgstr ""
+"판올림을 가져오던 중 오류가 발생했습니다.\n"
+"%s"
+
+#: ../src/piwiz.c:1272 ../src/piwiz.c:1312
+msgid "System is up to date"
+msgstr "시스템이 최신 상태임"
+
+#: ../src/piwiz.c:1290
+#, c-format
+msgid ""
+"Error comparing versions.\n"
+"%s"
+msgstr ""
+"버전을 비교하던 중 오류가 발생했습니다.\n"
+"%s"
+
+#: ../src/piwiz.c:1301
+msgid "Getting updates - please wait..."
+msgstr "판올림을 가져오는 중 - 잠시만 기다려주세요..."
+
+#: ../src/piwiz.c:1326
+#, c-format
+msgid ""
+"Error installing languages.\n"
+"%s"
+msgstr ""
+"언어팩 설치 중 오류가 발생했습니다.\n"
+"%s"
+
+#: ../src/piwiz.c:1332 ../src/piwiz.c:1383 ../src/piwiz.c:1426
+msgid "Comparing versions - please wait..."
+msgstr "버전을 비교하는 중 - 잠시만 기다려주세요..."
+
+#: ../src/piwiz.c:1347
+#, c-format
+msgid ""
+"Error finding languages.\n"
+"%s"
+msgstr ""
+"언어팩을 찾던 중 오류가 발생했습니다.\n"
+"%s"
+
+#: ../src/piwiz.c:1400
+#, c-format
+msgid ""
+"Error checking for updates.\n"
+"%s"
+msgstr ""
+"판올림 확인 중 오류가 발생했습니다.\n"
+"%s"
+
+#: ../src/piwiz.c:1420
+msgid "Finding languages - please wait..."
+msgstr "언어팩 찾는 중 - 잠시만 기다려주세요..."
+
+#: ../src/piwiz.c:1469 ../src/piwiz.c:1756
+msgid "Checking for updates - please wait..."
+msgstr "판올림 확인 중 - 잠시만 기다려주세요..."
+
+#: ../src/piwiz.c:1478
+msgid "Could not sync time - unable to check for updates"
+msgstr "시간 동기화 불가능 - 판올림을 확인할 수 없음"
+
+#: ../src/piwiz.c:1489 ../data/piwiz.ui.h:61
+msgid "_Next"
+msgstr "다음(_N)"
+
+#: ../src/piwiz.c:1490
+msgid "_Back"
+msgstr "이전(_B)"
+
+#: ../src/piwiz.c:1491 ../data/piwiz.ui.h:60
+msgid "_Skip"
+msgstr "넘기기(_S)"
+
+#: ../src/piwiz.c:1502
+msgid "<b>Rename User</b>"
+msgstr "<b>사용자 이름 바꾸기</b>"
+
+#: ../src/piwiz.c:1503
+#, c-format
+msgid ""
+"Your current user '%s' will be renamed.\n"
+"\n"
+"The new username can only contain lower-case letters, digits and hyphens, "
+"and must start with a letter."
+msgstr ""
+"현재 사용자 '%s'의 이름이 변경됩니다.\n"
+"\n"
+"새 사용자 이름은 소문자, 숫자 및 하이픈만 포함할 수 있으며, 반드시 문자로 시"
+"작해야 합니다."
+
+#: ../src/piwiz.c:1506
+msgid "Press 'Next' to rename the user."
+msgstr "사용자 이름을 바꾸려면 '다음'을 누르세요."
+
+#: ../src/piwiz.c:1507 ../src/dhcpcd-gtk/wpa.c:130 ../data/piwiz.ui.h:3
+msgid "_Cancel"
+msgstr "취소(_C)"
+
+#: ../src/piwiz.c:1514
+msgid "_Restart"
+msgstr "재시작(_R)"
+
+#: ../src/piwiz.c:1517
+msgid "<b>User Renamed</b>"
+msgstr "<b>사용자 이름이 변경됨</b>"
+
+#: ../src/piwiz.c:1518
+#, c-format
+msgid "The '%s' user has been renamed to '%s' and the new password set."
+msgstr "'%s' 사용자의 이름을 '%s'로 바꾸고 새 암호를 설정했습니다."
+
+#: ../src/piwiz.c:1521
+msgid "Press 'Restart' to reboot and login as the new user."
+msgstr "'재시작'을 누르고 재부팅해 새 사용자로 로그인하세요."
+
+#: ../src/piwiz.c:1527
+msgid "_Done"
+msgstr "완료(_D)"
+
+#: ../src/piwiz.c:1614
+msgid "Setting location - please wait..."
+msgstr "위치 설정 중 - 잠시만 기다려주세요..."
+
+#: ../src/piwiz.c:1633
+msgid "The username is blank."
+msgstr "사용자 이름을 입력하세요."
+
+#: ../src/piwiz.c:1638
+msgid "The username must be 32 characters or shorter."
+msgstr "사용자 이름은 32자 이하로 설정하세요."
+
+#: ../src/piwiz.c:1643
+msgid "The first character of the username must be a lower-case letter."
+msgstr "사용자 이름의 첫 번째 문자는 소문자로 설정하세요."
+
+#: ../src/piwiz.c:1648
+msgid ""
+"This username is used by the system and cannot be used for a user account."
+msgstr ""
+"이 사용자 이름은 시스템에서 사용되므로 사용자 계정에 사용할 수 없습니다."
+
+#: ../src/piwiz.c:1657
+msgid "Usernames can only contain lower-case letters, digits and hyphens."
+msgstr "사용자 이름에는 소문자, 숫자 및 하이픈만 사용할 수 있습니다."
+
+#: ../src/piwiz.c:1662
+msgid "The password is blank."
+msgstr "비밀번호를 입력하세요."
+
+#: ../src/piwiz.c:1667
+msgid "The two passwords entered do not match."
+msgstr "입력한 두 개의 비밀번호가 일치하지 않습니다."
+
+#: ../src/piwiz.c:1672
+msgid ""
+"You have used a known default value for the username or password.\n"
+"\n"
+"We strongly recommend you go back and choose something else."
+msgstr ""
+"사용자 이름 또는 비밀번호에 알려진 기본값을 사용했습니다.\n"
+"\n"
+"다른 것을 선택하는 것을 권장합니다."
+
+#: ../src/piwiz.c:1706
+#, c-format
+msgid "Enter the password for the WiFi network \"%s\"."
+msgstr "WiFi 네트워크 \"%s\"의 비밀번호를 입력하세요."
+
+#: ../src/piwiz.c:1720 ../src/piwiz.c:1731
+msgid "Connecting to WiFi network - please wait..."
+msgstr "WiFi 네트워크 연결 중 - 잠시만 기다려주세요..."
+
+#: ../src/piwiz.c:1723 ../src/piwiz.c:1734
+msgid "Could not connect to this network"
+msgstr "이 네트워크에 연결 불가능"
+
+#: ../src/piwiz.c:1761
+msgid "Synchronising clock - please wait..."
+msgstr "시간 동기화 중 - 잠시만 기다려주세요..."
+
+#: ../src/piwiz.c:1766
+msgid "No network connection found - unable to check for updates"
+msgstr "네트워크 연결을 찾을 수 없음 - 판올림을 확인할 수 없음"
+
+#: ../src/piwiz.c:1877
+#, c-format
+msgid "<span font_desc=\"10.0\">IP : %s</span>"
+msgstr "<span font_desc=\"10.0\">IP : %s</span>"
+
+#: ../src/dhcpcd-gtk/main.c:375
+msgid "Error creating new GIO Channel\n"
+msgstr "GIO 채널 생성 실패\n"
+
+#: ../src/dhcpcd-gtk/main.c:380
+msgid "Error creating watch\n"
+msgstr "시계 생성 실패\n"
+
+#: ../src/dhcpcd-gtk/main.c:387
+msgid "g_try_malloc\n"
+msgstr "g_try_malloc\n"
+
+#: ../src/dhcpcd-gtk/main.c:415
+msgid "Connection to dhcpcd lost"
+msgstr "해제된 dhcpcd 연결"
+
+#: ../src/dhcpcd-gtk/main.c:437
+#, c-format
+msgid "Connected to %s-%s"
+msgstr "%s-%s 연결됨"
+
+#: ../src/dhcpcd-gtk/main.c:455
+msgid "dhcpcd connection lost"
+msgstr "dhcpcd 연결이 해제됨"
+
+#: ../src/dhcpcd-gtk/main.c:520
+msgid "Network event"
+msgstr "네트워크 이벤트"
+
+#: ../src/dhcpcd-gtk/main.c:561
+#, c-format
+msgid "dhcpcd WPA connection lost: %s"
+msgstr "dhcpcd WPA 연결 해제됨: %s"
+
+#: ../src/dhcpcd-gtk/main.c:640
+msgid "New Access Point"
+msgstr "새 액세스 지점"
+
+#: ../src/dhcpcd-gtk/main.c:649
+msgid "New Access Points"
+msgstr "새 액세스 지점"
+
+#: ../src/dhcpcd-gtk/main.c:738
+msgid "Connecting to dhcpcd ..."
+msgstr "네트워크 dhcpcd 연결 중 ..."
+
+#: ../src/dhcpcd-gtk/main.c:746 ../src/dhcpcd-gtk/main.c:777
+msgid "Connecting ..."
+msgstr "연결 중 ..."
+
+#: ../src/dhcpcd-gtk/wpa.c:76
+msgid "Failed to disconnect."
+msgstr "연결을 해제하지 못했습니다."
+
+#: ../src/dhcpcd-gtk/wpa.c:79
+msgid "Faile to reconfigure."
+msgstr "재설정에 실패했습니다."
+
+#: ../src/dhcpcd-gtk/wpa.c:82
+msgid "Failed to set key management."
+msgstr "키 관리 설정을 실패했습니다."
+
+#: ../src/dhcpcd-gtk/wpa.c:85
+msgid "Failed to set password, probably too short."
+msgstr "비밀번호가 너무 짧아 설정할 수 없습니다."
+
+#: ../src/dhcpcd-gtk/wpa.c:88
+msgid "Failed to enable the network."
+msgstr "네트워크 활성화에 실패했습니다."
+
+#: ../src/dhcpcd-gtk/wpa.c:91
+msgid "Failed to select the network."
+msgstr "네트워크를 선택하지 못했습니다."
+
+#: ../src/dhcpcd-gtk/wpa.c:94
+msgid "Failed to start association."
+msgstr "연결을 시작하지 못했습니다."
+
+#: ../src/dhcpcd-gtk/wpa.c:97
+msgid ""
+"Failed to save wpa_supplicant configuration.\n"
+"\n"
+"You should add update_config=1 to /etc/wpa_supplicant.conf."
+msgstr ""
+"설정한 wpa_supplicant 값을 저장하지 못했습니다.\n"
+"\n"
+"/etc/wpa_supplicant.conf 파일에 update_config=1 명령을 추가해야 합니다."
+
+#: ../src/dhcpcd-gtk/wpa.c:103
+msgid "Error enabling network"
+msgstr "네트워크 활성화 중 오류"
+
+#: ../src/dhcpcd-gtk/wpa.c:129 ../data/piwiz.ui.h:1
+msgid "_OK"
+msgstr "확인(_O)"
+
+#: ../src/dhcpcd-gtk/wpa.c:141
+msgid "Pre Shared Key:"
+msgstr "사전 공유 키:"
+
+#: ../data/piwiz.ui.h:2
+msgid "label"
+msgstr "레이블"
+
+#: ../data/piwiz.ui.h:4
+msgid "Welcome to Raspberry Pi"
+msgstr "라즈베리 파이 환영 인사"
+
+#: ../data/piwiz.ui.h:5
+msgid ""
+"Welcome to the Raspberry Pi Desktop!\n"
+"\n"
+"Before you start using it, there are a few things to set up.\n"
+"\n"
+"Press 'Next' to get started. "
+msgstr ""
+"라즈베리 파이 데스크톱에 오신 것을 환영합니다!\n"
+"\n"
+"시작하기 전에, 몇 가지 설정이 필요합니다.\n"
+"\n"
+"'다음'을 눌러 시작하세요. "
+
+#: ../data/piwiz.ui.h:10
+msgid ""
+"If you are using a Bluetooth keyboard or mouse, put them into pairing mode "
+"and wait for them to connect."
+msgstr ""
+"블루투스 키보드 또는 마우스를 사용하는 경우 페어링 모드로 전환하고 연결될 때"
+"까지 기다려주세요."
+
+#: ../data/piwiz.ui.h:11
+msgid "<span font_desc=\"10.0\"> </span>"
+msgstr "<span font_desc=\"10.0\"> </span>"
+
+#: ../data/piwiz.ui.h:12
+msgid "<b>Set Country</b>"
+msgstr "<b>국가 설정</b>"
+
+#: ../data/piwiz.ui.h:13
+msgid ""
+"Enter the details of your location. This is used to set the language, time "
+"zone, keyboard and other international settings."
+msgstr ""
+"위치 세부 정보를 입력합니다. 언어, 시간대, 자판 및 기타 국제 설정에 사용됩니"
+"다."
+
+#: ../data/piwiz.ui.h:14
+msgid "Country:"
+msgstr "국가:"
+
+#: ../data/piwiz.ui.h:15
+msgid "Set the country in which you are using your Pi"
+msgstr "사용하는 국가를 설정"
+
+#: ../data/piwiz.ui.h:16
+msgid "Language:"
+msgstr "언어:"
+
+#: ../data/piwiz.ui.h:17
+msgid "Set the language in which applications should appear"
+msgstr "애플리케이션에 표시할 언어 설정"
+
+#: ../data/piwiz.ui.h:18
+msgid "Timezone:"
+msgstr "시간대:"
+
+#: ../data/piwiz.ui.h:19
+msgid "Set the closest city to your location"
+msgstr "사용자 위치에서 가장 가까운 도시 설정"
+
+#: ../data/piwiz.ui.h:20
+msgid "Use US keyboard"
+msgstr "US 키보드 사용"
+
+#: ../data/piwiz.ui.h:21
+msgid ""
+"Use the US keyboard layout instead of the default keyboard for your country"
+msgstr "사용자 국가 기본 자판 대신 US 키보드 레이아웃 사용"
+
+#: ../data/piwiz.ui.h:22
+msgid "Use English language"
+msgstr "영어 사용"
+
+#: ../data/piwiz.ui.h:23
+msgid "Use English instead of the default language for your country"
+msgstr "사용자 국가 언어 대신 영어 사용"
+
+#: ../data/piwiz.ui.h:24
+msgid "Press 'Next' when you have made your selection."
+msgstr "선택을 완료하고 '다음'을 누르세요."
+
+#: ../data/piwiz.ui.h:25
+msgid "<b>Create User</b>"
+msgstr "<b>사용자 생성</b>"
+
+#: ../data/piwiz.ui.h:26
+msgid ""
+"You need to create a user account to log in to your Raspberry Pi.\n"
+"\n"
+"The username can only contain lower-case letters, digits and hyphens, and "
+"must start with a letter."
+msgstr ""
+"라즈베리 파이에 로그인할 사용자 이름을 생성해야 합니다.\n"
+"\n"
+"사용자 이름에는 소문자, 숫자 및 하이픈만 사용할 수 있으며, 문자로 시작해야 "
+"합니다."
+
+#: ../data/piwiz.ui.h:29
+msgid "Enter password:"
+msgstr "비밀번호 입력:"
+
+#: ../data/piwiz.ui.h:30
+msgid "Confirm password:"
+msgstr "비밀번호 확인:"
+
+#: ../data/piwiz.ui.h:31
+msgid "Enter username:"
+msgstr "사용자 이름 입력:"
+
+#: ../data/piwiz.ui.h:32
+msgid "Enter a password"
+msgstr "비밀번호 입력"
+
+#: ../data/piwiz.ui.h:33
+msgid "Enter the password again"
+msgstr "비밀번호 재입력"
+
+#: ../data/piwiz.ui.h:34
+msgid "Enter a username"
+msgstr "사용자 이름 입력"
+
+#: ../data/piwiz.ui.h:35
+msgid "Hide characters"
+msgstr "글자 가리기"
+
+#: ../data/piwiz.ui.h:36
+msgid "Show or hide the characters in your password"
+msgstr "비밀번호를 가리거나 표시"
+
+#: ../data/piwiz.ui.h:37
+msgid "Press 'Next' to create your account."
+msgstr "'다음'을 눌러 사용자 계정을 생성합니다."
+
+#: ../data/piwiz.ui.h:38
+msgid "<b>Set Up Screen</b>"
+msgstr "<b>화면 설정</b>"
+
+#: ../data/piwiz.ui.h:39
+msgid ""
+"On some monitors, the desktop is larger than the screen and the edges are "
+"cut off. You can adjust this here."
+msgstr ""
+"일부 모니터에서는 데스크톱이 화면보다 크고 가장자리가 잘립니다. 여기에서 조"
+"정할 수 있습니다."
+
+#: ../data/piwiz.ui.h:40
+msgid "Reduce the size of the desktop on this monitor"
+msgstr "이 모니터에서 화면 크기 축소"
+
+#: ../data/piwiz.ui.h:41
+msgid "Turn on to shrink the desktop to fit the monitor"
+msgstr "화면을 모니터에 맞게 축소"
+
+#: ../data/piwiz.ui.h:42
+msgid "Reduce the size of the desktop on the second monitor"
+msgstr "보조 모니터에서 화면 크기 축소"
+
+#: ../data/piwiz.ui.h:43
+msgid "Turn on to shrink the desktop to fit the second monitor"
+msgstr "보조 모니터 화면을 모니터에 맞게 축소"
+
+#: ../data/piwiz.ui.h:44
+msgid "Press 'Next' when the screen looks correct."
+msgstr "화면이 제대로 보이면 '다음'을 누르세요."
+
+#: ../data/piwiz.ui.h:45
+msgid "<b>Select WiFi Network</b>"
+msgstr "<b>WiFi 네트워크 선택</b>"
+
+#: ../data/piwiz.ui.h:46
+msgid "Select your WiFi network from the list."
+msgstr "목록에서 WiFi 네트워크를 선택하세요."
+
+#: ../data/piwiz.ui.h:47
+msgid "Click the name of your network to select it"
+msgstr "네트워크 이름을 눌러 선택"
+
+#: ../data/piwiz.ui.h:48
+msgid "Press 'Next' to connect, or 'Skip' to continue without connecting."
+msgstr "연결하려면 '다음'을, 연결하지 않고 계속하려면 '넘기기'를 누르세요."
+
+#: ../data/piwiz.ui.h:49
+msgid "<b>Enter WiFi Password</b>"
+msgstr "<b>WiFi 비밀번호 입력</b>"
+
+#: ../data/piwiz.ui.h:50
+msgid "Enter the password for your WiFi network."
+msgstr "WiFi 네트워크의 비밀번호를 입력하세요."
+
+#: ../data/piwiz.ui.h:51
+msgid "Password:"
+msgstr "비밀번호:"
+
+#: ../data/piwiz.ui.h:52
+msgid "Enter the password for your network"
+msgstr "네트워크 비밀번호 입력"
+
+#: ../data/piwiz.ui.h:53
+msgid "<b>Update Software</b>"
+msgstr "<b>소프트웨어 판올림</b>"
+
+#: ../data/piwiz.ui.h:54
+msgid ""
+"The operating system and applications will now be checked and updated if "
+"necessary. This may involve a large download.\n"
+"\n"
+"Press 'Next' to check and update software, or 'Skip' to continue without "
+"checking."
+msgstr ""
+"운영체제와 애플리케이션의 판올림을 확인합니다. 대용량의 판올림이 필요할 수 "
+"있습니다.\n"
+"\n"
+"판올림을 확인하려면 '다음'을, 확인하지 않고 넘기려면 '넘기기'를 누르세요."
+
+#: ../data/piwiz.ui.h:57
+msgid "<b>Setup Complete</b>"
+msgstr "<b>설정 완료</b>"
+
+#: ../data/piwiz.ui.h:58
+msgid "Your Raspberry Pi is now set up and ready to go."
+msgstr "라즈베리 파이를 사용할 준비가 됐습니다."
+
+#: ../data/piwiz.ui.h:59
+msgid ""
+"Press 'Restart' to restart your Pi so the new settings will take effect."
+msgstr "'재시작'을 눌러 설정을 적용하세요."
+
+msgid "_Later"
+msgstr "나중에(_L)"
+
+#, c-format
+msgid "%s: Received scan results"
+msgstr "%s: 스캔 결과"
+
+msgid ""
+"The default 'pi' user account currently has the password 'raspberry'. It is "
+"strongly recommended that you change this to a different password that only "
+"you know."
+msgstr ""
+"기본 'pi' 사용자 계정이 'raspberry' 비밀번호를 사용합니다. 타인이 모르는 비"
+"밀번호로 바꾸는 것을 강력히 권장합니다."
+
+msgid ""
+"You should be able to see the taskbar along the top of the screen.\n"
+"Tick the box if some or all of it does not fit on the screen."
+msgstr ""
+"화면 상단의 작업 표시줄이 보여야 합니다.\n"
+"화면의 일부 또는 전체가 화면에 맞지 않으면 선택 상자를 누르세요."
+
+msgid "The taskbar does not fit onto the screen"
+msgstr "작업 표시줄이 화면에 맞게 표시되지 않음"
+
+msgid "Tick this box if the taskbar is not completely visible"
+msgstr "작업 표시줄이 완전히 표시되지 않는 경우 선택"
+
+msgid ""
+"The change will take effect when the Pi is restarted.\n"
+"\n"
+"Press 'Next' to save your setting."
+msgstr ""
+"이 변경은 재부팅 후에 적용됩니다.\n"
+"\n"
+"설정을 저장하려면 '다음'을 누르세요."
+
+msgid ""
+"To run applications, click the raspberry icon in the top left corner of the "
+"screen to open the menu."
+msgstr ""
+"애플리케이션 실행을 위해 화면 왼쪽 상단의 라즈베리 아이콘을 클릭해 메뉴를 "
+"열 수 있습니다."
