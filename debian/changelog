@@ -1,3 +1,9 @@
+piwiz (0.48) bookworm; urgency=medium
+
+  * Add message while waiting for reboot
+
+ -- Simon Long <simon@raspberrypi.com>  Tue, 30 May 2023 08:58:22 +0100
+
 piwiz (0.47) bookworm; urgency=medium
 
   * Added Korean translation

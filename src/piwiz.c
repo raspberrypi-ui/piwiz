@@ -1958,6 +1958,29 @@ static gboolean ntp_check (gpointer data)
     return TRUE;
 }
 
+/* Final configuration */
+
+static gpointer final_setup (gpointer ptr)
+{
+#ifdef HOMESCHOOL
+    if (chuser == NULL)
+    {
+        vsystem ("cp /usr/share/applications/chromium-browser.desktop /etc/xdg/autostart/");
+        vsystem ("mkdir -p /home/pi/Desktop");
+        vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Web Browser\nIcon=applications-internet\nURL=/usr/share/applications/chromium-browser.desktop\" > /home/pi/Desktop/chromium-browser.desktop");
+    }
+#endif
+    // rename the pi user to the new user and set the password
+    vsystem ("/usr/lib/userconf-pi/userconf %s %s '%s'", chuser ? chuser : "pi", user, pw);
+
+    // set an autostart to set HDMI audio on reboot as new user
+    if (chuser == NULL) vsystem ("echo \"[Desktop Entry]\nType=Application\nName=Select HDMI Audio\nExec=sh -c '/usr/bin/hdmi-audio-select; sudo rm /etc/xdg/autostart/hdmiaudio.desktop'\" > /etc/xdg/autostart/hdmiaudio.desktop", user);
+
+    if (reboot) vsystem ("sync;reboot");
+    gtk_main_quit ();
+    return NULL;
+}
+
 /* Page management */
 
 static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, gpointer data)
@@ -2257,23 +2280,8 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             }
                             break;
 
-        case PAGE_DONE :
-#ifdef HOMESCHOOL
-                            if (chuser == NULL)
-                            {
-                                vsystem ("cp /usr/share/applications/chromium-browser.desktop /etc/xdg/autostart/");
-                                vsystem ("mkdir -p /home/pi/Desktop");
-                                vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Web Browser\nIcon=applications-internet\nURL=/usr/share/applications/chromium-browser.desktop\" > /home/pi/Desktop/chromium-browser.desktop");
-                            }
-#endif
-                            // rename the pi user to the new user and set the password
-                            vsystem ("/usr/lib/userconf-pi/userconf %s %s '%s'", chuser ? chuser : "pi", user, pw);
-
-                            // set an autostart to set HDMI audio on reboot as new user
-                            if (chuser == NULL) vsystem ("echo \"[Desktop Entry]\nType=Application\nName=Select HDMI Audio\nExec=sh -c '/usr/bin/hdmi-audio-select; sudo rm /etc/xdg/autostart/hdmiaudio.desktop'\" > /etc/xdg/autostart/hdmiaudio.desktop", user);
-
-                            if (reboot) vsystem ("sync;reboot");
-                            gtk_main_quit ();
+        case PAGE_DONE :    message (_("Restarting - please wait..."), 0, 0, -1, TRUE);
+                            g_thread_new (NULL, final_setup, NULL);
                             break;
 
         case PAGE_UPDATE :  if (net_available ())
@@ -2520,7 +2528,7 @@ int main (int argc, char *argv[])
 #endif
 
     if (system ("raspi-config nonint is_pi")) is_pi = FALSE;
-    if (!system ("ps ax | grep wayfire | grep -qv grep")) wayfire = TRUE;
+    if (getenv ("WAYFIRE_CONFIG_FILE")) wayfire = TRUE;
 
     use_nm = check_service ("NetworkManager");
 
