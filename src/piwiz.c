@@ -2449,6 +2449,12 @@ static gboolean net_available (void)
     return val;
 }
 
+static gboolean check_bluetooth (void)
+{
+    if (!system ("rfkill list bluetooth | grep -q Bluetooth")) gtk_widget_show (bt_prompt);
+    return FALSE;
+}
+
 static gboolean srprompt (gpointer data)
 {
     if (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)) == PAGE_INTRO)
@@ -2668,8 +2674,9 @@ int main (int argc, char *argv[])
     gtk_tree_view_column_set_sizing (gtk_tree_view_get_column (GTK_TREE_VIEW (ap_tv), 2), GTK_TREE_VIEW_COLUMN_FIXED);
     gtk_tree_view_column_set_fixed_width (gtk_tree_view_get_column (GTK_TREE_VIEW (ap_tv), 2), 30);
 
-    // hide Bluetooth autoconnect prompt if no Bluetooth detected
-    if (system ("rfkill list bluetooth | grep -q Bluetooth")) gtk_widget_hide (bt_prompt);
+    // set idle event to check for Bluetooth hardware
+    gtk_widget_hide (bt_prompt);
+    g_idle_add ((GSourceFunc) check_bluetooth, NULL);
 
     /* start timed event to detect IP address being available */
     g_timeout_add (1000, (GSourceFunc) show_ip, NULL);
