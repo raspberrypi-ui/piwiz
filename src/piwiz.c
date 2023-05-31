@@ -2281,6 +2281,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             break;
 
         case PAGE_DONE :    message (_("Restarting - please wait..."), 0, 0, -1, TRUE);
+                            gtk_widget_hide (main_dlg);
                             g_thread_new (NULL, final_setup, NULL);
                             break;
 
@@ -2708,7 +2709,6 @@ int main (int argc, char *argv[])
     gtk_widget_show (main_dlg);
     gtk_window_set_decorated (GTK_WINDOW (main_dlg), FALSE);
     gtk_main ();
-    gtk_widget_destroy (main_dlg);
 
     return 0;
 }
