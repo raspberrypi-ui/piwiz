@@ -1711,8 +1711,6 @@ static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
     // check reboot flag set by install process
     if (!access ("/run/reboot-required", F_OK)) reboot = TRUE;
 
-    // re-set the serial number in case a Chromium update was installed
-    set_marketing_serial ();
     thread_message (_("System is up to date"), -2);
 }
 
@@ -2380,16 +2378,7 @@ static gboolean show_ip (void)
 
 static void set_marketing_serial (void)
 {
-    if (is_pi)
-    {
-        if (access ("/etc/chromium/master_preferences", F_OK) != -1)
-        {
-            if (system ("raspi-config nonint is_pifour") == 0)
-                vsystem ("sed -i /etc/chromium/master_preferences -e s/UNIDENTIFIED/`vcgencmd otp_dump | grep ^6[45] | sha256sum | cut -d ' ' -f 1`/g");
-            else
-                vsystem ("sed -i /etc/chromium/master_preferences -e s/UNIDENTIFIED/`cat /proc/cpuinfo | grep Serial | sha256sum | cut -d ' ' -f 1`/g");
-        }
-    }
+   // no thank you
 }
 
 static gboolean net_available (void)
@@ -2492,8 +2481,6 @@ int main (int argc, char *argv[])
 
     reboot = TRUE;
     read_inits ();
-
-    set_marketing_serial ();
 
     // GTK setup
     gtk_init (&argc, &argv);
