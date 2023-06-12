@@ -10,18 +10,25 @@ piwiz_CFLAGS = \
 	-DPACKAGE_UI_DIR=\""$(datadir)/piwiz/ui"\" \
 	-DPACKAGE_BIN_DIR=\""$(bindir)"\" \
 	-DPACKAGE_LOCALE_DIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
-	-I$(srcdir)/libdhcpcd \
-	-I$(srcdir)/dhcpcd-gtk \
 	$(PACKAGE_CFLAGS) \
 	$(G_CAST_CHECKS) \
 	-Wall
 
-piwiz_SOURCES = piwiz.c \
+piwiz_SOURCES = piwiz.c
+
+if USE_DHCPCD
+piwiz_SOURCES += \
 		libdhcpcd/config.c \
 		libdhcpcd/dhcpcd.c \
 		libdhcpcd/wpa.c \
 		dhcpcd-gtk/wpa.c \
 		dhcpcd-gtk/main.c
+
+piwiz_CFLAGS += \
+	-DUSE_DHCPCD \
+	-I$(srcdir)/libdhcpcd \
+	-I$(srcdir)/dhcpcd-gtk
+endif
 
 piwiz_includedir = $(includedir)/piwiz
 
@@ -44,18 +51,25 @@ piwizhs_CFLAGS = \
 	-DPACKAGE_BIN_DIR=\""$(bindir)"\" \
 	-DPACKAGE_LOCALE_DIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
 	-DHOMESCHOOL \
-	-I$(srcdir)/libdhcpcd \
-	-I$(srcdir)/dhcpcd-gtk \
 	$(PACKAGE_CFLAGS) \
 	$(G_CAST_CHECKS) \
 	-Wall
 
-piwizhs_SOURCES = piwiz.c \
+piwizhs_SOURCES = piwiz.c
+
+if USE_DHCPCD
+piwizhs_SOURCES += \
 		libdhcpcd/config.c \
 		libdhcpcd/dhcpcd.c \
 		libdhcpcd/wpa.c \
 		dhcpcd-gtk/wpa.c \
 		dhcpcd-gtk/main.c
+
+piwizhs_CFLAGS += \
+	-DUSE_DHCPCD \
+	-I$(srcdir)/libdhcpcd \
+	-I$(srcdir)/dhcpcd-gtk
+endif
 
 piwizhs_includedir = $(includedir)/piwiz
 

@@ -45,6 +45,14 @@ if test x"$enable_more_warnings" = x"yes"; then
 fi
 AC_SUBST(ADDITIONAL_FLAGS)
 
+AC_ARG_ENABLE(dhcpcd,
+       [AC_HELP_STRING([--enable-dhcpcd],
+               [Build with dhcpcd support @<:@default=no@:>@])],
+       [enable_dhcpcd="${enableval}"],
+       [enable_dhcpcd=no]
+)
+AM_CONDITIONAL([USE_DHCPCD], [test x"$enable_dhcpcd" = x"yes"])
+
 PACKAGE_CFLAGS="$PACKAGE_CFLAGS $ADDITIONAL_FLAGS"
 PACKAGE_LIBS="$PACKAGE_LIBS"
 

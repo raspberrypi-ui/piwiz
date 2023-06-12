@@ -3,7 +3,6 @@ Copyright (c) 2018 Raspberry Pi (Trading) Ltd.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
-Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
@@ -52,8 +51,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <NetworkManager.h>
 
+#ifdef USE_DHCPCD
 #include "dhcpcd.h"
 #include "dhcpcd-gtk.h"
+#endif
 
 #define PAGE_INTRO 0
 #define PAGE_LOCALE 1
@@ -136,7 +137,9 @@ int last_btn = NEXT_BTN;
 int calls;
 gboolean wayfire = FALSE;
 
+#ifdef USE_DHCPCD
 gboolean use_nm;
+#endif
 NMClient *nm_client = NULL;
 gboolean nm_scanning = FALSE;
 NMDevice *nm_dev;
@@ -338,8 +341,10 @@ static const char wf_kbd_files[WF_CONFIGS][30] = {
 
 /* In dhcpcd-gtk/main.c */
 
+#ifdef USE_DHCPCD
 void init_dhcpcd (void);
 extern DHCPCD_CONNECTION *con;
+#endif
 
 /* Local prototypes */
 
@@ -365,12 +370,14 @@ static void country_changed (GtkComboBox *cb, gpointer ptr);
 static gboolean match_country (GtkTreeModel *model, GtkTreeIter *iter, gpointer data);
 static void read_inits (void);
 static void set_init (GtkTreeModel *model, GtkWidget *cb, int pos, const char *init);
-static void scans_add (char *str, int match, int secure, int signal, int connected);
 static int find_line (char **lssid, int *secure, int *connected);
 void connect_success (void);
 static gint connect_failure (gpointer data);
+#ifdef USE_DHCPCD
+static void scans_add (char *str, int match, int secure, int signal, int connected);
 static gboolean select_ssid (char *lssid, const char *psk);
 static char *find_psk_for_network (char *ssid);
+#endif
 static void nm_start_scan (void);
 static void nm_stop_scan (void);
 static void nm_req_scan_finish_cb (GObject *device, GAsyncResult *result, gpointer data);
@@ -1123,6 +1130,7 @@ static void set_init (GtkTreeModel *model, GtkWidget *cb, int pos, const char *i
 
 /* WiFi */
 
+#ifdef USE_DHCPCD
 static void scans_add (char *str, int match, int secure, int signal, int connected)
 {
     GtkTreeIter iter, siter, fiter;
@@ -1154,6 +1162,7 @@ static void scans_add (char *str, int match, int secure, int signal, int connect
         gtk_tree_selection_select_iter (gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv)), &fiter);
     }
 }
+#endif
 
 static int find_line (char **lssid, int *secure, int *connected)
 {
@@ -1164,12 +1173,16 @@ static int find_line (char **lssid, int *secure, int *connected)
     sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv));
     if (sel && gtk_tree_selection_get_selected (sel, &model, &iter))
     {
+#ifdef USE_DHCPCD
         if (use_nm)
         {
+#endif
             if (nm_ap_id) g_free (nm_ap_id);
             gtk_tree_model_get (model, &iter, AP_SSID, lssid, AP_SECURE, secure, AP_CONNECTED, connected, AP_DEVICE, &nm_dev, AP_AP, &nm_ap_id, -1);
+#ifdef USE_DHCPCD
         }
         else gtk_tree_model_get (model, &iter, AP_SSID, lssid, AP_SECURE, secure, AP_CONNECTED, connected, -1);
+#endif
         if (g_strcmp0 (*lssid, _("Searching for networks - please wait..."))) return 1;
     } 
     return 0;
@@ -1194,6 +1207,7 @@ static gint connect_failure (gpointer data)
     return FALSE;
 }
 
+#ifdef USE_DHCPCD
 static gboolean select_ssid (char *lssid, const char *psk)
 {
     DHCPCD_WI_SCAN scan, *s;
@@ -1299,6 +1313,7 @@ static char *find_psk_for_network (char *ssid)
     g_free (seek);
     return ret;
 }
+#endif
 
 /* Network Manager - scanning */
 
@@ -2027,8 +2042,11 @@ static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, g
                             }
                             break;
 
-        case PAGE_WIFIAP :  if (use_nm)
+        case PAGE_WIFIAP :
+#ifdef USE_DHCPCD
+                            if (use_nm)
                             {
+#endif
                                 if (!nm_client)
                                 {
                                     GtkTreeIter iter;
@@ -2040,6 +2058,7 @@ static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, g
                                     gtk_widget_set_sensitive (ap_tv, FALSE);
                                 }
                                 nm_start_scan ();
+#ifdef USE_DHCPCD
                             }
                             else
                             {
@@ -2051,6 +2070,7 @@ static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, g
                                     gtk_widget_set_sensitive (ap_tv, FALSE);
                                 }
                             }
+#endif
                             gtk_widget_show (skip_btn);
                             break;
 
@@ -2218,7 +2238,10 @@ static void next_page (GtkButton* btn, gpointer ptr)
 
         case PAGE_WIFIAP :  if (ssid) g_free (ssid);
                             ssid = NULL;
-                            if (use_nm) nm_stop_scan ();
+#ifdef USE_DHCPCD
+                            if (use_nm)
+#endif
+                            nm_stop_scan ();
 
                             if (!find_line (&ssid, &secure, &connected))
                                 gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
@@ -2235,8 +2258,14 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                     gtk_label_set_text (GTK_LABEL (psk_label), text);
                                     g_free (text);
 
-                                    if (use_nm) text = nm_find_psk_for_network (ssid);
-                                    else text = find_psk_for_network (ssid);
+#ifdef USE_DHCPCD
+                                    if (use_nm)
+#endif
+                                        text = nm_find_psk_for_network (ssid);
+#ifdef USE_DHCPCD
+                                    else
+                                        text = find_psk_for_network (ssid);
+#endif
                                     gtk_entry_set_text (GTK_ENTRY (psk_te), text ? text : "");
                                     if (text) g_free (text);
 
@@ -2244,11 +2273,14 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                 }
                                 else
                                 {
+#ifdef USE_DHCPCD
                                     if (use_nm)
                                     {
+#endif
                                         message (_("Connecting to WiFi network - please wait..."), 0, 0, -1, TRUE);
                                         conn_timeout = g_timeout_add (30000, connect_failure, NULL);
                                         nm_connect_wifi (NULL);
+#ifdef USE_DHCPCD
                                     }
                                     else
                                     {
@@ -2259,16 +2291,20 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                         }
                                         else message (_("Could not connect to this network"), 1, 0, -1, FALSE);
                                     }
+#endif
                                 }
                             }
                             break;
 
         case PAGE_WIFIPSK : ccptr = gtk_entry_get_text (GTK_ENTRY (psk_te));
+#ifdef USE_DHCPCD
                             if (use_nm)
                             {
+#endif
                                 message (_("Connecting to WiFi network - please wait..."), 0, 0, -1, TRUE);
                                 conn_timeout = g_timeout_add (30000, connect_failure, NULL);
                                 nm_connect_wifi (ccptr);
+#ifdef USE_DHCPCD
                             }
                             else
                             {
@@ -2279,6 +2315,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                 }
                                 else message (_("Could not connect to this network"), 1, 0, -1, FALSE);
                             }
+#endif
                             break;
 
         case PAGE_DONE :    message (_("Restarting - please wait..."), 0, 0, -1, TRUE);
@@ -2334,7 +2371,11 @@ static void prev_page (GtkButton* btn, gpointer ptr)
                             }
                             break;
 
-        case PAGE_WIFIAP :  if (use_nm) nm_stop_scan ();
+        case PAGE_WIFIAP :
+#ifdef USE_DHCPCD
+                            if (use_nm)
+#endif
+                            nm_stop_scan ();
                             if (is_pi)
                                 gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
                             else
@@ -2357,7 +2398,11 @@ static void skip_page (GtkButton* btn, gpointer ptr)
     last_btn = SKIP_BTN;
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
     {
-        case PAGE_WIFIAP :  if (use_nm) nm_stop_scan ();
+        case PAGE_WIFIAP :
+#ifdef USE_DHCPCD
+                            if (use_nm)
+#endif
+                            nm_stop_scan ();
                             gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
                             break;
 
@@ -2493,6 +2538,7 @@ static void uscan_toggle (GtkSwitch *sw, gpointer ptr)
         vsystem ("raspi-config nonint do_overscan_kms 1 %d", enable);
 }
 
+#ifdef USE_DHCPCD
 static gboolean check_service (char *name)
 {
     int res;
@@ -2510,6 +2556,7 @@ static gboolean check_service (char *name)
 
     return !!res;
 }
+#endif
 
 static int num_screens (void)
 {
@@ -2538,7 +2585,9 @@ int main (int argc, char *argv[])
     if (system ("raspi-config nonint is_pi")) is_pi = FALSE;
     if (getenv ("WAYFIRE_CONFIG_FILE")) wayfire = TRUE;
 
+#ifdef USE_DHCPCD
     use_nm = check_service ("NetworkManager");
+#endif
 
     // set the audio output to HDMI if there is one, otherwise the analog jack
     vsystem ("hdmi-audio-select");
