@@ -2098,16 +2098,6 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             gtk_tree_model_get (model, &iter, LL_CCODE, &cc, -1);
                             gtk_tree_model_get (model, &iter, LL_CHARS, &ext, -1);
                             wc = g_strdup (cc);
-                            if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (eng_chk)))
-                            {
-                                // override language setting
-                                g_free (lc);
-                                g_free (cc);
-                                g_free (ext);
-                                lc = g_strdup ("en");
-                                cc = g_strdup ("US");
-                                ext = g_strdup (".UTF-8");
-                            }
 
                             model = gtk_combo_box_get_model (GTK_COMBO_BOX (timezone_cb));
                             gtk_combo_box_get_active_iter (GTK_COMBO_BOX (timezone_cb), &iter);
@@ -2119,6 +2109,17 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                 var = g_strdup ("");
                             }
                             else lookup_keyboard (cc, lc, &lay, &var);
+
+                            if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (eng_chk)))
+                            {
+                                // override language setting
+                                g_free (lc);
+                                g_free (cc);
+                                g_free (ext);
+                                lc = g_strdup ("en");
+                                cc = g_strdup ("US");
+                                ext = g_strdup (".UTF-8");
+                            }
 
                             // set wifi country - this is quick, so no need for warning
                             if (wifi_if)
