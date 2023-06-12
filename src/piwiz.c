@@ -1320,6 +1320,7 @@ static char *find_psk_for_network (char *ssid)
 // trigger a scan for APs
 static void nm_start_scan (void)
 {
+    if (!wifi_if) return;
     if (!nm_scanning)
     {
         const GPtrArray *devices = nm_client_get_devices (nm_client);
@@ -1340,6 +1341,7 @@ static void nm_start_scan (void)
 // stop a scan for APs
 static void nm_stop_scan (void)
 {
+    if (!wifi_if) return;
     if (nm_scanning)
     {
         const GPtrArray *devices = nm_client_get_devices (nm_client);
@@ -1394,21 +1396,16 @@ static void nm_ap_changed_cb (NMDeviceWifi *device, NMAccessPoint *unused, gpoin
     if (data || (!sel_ap && active_ap)) sel_ap = active_ap;
 
     // reselect the selected line
-    if (sel_ap)
-    {
-        gtk_tree_model_foreach (gtk_tree_view_get_model (GTK_TREE_VIEW (ap_tv)), nm_select_matched_ssid, sel_ap);
-        g_free (sel_ap);
-    }
+    if (sel_ap) gtk_tree_model_foreach (gtk_tree_view_get_model (GTK_TREE_VIEW (ap_tv)), nm_select_matched_ssid, sel_ap);
 
     // update connection state for the non-active entries in the list
-    if (active_ap)
-    {
-        gtk_tree_model_foreach (GTK_TREE_MODEL (ap_list), nm_set_connected_flag, active_ap);
-        if (active_ap != sel_ap) g_free (active_ap);
-    }
+    if (active_ap) gtk_tree_model_foreach (GTK_TREE_MODEL (ap_list), nm_set_connected_flag, active_ap);
 
     gtk_tree_model_filter_refilter (GTK_TREE_MODEL_FILTER (fap));
     if (gtk_tree_model_iter_n_children (fap, NULL)) gtk_widget_set_sensitive (ap_tv, TRUE);
+
+    if (sel_ap != active_ap && sel_ap) g_free (sel_ap);
+    if (active_ap) g_free (active_ap);
 }
 
 // add an AP to the list store
@@ -1480,7 +1477,6 @@ static gboolean nm_set_connected_flag (GtkTreeModel *model, GtkTreePath *path, G
     gtk_tree_model_get (model, iter, AP_AP, &ap, -1);
 
     if (!g_strcmp0 (ap, (char *) data)) gtk_list_store_set (GTK_LIST_STORE (model), iter, AP_CONNECTED, 1, -1);
-
     g_free (ap);
     return FALSE;
 }
@@ -1693,7 +1689,7 @@ static char *nm_find_psk_for_network (char *ssid)
     char *cmd, *fname, *res;
 
     // find the file with a matching SSID
-    cmd = g_strdup_printf ("grep 'ssid=%s$' /etc/NetworkManager/system-connections/*.nmconnection 2> /dev/null | cut -d : -f 1", ssid);
+    cmd = g_strdup_printf ("grep -l 'ssid=%s$' /etc/NetworkManager/system-connections/*.nmconnection 2> /dev/null", ssid);
     fname = get_shell_string (cmd, TRUE);
     g_free (cmd);
 
@@ -1705,6 +1701,40 @@ static char *nm_find_psk_for_network (char *ssid)
     g_free (fname);
 
     return res;
+}
+
+// initiate scan for networks
+static void start_scanning (void)
+{
+     if (!wifi_if) return;
+#ifdef USE_DHCPCD
+    if (use_nm)
+    {
+#endif
+        if (!nm_client)
+        {
+            GtkTreeIter iter;
+            nm_client = nm_client_new (NULL, NULL);
+            gtk_list_store_clear (ap_list);
+            gtk_list_store_append (ap_list, &iter);
+            gtk_list_store_set (ap_list, &iter, AP_SSID, _("Searching for networks - please wait..."),
+                AP_SEC_ICON, NULL, AP_SIG_ICON, NULL, AP_AP, NULL, -1);
+            gtk_widget_set_sensitive (ap_tv, FALSE);
+        }
+        nm_start_scan ();
+#ifdef USE_DHCPCD
+    }
+    else
+    {
+        if (!con)
+        {
+            init_dhcpcd ();
+            gtk_list_store_clear (ap_list);
+            scans_add (_("Searching for networks - please wait..."), 0, 0, -1, 0);
+            gtk_widget_set_sensitive (ap_tv, FALSE);
+        }
+    }
+#endif
 }
 
 
@@ -2020,6 +2050,7 @@ static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, g
                                 gtk_label_set_text (GTK_LABEL (rename_prompt), _("Press 'Next' to rename the user."));
                                 gtk_button_set_label (GTK_BUTTON (prev_btn), _("_Cancel"));
                             }
+                            else start_scanning ();
                             break;
 
         case PAGE_DONE :    if (reboot)
@@ -2042,36 +2073,7 @@ static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, g
                             }
                             break;
 
-        case PAGE_WIFIAP :
-#ifdef USE_DHCPCD
-                            if (use_nm)
-                            {
-#endif
-                                if (!nm_client)
-                                {
-                                    GtkTreeIter iter;
-                                    nm_client = nm_client_new (NULL, NULL);
-                                    gtk_list_store_clear (ap_list);
-                                    gtk_list_store_append (ap_list, &iter);
-                                    gtk_list_store_set (ap_list, &iter, AP_SSID, _("Searching for networks - please wait..."),
-                                        AP_SEC_ICON, NULL, AP_SIG_ICON, NULL, AP_AP, NULL, -1);
-                                    gtk_widget_set_sensitive (ap_tv, FALSE);
-                                }
-                                nm_start_scan ();
-#ifdef USE_DHCPCD
-                            }
-                            else
-                            {
-                                if (!con)
-                                {
-                                    init_dhcpcd ();
-                                    gtk_list_store_clear (ap_list);
-                                    scans_add (_("Searching for networks - please wait..."), 0, 0, -1, 0);
-                                    gtk_widget_set_sensitive (ap_tv, FALSE);
-                                }
-                            }
-#endif
-                            gtk_widget_show (skip_btn);
+        case PAGE_WIFIAP :  gtk_widget_show (skip_btn);
                             break;
 
         case PAGE_WIFIPSK : gtk_widget_show (skip_btn);
@@ -2238,11 +2240,6 @@ static void next_page (GtkButton* btn, gpointer ptr)
 
         case PAGE_WIFIAP :  if (ssid) g_free (ssid);
                             ssid = NULL;
-#ifdef USE_DHCPCD
-                            if (use_nm)
-#endif
-                            nm_stop_scan ();
-
                             if (!find_line (&ssid, &secure, &connected))
                                 gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
                             else
@@ -2318,7 +2315,12 @@ static void next_page (GtkButton* btn, gpointer ptr)
 #endif
                             break;
 
-        case PAGE_DONE :    message (_("Restarting - please wait..."), 0, 0, -1, TRUE);
+        case PAGE_DONE :
+#ifdef USE_DHCPCD
+                            if (use_nm)
+#endif
+                            nm_stop_scan ();
+                            message (_("Restarting - please wait..."), 0, 0, -1, TRUE);
                             gtk_widget_hide (main_dlg);
                             g_thread_new (NULL, final_setup, NULL);
                             break;
@@ -2371,12 +2373,7 @@ static void prev_page (GtkButton* btn, gpointer ptr)
                             }
                             break;
 
-        case PAGE_WIFIAP :
-#ifdef USE_DHCPCD
-                            if (use_nm)
-#endif
-                            nm_stop_scan ();
-                            if (is_pi)
+        case PAGE_WIFIAP :  if (is_pi)
                                 gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
                             else
                                 gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
@@ -2398,12 +2395,7 @@ static void skip_page (GtkButton* btn, gpointer ptr)
     last_btn = SKIP_BTN;
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
     {
-        case PAGE_WIFIAP :
-#ifdef USE_DHCPCD
-                            if (use_nm)
-#endif
-                            nm_stop_scan ();
-                            gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
+        case PAGE_WIFIAP :  gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
                             break;
 
         case PAGE_UPDATE :  gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_DONE);
