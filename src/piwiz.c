@@ -332,13 +332,6 @@ static const char kb_tzs[MAX_KBS][20] = {
     "Asia/Seoul"
 };
 
-#define WF_CONFIGS 3
-static const char wf_kbd_files[WF_CONFIGS][30] = {
-    "/etc/wayfire/defaults.ini",
-    "/etc/wayfire/greeter.ini",
-    "/etc/wayfire/wizard.ini"
-};
-
 /* In dhcpcd-gtk/main.c */
 
 #ifdef USE_DHCPCD
@@ -589,6 +582,7 @@ static void error_box (char *msg)
         g_signal_connect (err_btn, "clicked", G_CALLBACK (ok_clicked), (void *) dest_page);
 
         gtk_widget_show_all (err_dlg);
+        gtk_window_set_decorated (GTK_WINDOW (err_dlg), FALSE);
         g_object_unref (builder);
     }
     else gtk_label_set_text (GTK_LABEL (err_msg), msg);
@@ -663,6 +657,7 @@ static void message (char *msg, int wait, int dest_page, int prog, gboolean puls
     }
 
     gtk_widget_show (msg_dlg);
+    gtk_window_set_decorated (GTK_WINDOW (msg_dlg), FALSE);
 }
 
 static gboolean cb_message (gpointer data)
@@ -794,20 +789,23 @@ static gpointer set_locale (gpointer data)
         }
 
         // Wayfire settings
-        for (i = 0; i < WF_CONFIGS; i++)
-        {
-            kf = g_key_file_new ();
-            g_key_file_load_from_file (kf, wf_kbd_files[i], G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, NULL);
+        kf = g_key_file_new ();
+        g_key_file_load_from_file (kf, "/home/rpi-first-boot-wizard/.config/wayfire.ini", G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, NULL);
+        g_key_file_set_string (kf, "input", "xkb_layout", lay);
+        g_key_file_set_string (kf, "input", "xkb_variant", var);
+        str = g_key_file_to_data (kf, &len, NULL);
+        g_file_set_contents ("/home/rpi-first-boot-wizard/.config/wayfire.ini", str, len, NULL);
+        g_free (str);
+        g_key_file_free (kf);
 
-            if (g_strcmp0 (lay, init_kb)) g_key_file_set_string (kf, "input", "xkb_layout", lay);
-            if (g_strcmp0 (var, init_var)) g_key_file_set_string (kf, "input", "xkb_variant", var);
-
-            str = g_key_file_to_data (kf, &len, NULL);
-            g_file_set_contents (wf_kbd_files[i], str, len, NULL);
-            g_free (str);
-
-            g_key_file_free (kf);
-        }
+        kf = g_key_file_new ();
+        g_key_file_load_from_file (kf, "/etc/wayfire/greeter.ini", G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, NULL);
+        g_key_file_set_string (kf, "input", "xkb_layout", lay);
+        g_key_file_set_string (kf, "input", "xkb_variant", var);
+        str = g_key_file_to_data (kf, &len, NULL);
+        g_file_set_contents ("/usr/share/greeter.ini", str, len, NULL);
+        g_free (str);
+        g_key_file_free (kf);
 
         if (!wayfire) vsystem ("setxkbmap -layout %s -variant \"%s\" -option \"\"", lay, var);
 
@@ -2015,6 +2013,9 @@ static gpointer final_setup (gpointer ptr)
         vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Web Browser\nIcon=applications-internet\nURL=/usr/share/applications/chromium-browser.desktop\" > /home/pi/Desktop/chromium-browser.desktop");
     }
 #endif
+    // copy the wayfire config file for the new user
+    if (!chuser) vsystem ("mkdir -p /home/pi/.config/;chown pi:pi /home/pi/.config/;cp /home/rpi-first-boot-wizard/.config/wayfire.ini /home/pi/.config/wayfire.ini");
+
     // rename the pi user to the new user and set the password
     vsystem ("/usr/lib/userconf-pi/userconf %s %s '%s'", chuser ? chuser : "pi", user, pw);
 
@@ -2750,6 +2751,7 @@ int main (int argc, char *argv[])
 
     gtk_widget_show (main_dlg);
     gtk_window_set_decorated (GTK_WINDOW (main_dlg), FALSE);
+    gtk_window_set_default_size (GTK_WINDOW (main_dlg), 1, 1);
     gtk_main ();
 
     return 0;
