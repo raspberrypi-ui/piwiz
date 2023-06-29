@@ -791,6 +791,7 @@ static gpointer set_locale (gpointer data)
         // Wayfire settings
         kf = g_key_file_new ();
         g_key_file_load_from_file (kf, "/home/rpi-first-boot-wizard/.config/wayfire.ini", G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, NULL);
+        g_key_file_set_string (kf, "input", "xkb_model", "pc105");
         g_key_file_set_string (kf, "input", "xkb_layout", lay);
         g_key_file_set_string (kf, "input", "xkb_variant", var);
         str = g_key_file_to_data (kf, &len, NULL);
@@ -800,6 +801,7 @@ static gpointer set_locale (gpointer data)
 
         kf = g_key_file_new ();
         g_key_file_load_from_file (kf, "/etc/wayfire/gtemplate.ini", G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, NULL);
+        g_key_file_set_string (kf, "input", "xkb_model", "pc105");
         g_key_file_set_string (kf, "input", "xkb_layout", lay);
         g_key_file_set_string (kf, "input", "xkb_variant", var);
         str = g_key_file_to_data (kf, &len, NULL);
