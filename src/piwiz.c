@@ -799,7 +799,7 @@ static gpointer set_locale (gpointer data)
         g_key_file_free (kf);
 
         kf = g_key_file_new ();
-        g_key_file_load_from_file (kf, "/etc/wayfire/greeter.ini", G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, NULL);
+        g_key_file_load_from_file (kf, "/etc/wayfire/gtemplate.ini", G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, NULL);
         g_key_file_set_string (kf, "input", "xkb_layout", lay);
         g_key_file_set_string (kf, "input", "xkb_variant", var);
         str = g_key_file_to_data (kf, &len, NULL);
