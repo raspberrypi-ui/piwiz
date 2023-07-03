@@ -1,3 +1,9 @@
+piwiz (0.51) bookworm; urgency=medium
+
+  * Set ownership correctly for user wayfire config file
+
+ -- Simon Long <simon@raspberrypi.com>  Mon, 03 Jul 2023 11:11:20 +0100
+
 piwiz (0.50) bookworm; urgency=medium
 
   * Modifications to initial wayfire keyboard configuration

@@ -2016,7 +2016,7 @@ static gpointer final_setup (gpointer ptr)
     }
 #endif
     // copy the wayfire config file for the new user
-    if (!chuser) vsystem ("mkdir -p /home/pi/.config/;chown pi:pi /home/pi/.config/;cp /home/rpi-first-boot-wizard/.config/wayfire.ini /home/pi/.config/wayfire.ini");
+    if (!chuser) vsystem ("mkdir -p /home/pi/.config/;chown pi:pi /home/pi/.config/;cp /home/rpi-first-boot-wizard/.config/wayfire.ini /home/pi/.config/wayfire.ini;chown pi:pi /home/pi/.config/wayfire.ini");
 
     // rename the pi user to the new user and set the password
     vsystem ("/usr/lib/userconf-pi/userconf %s %s '%s'", chuser ? chuser : "pi", user, pw);
