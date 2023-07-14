@@ -2578,7 +2578,7 @@ int main (int argc, char *argv[])
 #endif
 
     if (system ("raspi-config nonint is_pi")) is_pi = FALSE;
-    if (getenv ("WAYLAND_DISPLAY")) wayfire = TRUE;
+    if (getenv ("WAYFIRE_CONFIG_FILE")) wayfire = TRUE;
 
 #ifdef USE_DHCPCD
     use_nm = check_service ("NetworkManager");
