@@ -1,0 +1,7 @@
+[allow wizard to install upgrades]
+Identity=unix-user:rpi-first-boot-wizard
+Action=org.freedesktop.packagekit.package-install;org.freedesktop.packagekit.package-reinstall;org.freedesktop.packagekit.system-update;org.freedesktop.org.packagekit.upgrade-system
+ResultAny=no
+ResultInactive=no
+ResultActive=yes
+
