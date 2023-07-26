@@ -1977,7 +1977,7 @@ static gpointer final_setup (gpointer ptr)
     // set an autostart to set HDMI audio on reboot as new user
     if (chuser == NULL) vsystem ("echo \"[Desktop Entry]\nType=Application\nName=Select HDMI Audio\nExec=sh -c '/usr/bin/hdmi-audio-select; sudo rm /etc/xdg/autostart/hdmiaudio.desktop'\" | sudo tee /etc/xdg/autostart/hdmiaudio.desktop", user);
 
-    if (reboot) vsystem ("sync;reboot");
+    if (reboot) vsystem ("sync; sudo reboot");
     gtk_main_quit ();
     return NULL;
 }
