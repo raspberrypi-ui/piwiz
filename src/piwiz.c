@@ -751,23 +751,10 @@ static void lookup_keyboard (char *country, char *language, char **layout, char 
 
 static gpointer set_locale (gpointer data)
 {
-    FILE *fp;
-    char *str;
-    GKeyFile *kf;
-    gsize len;
-    int i;
-
     // set timezone
     if (g_strcmp0 (init_tz, city))
     {
-        fp = fopen ("/etc/timezone", "wb");
-        if (fp)
-        {
-            fprintf (fp, "%s\n", city);
-            fclose (fp);
-        }
-        vsystem ("rm /etc/localtime");
-        vsystem ("dpkg-reconfigure --frontend noninteractive tzdata");
+        vsystem ("sudo raspi-config nonint do_change_timezone_rc_gui %s", city);
         if (init_tz)
         {
             g_free (init_tz);
@@ -779,38 +766,7 @@ static gpointer set_locale (gpointer data)
     if (g_strcmp0 (init_kb, lay) || g_strcmp0 (init_var, var))
     {
         reboot = TRUE;
-
-        // X settings
-        fp = fopen ("/etc/default/keyboard", "wb");
-        if (fp)
-        {
-            fprintf (fp, "XKBMODEL=pc105\nXKBLAYOUT=%s\nXKBVARIANT=%s\nXKBOPTIONS=\nBACKSPACE=guess", lay, var);
-            fclose (fp);
-        }
-
-        // Wayfire settings
-        kf = g_key_file_new ();
-        g_key_file_load_from_file (kf, "/home/rpi-first-boot-wizard/.config/wayfire.ini", G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, NULL);
-        g_key_file_set_string (kf, "input", "xkb_model", "pc105");
-        g_key_file_set_string (kf, "input", "xkb_layout", lay);
-        g_key_file_set_string (kf, "input", "xkb_variant", var);
-        str = g_key_file_to_data (kf, &len, NULL);
-        g_file_set_contents ("/home/rpi-first-boot-wizard/.config/wayfire.ini", str, len, NULL);
-        g_free (str);
-        g_key_file_free (kf);
-
-        kf = g_key_file_new ();
-        g_key_file_load_from_file (kf, "/etc/wayfire/gtemplate.ini", G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS, NULL);
-        g_key_file_set_string (kf, "input", "xkb_model", "pc105");
-        g_key_file_set_string (kf, "input", "xkb_layout", lay);
-        g_key_file_set_string (kf, "input", "xkb_variant", var);
-        str = g_key_file_to_data (kf, &len, NULL);
-        g_file_set_contents ("/usr/share/greeter.ini", str, len, NULL);
-        g_free (str);
-        g_key_file_free (kf);
-
-        if (!wayfire) vsystem ("setxkbmap -layout %s -variant \"%s\" -option \"\"", lay, var);
-
+        vsystem ("sudo raspi-config nonint do_change_keyboard_rc_gui pc105 %s %s", lay, var);
         if (init_kb)
         {
             g_free (init_kb);
@@ -827,10 +783,7 @@ static gpointer set_locale (gpointer data)
     if (g_strcmp0 (init_country, cc) || g_strcmp0 (init_lang, lc))
     {
         reboot = TRUE;
-        vsystem ("sed -i /etc/locale.gen -e 's/^\\([^#].*\\)/# \\1/g'");
-        vsystem ("sed -i /etc/locale.gen -e 's/^# \\(%s_%s[\\. ].*UTF-8\\)/\\1/g'", lc, cc);
-        vsystem ("locale-gen");
-        vsystem ("LC_ALL=%s_%s%s LANG=%s_%s%s LANGUAGE=%s_%s%s update-locale LANG=%s_%s%s LC_ALL=%s_%s%s LANGUAGE=%s_%s%s", lc, cc, ext, lc, cc, ext, lc, cc, ext, lc, cc, ext, lc, cc, ext, lc, cc, ext);
+        vsystem ("sudo raspi-config nonint do_change_locale_rc_gui %s_%s", lc, cc);
         if (init_country)
         {
             g_free (init_country);
@@ -1975,11 +1928,11 @@ static void resync (void)
 {
     if (system ("test -e /usr/sbin/ntpd") == 0)
     {
-        vsystem ("/etc/init.d/ntp stop; ntpd -gq; /etc/init.d/ntp start");
+        vsystem ("sudo /etc/init.d/ntp stop; sudo ntpd -gq; sudo /etc/init.d/ntp start");
     }
     else
     {
-        vsystem ("systemctl -q stop systemd-timesyncd 2> /dev/null; systemctl -q start systemd-timesyncd 2> /dev/null");
+        vsystem ("sudo systemctl -q stop systemd-timesyncd 2> /dev/null; sudo systemctl -q start systemd-timesyncd 2> /dev/null");
     }
 }
 
@@ -2010,19 +1963,19 @@ static gpointer final_setup (gpointer ptr)
 #ifdef HOMESCHOOL
     if (chuser == NULL)
     {
-        vsystem ("cp /usr/share/applications/chromium-browser.desktop /etc/xdg/autostart/");
-        vsystem ("mkdir -p /home/pi/Desktop");
-        vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Web Browser\nIcon=applications-internet\nURL=/usr/share/applications/chromium-browser.desktop\" > /home/pi/Desktop/chromium-browser.desktop");
+        vsystem ("sudo cp /usr/share/applications/chromium-browser.desktop /etc/xdg/autostart/");
+        vsystem ("sudo mkdir -p /home/pi/Desktop; sudo chown pi:pi /home/pi/Desktop/");
+        vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Web Browser\nIcon=applications-internet\nURL=/usr/share/applications/chromium-browser.desktop\" | sudo tee /home/pi/Desktop/chromium-browser.desktop; sudo chown pi:pi /home/pi/Desktop/chromium-browser.desktop");
     }
 #endif
     // copy the wayfire config file for the new user
-    if (!chuser) vsystem ("mkdir -p /home/pi/.config/;chown pi:pi /home/pi/.config/;cp /home/rpi-first-boot-wizard/.config/wayfire.ini /home/pi/.config/wayfire.ini;chown pi:pi /home/pi/.config/wayfire.ini");
+    if (!chuser) vsystem ("sudo mkdir -p /home/pi/.config/; sudo chown pi:pi /home/pi/.config/; sudo cp /home/rpi-first-boot-wizard/.config/wayfire.ini /home/pi/.config/wayfire.ini; sudo chown pi:pi /home/pi/.config/wayfire.ini");
 
     // rename the pi user to the new user and set the password
-    vsystem ("/usr/lib/userconf-pi/userconf %s %s '%s'", chuser ? chuser : "pi", user, pw);
+    vsystem ("sudo /usr/lib/userconf-pi/userconf %s %s '%s'", chuser ? chuser : "pi", user, pw);
 
     // set an autostart to set HDMI audio on reboot as new user
-    if (chuser == NULL) vsystem ("echo \"[Desktop Entry]\nType=Application\nName=Select HDMI Audio\nExec=sh -c '/usr/bin/hdmi-audio-select; sudo rm /etc/xdg/autostart/hdmiaudio.desktop'\" > /etc/xdg/autostart/hdmiaudio.desktop", user);
+    if (chuser == NULL) vsystem ("echo \"[Desktop Entry]\nType=Application\nName=Select HDMI Audio\nExec=sh -c '/usr/bin/hdmi-audio-select; sudo rm /etc/xdg/autostart/hdmiaudio.desktop'\" | sudo tee /etc/xdg/autostart/hdmiaudio.desktop", user);
 
     if (reboot) vsystem ("sync;reboot");
     gtk_main_quit ();
@@ -2149,7 +2102,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             // set wifi country - this is quick, so no need for warning
                             if (wifi_if)
                             {
-                                vsystem ("raspi-config nonint do_wifi_country %s > /dev/null", wc);
+                                vsystem ("sudo raspi-config nonint do_wifi_country %s > /dev/null", wc);
                             }
                             g_free (wc);
 
@@ -2358,7 +2311,7 @@ static void prev_page (GtkButton* btn, gpointer ptr)
         case PAGE_PASSWD :  if (chuser != NULL)
                             {
                                 // call the script to cancel renaming and reset original user
-                                vsystem ("/usr/bin/cancel-rename %s", chuser);
+                                vsystem ("sudo /usr/bin/cancel-rename %s", chuser);
                                 vsystem ("sync;reboot");
                                 gtk_main_quit ();
                             }
@@ -2470,9 +2423,9 @@ static void set_marketing_serial (void)
         if (access ("/etc/chromium/master_preferences", F_OK) != -1)
         {
             if (system ("raspi-config nonint is_pifour") == 0)
-                vsystem ("sed -i /etc/chromium/master_preferences -e s/UNIDENTIFIED/`vcgencmd otp_dump | grep ^6[45] | sha256sum | cut -d ' ' -f 1`/g");
+                vsystem ("sudo sed -i /etc/chromium/master_preferences -e s/UNIDENTIFIED/`vcgencmd otp_dump | grep ^6[45] | sha256sum | cut -d ' ' -f 1`/g");
             else
-                vsystem ("sed -i /etc/chromium/master_preferences -e s/UNIDENTIFIED/`cat /proc/cpuinfo | grep Serial | sha256sum | cut -d ' ' -f 1`/g");
+                vsystem ("sudo sed -i /etc/chromium/master_preferences -e s/UNIDENTIFIED/`cat /proc/cpuinfo | grep Serial | sha256sum | cut -d ' ' -f 1`/g");
         }
     }
 }
@@ -2503,13 +2456,8 @@ static gboolean srprompt (gpointer data)
     {
         if (net_available () && clock_synced ())
         {
-            char *udir = getenv ("XDG_RUNTIME_DIR");
-            char *dir = g_strdup_printf ("XDG_RUNTIME_DIR=%s", udir);
-            char *unum = g_strdup_printf ("#%s", udir + 10);
-            char *args[7] = { "/usr/bin/sudo", "-u", unum, dir, "/usr/bin/aplay", "srprompt.wav", NULL };
+            char *args[3] = { "/usr/bin/aplay", "srprompt.wav", NULL };
             g_spawn_async (PACKAGE_DATA_DIR, args, NULL, 0, NULL, NULL, NULL, NULL);
-            g_free (dir);
-            g_free (unum);
         }
         return TRUE;
     }
@@ -2528,9 +2476,9 @@ static void uscan_toggle (GtkSwitch *sw, gpointer ptr)
 {
     int enable = gtk_switch_get_active (sw) ? 0 : 1;
     if (GTK_WIDGET (sw) == uscan2_sw)
-        vsystem ("raspi-config nonint do_overscan_kms 2 %d", enable);
+        vsystem ("sudo raspi-config nonint do_overscan_kms 2 %d", enable);
     else
-        vsystem ("raspi-config nonint do_overscan_kms 1 %d", enable);
+        vsystem ("sudo raspi-config nonint do_overscan_kms 1 %d", enable);
 }
 
 #ifdef USE_DHCPCD
@@ -2592,7 +2540,7 @@ int main (int argc, char *argv[])
     if (kbd > MAX_KBS - 1) kbd = 0;
 
 #ifdef HOMESCHOOL
-    vsystem ("familyshield on");
+    vsystem ("sudo familyshield on");
 #endif
 
     reboot = TRUE;
