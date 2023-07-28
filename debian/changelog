@@ -1,3 +1,9 @@
+piwiz (0.54) bookworm; urgency=medium
+
+  * Add polkit rule to allow clock resync
+
+ -- Simon Long <simon@raspberrypi.com>  Fri, 28 Jul 2023 15:17:43 +0100
+
 piwiz (0.53) bookworm; urgency=medium
 
   * Set volume to 100% at startup

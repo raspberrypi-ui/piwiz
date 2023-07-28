@@ -3,3 +3,4 @@ src/piwiz => /usr/bin/piwiz
 src/hdmi-audio-select => /usr/bin/hdmi-audio-select
 usr/share/* usr/share
 data/org.freedesktop.packagekit.pkla => /etc/polkit-1/localauthority/20-org.d/org.freedesktop.packagekit.pkla
+data/10-piwiz-timesync.rules => /etc/polkit-1/rules.d/10-piwiz-timesync.rules
