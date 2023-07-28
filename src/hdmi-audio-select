@@ -18,3 +18,4 @@ else
     OUTPUT=bcm2835_audio.analog-stereo 
 fi
 sudo -u "#$PAUID" XDG_RUNTIME_DIR=/run/user/$PAUID pactl set-default-sink alsa_output.platform-$OUTPUT
+sudo -u "#$PAUID" XDG_RUNTIME_DIR=/run/user/$PAUID pactl set-sink-volume alsa_output.platform-$OUTPUT 100%
