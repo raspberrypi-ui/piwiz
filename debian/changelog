@@ -1,3 +1,10 @@
+piwiz (0.52) bookworm; urgency=medium
+
+  * Use pre-1970 time zone database
+  * Fix accented character in language name
+
+ -- Simon Long <simon@raspberrypi.com>  Wed, 16 Aug 2023 07:18:14 +0100
+
 piwiz (0.51) bookworm; urgency=medium
 
   * Set ownership correctly for user wayfire config file
