@@ -804,6 +804,25 @@ static gpointer set_locale (gpointer data)
     return NULL;
 }
 
+static void deunicode (char **str)
+{
+    if (*str && strchr (*str, '<'))
+    {
+        int val;
+        char *tmp = g_strdup (*str);
+        char *pos = strchr (tmp, '<');
+
+        if (sscanf (pos, "<U00%X>", &val) == 1)
+        {
+            *pos++ = val >= 0xC0 ? 0xC3 : 0xC2;
+            *pos++ = val >= 0xC0 ? val - 0x40 : val;
+            sprintf (pos, "%s", strchr (*str, '>') + 1);
+            g_free (*str);
+            *str = tmp;
+        }
+    }
+}
+
 static void read_locales (void)
 {
     char *cname, *lname, *buffer, *buffer1, *cptr, *cptr1, *cptr2, *cptr3, *cptr4, *cname1;
@@ -843,39 +862,10 @@ static void read_locales (void)
                     cname[0] = g_ascii_toupper (cname[0]);
                     lname[0] = g_ascii_toupper (lname[0]);
 
-                    // Curacao, why do you have to be different from everyone else? Standard ASCII characters not good enough for you...?
-                    if (strchr (cname, '<'))
-                    {
-                        int val;
-                        char *tmp = g_strdup (cname);
-                        char *pos = strchr (tmp, '<');
+                    // deal with Curacao and Bokmal
+                    deunicode (&cname);
+                    deunicode (&lname);
 
-                        if (sscanf (pos, "<U00%X>", &val) == 1)
-                        {
-                            *pos++ = val >= 0xC0 ? 0xC3 : 0xC2;
-                            *pos++ = val >= 0xC0 ? val - 0x40 : val;
-                            sprintf (pos, "%s", strchr (cname, '>') + 1);
-                            g_free (cname);
-                            cname = tmp;
-                        }
-                    }
-
-                    // Norwegian Bokmal, why do you have to be different from everyone else? Standard ASCII characters not good enough for you...?
-                    if (strchr (lname, '<'))
-                    {
-                        int val;
-                        char *tmp = g_strdup (lname);
-                        char *pos = strchr (tmp, '<');
-
-                        if (sscanf (pos, "<U00%X>", &val) == 1)
-                        {
-                            *pos++ = val >= 0xC0 ? 0xC3 : 0xC2;
-                            *pos++ = val >= 0xC0 ? val - 0x40 : val;
-                            sprintf (pos, "%s", strchr (lname, '>') + 1);
-                            g_free (lname);
-                            lname = tmp;
-                        }
-                    }
                     gtk_list_store_append (locale_list, &iter);
                     gtk_list_store_set (locale_list, &iter, LL_LCODE, cptr1, LL_CCODE, cptr2, LL_LNAME, lname, LL_CHARS, ext ? ".UTF-8" : "", -1);
                     gtk_list_store_append (country_list, &iter);
