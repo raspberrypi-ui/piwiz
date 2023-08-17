@@ -860,6 +860,22 @@ static void read_locales (void)
                         }
                     }
 
+                    // Norwegian Bokmal, why do you have to be different from everyone else? Standard ASCII characters not good enough for you...?
+                    if (strchr (lname, '<'))
+                    {
+                        int val;
+                        char *tmp = g_strdup (lname);
+                        char *pos = strchr (tmp, '<');
+
+                        if (sscanf (pos, "<U00%X>", &val) == 1)
+                        {
+                            *pos++ = val >= 0xC0 ? 0xC3 : 0xC2;
+                            *pos++ = val >= 0xC0 ? val - 0x40 : val;
+                            sprintf (pos, "%s", strchr (lname, '>') + 1);
+                            g_free (lname);
+                            lname = tmp;
+                        }
+                    }
                     gtk_list_store_append (locale_list, &iter);
                     gtk_list_store_set (locale_list, &iter, LL_LCODE, cptr1, LL_CCODE, cptr2, LL_LNAME, lname, LL_CHARS, ext ? ".UTF-8" : "", -1);
                     gtk_list_store_append (country_list, &iter);
@@ -882,7 +898,7 @@ static void read_locales (void)
     // populate the timezone database
     buffer = NULL;
     len = 0;
-    fp = fopen ("/usr/share/zoneinfo/zone1970.tab", "rb");
+    fp = fopen ("/usr/share/zoneinfo/zone.tab", "rb");
     if (fp)
     {
         while (getline (&buffer, &len, fp) > 0)
