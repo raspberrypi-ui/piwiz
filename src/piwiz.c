@@ -830,7 +830,7 @@ static void read_locales (void)
     GtkTreeIter iter;
     FILE *fp, *fp1;
     size_t len, len1;
-    int ext;
+    int has_ext;
 
     // populate the locale database
     buffer = NULL;
@@ -843,8 +843,8 @@ static void read_locales (void)
             // does the line contain UTF-8; ignore lines with an @
             if (strstr (buffer, "UTF-8") && !strstr (buffer, "@"))
             {
-                if (strstr (buffer, ".UTF-8")) ext = 1;
-                else ext = 0;
+                if (strstr (buffer, ".UTF-8")) has_ext = 1;
+                else has_ext = 0;
 
                 // split into lang and country codes
                 cptr1 = strtok (buffer, "_");
@@ -867,7 +867,7 @@ static void read_locales (void)
                     deunicode (&lname);
 
                     gtk_list_store_append (locale_list, &iter);
-                    gtk_list_store_set (locale_list, &iter, LL_LCODE, cptr1, LL_CCODE, cptr2, LL_LNAME, lname, LL_CHARS, ext ? ".UTF-8" : "", -1);
+                    gtk_list_store_set (locale_list, &iter, LL_LCODE, cptr1, LL_CCODE, cptr2, LL_LNAME, lname, LL_CHARS, has_ext ? ".UTF-8" : "", -1);
                     gtk_list_store_append (country_list, &iter);
                     gtk_list_store_set (country_list, &iter, CL_CNAME, cname, CL_CCODE, cptr2, -1);
                     g_free (cname);
