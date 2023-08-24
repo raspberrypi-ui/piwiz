@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.2 -->
+<!-- Generated with glade 3.40.0 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkWindow" id="error">
@@ -260,9 +260,6 @@ Press 'Next' to get started. </property>
                 </child>
               </object>
             </child>
-            <child type="tab">
-              <placeholder/>
-            </child>
             <child>
               <object class="GtkBox" id="p1vbox">
                 <property name="visible">True</property>
@@ -482,9 +479,6 @@ Press 'Next' to get started. </property>
                 <property name="position">1</property>
               </packing>
             </child>
-            <child type="tab">
-              <placeholder/>
-            </child>
             <child>
               <object class="GtkBox" id="p2vbox">
                 <property name="visible">True</property>
@@ -669,9 +663,6 @@ The username can only contain lower-case letters, digits and hyphens, and must s
                 <property name="position">2</property>
               </packing>
             </child>
-            <child type="tab">
-              <placeholder/>
-            </child>
             <child>
               <object class="GtkBox" id="p7vbox">
                 <property name="visible">True</property>
@@ -810,9 +801,6 @@ The username can only contain lower-case letters, digits and hyphens, and must s
                 <property name="position">3</property>
               </packing>
             </child>
-            <child type="tab">
-              <placeholder/>
-            </child>
             <child>
               <object class="GtkBox" id="p3vbox">
                 <property name="visible">True</property>
@@ -895,9 +883,6 @@ The username can only contain lower-case letters, digits and hyphens, and must s
               <packing>
                 <property name="position">4</property>
               </packing>
-            </child>
-            <child type="tab">
-              <placeholder/>
             </child>
             <child>
               <object class="GtkBox" id="p4vbox">
@@ -1025,8 +1010,119 @@ The username can only contain lower-case letters, digits and hyphens, and must s
                 <property name="position">5</property>
               </packing>
             </child>
-            <child type="tab">
-              <placeholder/>
+            <child>
+              <object class="GtkBox" id="p8vbox">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="orientation">vertical</property>
+                <property name="spacing">5</property>
+                <child>
+                  <object class="GtkLabel" id="p8title">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">&lt;b&gt;Choose Browser&lt;/b&gt;</property>
+                    <property name="use-markup">True</property>
+                    <property name="max-width-chars">50</property>
+                    <property name="xalign">0</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="p8info">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">Both the Chromium and Firefox web browsers are preinstalled on Raspberry Pi OS. Select the one you prefer to use.</property>
+                    <property name="wrap">True</property>
+                    <property name="max-width-chars">50</property>
+                    <property name="xalign">0</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="padding">5</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkBox" id="p8hbox1">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <child>
+                      <object class="GtkRadioButton" id="p8rbcr">
+                        <property name="label" translatable="yes">Chromium</property>
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="receives-default">False</property>
+                        <property name="active">True</property>
+                        <property name="draw-indicator">True</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkRadioButton" id="p8rbff">
+                        <property name="label" translatable="yes">Firefox</property>
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="receives-default">False</property>
+                        <property name="active">True</property>
+                        <property name="draw-indicator">True</property>
+                        <property name="group">p8rbcr</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkCheckButton" id="p8chuninst">
+                    <property name="label" translatable="yes">Tick here to uninstall the unused browser</property>
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="receives-default">False</property>
+                    <property name="draw-indicator">True</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">3</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="p8prompt">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">Press 'Next' when you have chosen a browser.</property>
+                    <property name="wrap">True</property>
+                    <property name="max-width-chars">50</property>
+                    <property name="xalign">0</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="padding">5</property>
+                    <property name="position">4</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="position">6</property>
+              </packing>
             </child>
             <child>
               <object class="GtkBox" id="p5vbox">
@@ -1069,11 +1165,8 @@ Press 'Next' to check and update software, or 'Skip' to continue without checkin
                 </child>
               </object>
               <packing>
-                <property name="position">6</property>
+                <property name="position">7</property>
               </packing>
-            </child>
-            <child type="tab">
-              <placeholder/>
             </child>
             <child>
               <object class="GtkBox" id="p6vbox">
@@ -1144,11 +1237,8 @@ Press 'Next' to check and update software, or 'Skip' to continue without checkin
                 </child>
               </object>
               <packing>
-                <property name="position">7</property>
+                <property name="position">8</property>
               </packing>
-            </child>
-            <child type="tab">
-              <placeholder/>
             </child>
           </object>
           <packing>
