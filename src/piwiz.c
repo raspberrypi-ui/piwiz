@@ -138,6 +138,7 @@ gboolean reboot = TRUE, is_pi = TRUE;
 int last_btn = NEXT_BTN;
 int calls;
 gboolean wayfire = FALSE;
+gboolean browser = TRUE;
 
 #ifdef USE_DHCPCD
 gboolean use_nm;
@@ -2301,14 +2302,14 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             else
                             {
                                 if (!wifi_if)
-                                    gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_BROWSER);
+                                    gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), browser ? PAGE_BROWSER : PAGE_UPDATE);
                                 else
                                     gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIAP);
                             }
                             break;
 
         case PAGE_OSCAN :   if (!wifi_if)
-                                gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_BROWSER);
+                                gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), browser ? PAGE_BROWSER : PAGE_UPDATE);
                             else
                                 gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIAP);
                             break;
@@ -2316,12 +2317,12 @@ static void next_page (GtkButton* btn, gpointer ptr)
         case PAGE_WIFIAP :  if (ssid) g_free (ssid);
                             ssid = NULL;
                             if (!find_line (&ssid, &secure, &connected))
-                                gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_BROWSER);
+                                gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), browser ? PAGE_BROWSER : PAGE_UPDATE);
                             else
                             {
                                 if (connected)
                                 {
-                                    gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_BROWSER);
+                                    gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), browser ? PAGE_BROWSER : PAGE_UPDATE);
                                     break;
                                 }
                                 if (secure)
@@ -2445,6 +2446,11 @@ static void prev_page (GtkButton* btn, gpointer ptr)
                                 gtk_notebook_prev_page (GTK_NOTEBOOK (wizard_nb));
                             break;
 
+        case PAGE_UPDATE :  if (browser)
+                            {
+                                gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_BROWSER);
+                                break;
+                            } // fallthrough
         case PAGE_BROWSER : if (wifi_if) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIAP);
                             else
                             {
@@ -2477,7 +2483,8 @@ static void skip_page (GtkButton* btn, gpointer ptr)
     last_btn = SKIP_BTN;
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
     {
-        case PAGE_WIFIAP :  gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_BROWSER);
+        case PAGE_WIFIAP :
+        case PAGE_WIFIPSK : gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), browser ? PAGE_BROWSER : PAGE_UPDATE);
                             break;
 
         case PAGE_UPDATE :  gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_DONE);
@@ -2671,6 +2678,8 @@ int main (int argc, char *argv[])
 
     reboot = TRUE;
     read_inits ();
+    if (vsystem ("raspi-config nonint is_installed chromium-browser")) browser = FALSE;
+    if (vsystem ("raspi-config nonint is_installed firefox")) browser = FALSE;
 
     set_marketing_serial ();
 
