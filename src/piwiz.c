@@ -1730,6 +1730,13 @@ static void progress (PkProgress *progress, PkProgressType *type, gpointer data)
                                             }
                                             break;
 
+            case PK_STATUS_ENUM_REMOVE :    if ((int) type == PK_PROGRESS_TYPE_PERCENTAGE)
+                                            {
+                                                if (role == PK_ROLE_ENUM_REMOVE_PACKAGES)
+                                                    thread_message (_("Uninstalling browser - please wait..."), pk_progress_get_percentage (progress));
+                                            }
+                                            break;
+
             default :                       gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
                                             break;
         }
@@ -1807,7 +1814,6 @@ static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
     GError *error = NULL;
     PkResults *results = pk_task_generic_finish (task, res, &error);
     PkPackage *item;
-    gchar *package_id, *arch;
     gchar **ids;
     int i;
 
@@ -1826,6 +1832,7 @@ static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
     GPtrArray *array = pk_package_sack_get_array (fsack);
     for (i = 0; i < array->len; i++)
     {
+        gchar *package_id, *arch;
         item = g_ptr_array_index (array, i);
         g_object_get (item, "package-id", &package_id, NULL);
         if ((arch = strstr (package_id, "arm64")))
