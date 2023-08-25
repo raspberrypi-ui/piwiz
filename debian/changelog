@@ -1,3 +1,9 @@
+piwiz (0.56) bookworm; urgency=medium
+
+  * Add browser selection
+
+ -- Simon Long <simon@raspberrypi.com>  Fri, 25 Aug 2023 10:34:16 +0100
+
 piwiz (0.55) bookworm; urgency=medium
 
   * Use pre-1970 time zone database
