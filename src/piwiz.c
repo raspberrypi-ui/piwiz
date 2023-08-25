@@ -1736,27 +1736,6 @@ static void progress (PkProgress *progress, PkProgressType *type, gpointer data)
     }
 }
 
-static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
-{
-    GError *error = NULL;
-    pk_task_generic_finish (task, res, &error);
-
-    if (error != NULL)
-    {
-        char *buffer = g_strdup_printf (_("Error getting updates.\n%s"), error->message);
-        thread_error (buffer);
-        g_error_free (error);
-        return;
-    }
-
-    // check reboot flag set by install process
-    if (!access ("/run/reboot-required", F_OK)) reboot = TRUE;
-
-    // re-set the serial number in case a Chromium update was installed
-    set_marketing_serial ();
-    thread_message (_("System is up to date"), -2);
-}
-
 static gboolean filter_fn (PkPackage *package, gpointer user_data)
 {
     if (is_pi) return TRUE;
@@ -1764,212 +1743,11 @@ static gboolean filter_fn (PkPackage *package, gpointer user_data)
     return TRUE;
 }
 
-static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
+static gpointer refresh_update_cache (gpointer data)
 {
-    GError *error = NULL;
-    PkResults *results = pk_task_generic_finish (task, res, &error);
-    gchar **ids;
-
-    if (error != NULL)
-    {
-        char *buffer = g_strdup_printf (_("Error comparing versions.\n%s"), error->message);
-        thread_error (buffer);
-        g_error_free (error);
-        return;
-    }
-
-    PkPackageSack *sack = pk_results_get_package_sack (results);
-    PkPackageSack *fsack = pk_package_sack_filter (sack, filter_fn, NULL);
-
-    if (pk_package_sack_get_size (fsack) > 0)
-    {
-        thread_message (_("Getting updates - please wait..."), -1);
-
-        ids = pk_package_sack_get_ids (fsack);
-        pk_task_update_packages_async (task, ids, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) do_updates_done, NULL);
-        g_strfreev (ids);
-    }
-    else
-    {
-        // check reboot flag set by install process
-        if (!access ("/run/reboot-required", F_OK)) reboot = TRUE;
-
-        thread_message (_("System is up to date"), -2);
-    }
-
-    g_object_unref (sack);
-    g_object_unref (fsack);
-}
-
-static void install_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
-{
-    GError *error = NULL;
-    pk_task_generic_finish (task, res, &error);
-    gchar **pack_array;
-    gchar *lpack;
-
-    if (error != NULL)
-    {
-        char *buffer = g_strdup_printf (_("Error installing languages.\n%s"), error->message);
-        thread_error (buffer);
-        g_error_free (error);
-        return;
-    }
-
-    if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (uninstall_chk)))
-    {
-        if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (chromium_rb))) lpack = g_strdup ("firefox");
-        else lpack = g_strdup ("chromium-browser");
-        pack_array = g_strsplit (lpack, " ", -1);
-        thread_message (_("Uninstalling browser - please wait..."), -1);
-        pk_client_resolve_async (PK_CLIENT (task), 0, pack_array, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) resolve_browser_done, NULL);
-        g_strfreev (pack_array);
-        g_free (lpack);
-    }
-    else
-    {
-        thread_message (_("Comparing versions - please wait..."), -1);
-        pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
-    }
-}
-
-static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
-{
-    GError *error = NULL;
-    PkResults *results = pk_task_generic_finish (task, res, &error);
-    PkPackage *item;
-    gchar *package_id, *arch;
-    gchar **ids;
-    gchar **pack_array;
-    gchar *lpack;
-    int i;
-
-    if (error != NULL)
-    {
-        char *buffer = g_strdup_printf (_("Error finding languages.\n%s"), error->message);
-        thread_error (buffer);
-        g_error_free (error);
-        return;
-    }
-
-    PkPackageSack *sack = pk_results_get_package_sack (results);
-    PkPackageSack *fsack = pk_package_sack_filter (sack, filter_fn, NULL);
-    GPtrArray *array = pk_package_sack_get_array (fsack);
-
-    // remove armhf packages for which there is an arm64 equivalent...
-    for (i = 0; i < array->len; i++)
-    {
-        item = g_ptr_array_index (array, i);
-        g_object_get (item, "package-id", &package_id, NULL);
-        if ((arch = strstr (package_id, "arm64")))
-        {
-            *(arch + 3) = 'h';
-            *(arch + 4) = 'f';
-            item = pk_package_sack_find_by_id_name_arch (fsack, package_id);
-            if (item) pk_package_sack_remove_package (fsack, item);
-        }
-        g_free (package_id);
-    }
-    g_ptr_array_unref (array);
-
-    if (pk_package_sack_get_size (fsack) > 0)
-    {
-        thread_message (_("Installing languages - please wait..."), -1);
-
-        ids = pk_package_sack_get_ids (fsack);
-        pk_task_install_packages_async (task, ids, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) install_lang_done, NULL);
-        g_strfreev (ids);
-    }
-    else if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (uninstall_chk)))
-    {
-        if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (chromium_rb))) lpack = g_strdup ("firefox");
-        else lpack = g_strdup ("chromium-browser");
-        pack_array = g_strsplit (lpack, " ", -1);
-        thread_message (_("Uninstalling browser - please wait..."), -1);
-        pk_client_resolve_async (PK_CLIENT (task), 0, pack_array, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) resolve_browser_done, NULL);
-        g_strfreev (pack_array);
-        g_free (lpack);
-    }
-    else
-    {
-        thread_message (_("Comparing versions - please wait..."), -1);
-        pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
-    }
-
-    g_object_unref (sack);
-    g_object_unref (fsack);
-}
-
-static void uninstall_browser_done (PkTask *task, GAsyncResult *res, gpointer data)
-{
-    GError *error = NULL;
-    pk_task_generic_finish (task, res, &error);
-
-    if (error != NULL)
-    {
-        char *buffer = g_strdup_printf (_("Error uninstalling browser.\n%s"), error->message);
-        thread_error (buffer);
-        g_error_free (error);
-        return;
-    }
-
-    thread_message (_("Comparing versions - please wait..."), -1);
-    pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
-}
-
-static void resolve_browser_done (PkTask *task, GAsyncResult *res, gpointer data)
-{
-    GError *error = NULL;
-    PkResults *results = pk_task_generic_finish (task, res, &error);
-    PkPackage *item;
-    gchar *package_id, *arch;
-    gchar **ids;
-    int i;
-
-    if (error != NULL)
-    {
-        char *buffer = g_strdup_printf (_("Error uninstalling browser.\n%s"), error->message);
-        thread_error (buffer);
-        g_error_free (error);
-        return;
-    }
-
-    PkPackageSack *sack = pk_results_get_package_sack (results);
-    PkPackageSack *fsack = pk_package_sack_filter (sack, filter_fn, NULL);
-    GPtrArray *array = pk_package_sack_get_array (fsack);
-
-    // remove armhf packages for which there is an arm64 equivalent...
-    for (i = 0; i < array->len; i++)
-    {
-        item = g_ptr_array_index (array, i);
-        g_object_get (item, "package-id", &package_id, NULL);
-        if ((arch = strstr (package_id, "arm64")))
-        {
-            *(arch + 3) = 'h';
-            *(arch + 4) = 'f';
-            item = pk_package_sack_find_by_id_name_arch (fsack, package_id);
-            if (item) pk_package_sack_remove_package (fsack, item);
-        }
-        g_free (package_id);
-    }
-    g_ptr_array_unref (array);
-
-    if (pk_package_sack_get_size (fsack) > 0)
-    {
-        thread_message (_("Uninstalling browser - please wait..."), -1);
-
-        ids = pk_package_sack_get_ids (fsack);
-        pk_task_remove_packages_async (task, ids, TRUE, TRUE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) uninstall_browser_done, NULL);
-        g_strfreev (ids);
-    }
-    else
-    {
-        thread_message (_("Comparing versions - please wait..."), -1);
-        pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
-    }
-
-    g_object_unref (sack);
-    g_object_unref (fsack);
+    PkTask *task = pk_task_new ();
+    pk_client_refresh_cache_async (PK_CLIENT (task), TRUE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) refresh_cache_done, NULL);
+    return NULL;
 }
 
 static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data)
@@ -2024,11 +1802,215 @@ static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data)
     }
 }
 
-static gpointer refresh_update_cache (gpointer data)
+static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
 {
-    PkTask *task = pk_task_new ();
-    pk_client_refresh_cache_async (PK_CLIENT (task), TRUE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) refresh_cache_done, NULL);
-    return NULL;
+    GError *error = NULL;
+    PkResults *results = pk_task_generic_finish (task, res, &error);
+    PkPackage *item;
+    gchar *package_id, *arch;
+    gchar **ids;
+    int i;
+
+    if (error != NULL)
+    {
+        char *buffer = g_strdup_printf (_("Error finding languages.\n%s"), error->message);
+        thread_error (buffer);
+        g_error_free (error);
+        return;
+    }
+
+    PkPackageSack *sack = pk_results_get_package_sack (results);
+    PkPackageSack *fsack = pk_package_sack_filter (sack, filter_fn, NULL);
+
+    // remove armhf packages for which there is an arm64 equivalent...
+    GPtrArray *array = pk_package_sack_get_array (fsack);
+    for (i = 0; i < array->len; i++)
+    {
+        item = g_ptr_array_index (array, i);
+        g_object_get (item, "package-id", &package_id, NULL);
+        if ((arch = strstr (package_id, "arm64")))
+        {
+            *(arch + 3) = 'h';
+            *(arch + 4) = 'f';
+            item = pk_package_sack_find_by_id_name_arch (fsack, package_id);
+            if (item) pk_package_sack_remove_package (fsack, item);
+        }
+        g_free (package_id);
+    }
+    g_ptr_array_unref (array);
+
+    if (pk_package_sack_get_size (fsack) > 0)
+    {
+        thread_message (_("Installing languages - please wait..."), -1);
+
+        ids = pk_package_sack_get_ids (fsack);
+        pk_task_install_packages_async (task, ids, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) install_lang_done, NULL);
+        g_strfreev (ids);
+    }
+    else if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (uninstall_chk)))
+    {
+        gchar **pack_array;
+        gchar *lpack;
+
+        if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (chromium_rb))) lpack = g_strdup ("firefox");
+        else lpack = g_strdup ("chromium-browser");
+        pack_array = g_strsplit (lpack, " ", -1);
+        thread_message (_("Uninstalling browser - please wait..."), -1);
+        pk_client_resolve_async (PK_CLIENT (task), 0, pack_array, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) resolve_browser_done, NULL);
+        g_strfreev (pack_array);
+        g_free (lpack);
+    }
+    else
+    {
+        thread_message (_("Comparing versions - please wait..."), -1);
+        pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
+    }
+
+    g_object_unref (sack);
+    g_object_unref (fsack);
+}
+
+static void install_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
+{
+    GError *error = NULL;
+    pk_task_generic_finish (task, res, &error);
+
+    if (error != NULL)
+    {
+        char *buffer = g_strdup_printf (_("Error installing languages.\n%s"), error->message);
+        thread_error (buffer);
+        g_error_free (error);
+        return;
+    }
+
+    if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (uninstall_chk)))
+    {
+        gchar **pack_array;
+        gchar *lpack;
+
+        if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (chromium_rb))) lpack = g_strdup ("firefox");
+        else lpack = g_strdup ("chromium-browser");
+        pack_array = g_strsplit (lpack, " ", -1);
+        thread_message (_("Uninstalling browser - please wait..."), -1);
+        pk_client_resolve_async (PK_CLIENT (task), 0, pack_array, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) resolve_browser_done, NULL);
+        g_strfreev (pack_array);
+        g_free (lpack);
+    }
+    else
+    {
+        thread_message (_("Comparing versions - please wait..."), -1);
+        pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
+    }
+}
+
+static void resolve_browser_done (PkTask *task, GAsyncResult *res, gpointer data)
+{
+    GError *error = NULL;
+    PkResults *results = pk_task_generic_finish (task, res, &error);
+    gchar **ids;
+
+    if (error != NULL)
+    {
+        char *buffer = g_strdup_printf (_("Error uninstalling browser.\n%s"), error->message);
+        thread_error (buffer);
+        g_error_free (error);
+        return;
+    }
+
+    PkPackageSack *sack = pk_results_get_package_sack (results);
+    PkPackageSack *fsack = pk_package_sack_filter (sack, filter_fn, NULL);
+
+    if (pk_package_sack_get_size (fsack) > 0)
+    {
+        thread_message (_("Uninstalling browser - please wait..."), -1);
+
+        ids = pk_package_sack_get_ids (fsack);
+        pk_task_remove_packages_async (task, ids, TRUE, TRUE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) uninstall_browser_done, NULL);
+        g_strfreev (ids);
+    }
+    else
+    {
+        thread_message (_("Comparing versions - please wait..."), -1);
+        pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
+    }
+
+    g_object_unref (sack);
+    g_object_unref (fsack);
+}
+
+static void uninstall_browser_done (PkTask *task, GAsyncResult *res, gpointer data)
+{
+    GError *error = NULL;
+    pk_task_generic_finish (task, res, &error);
+
+    if (error != NULL)
+    {
+        char *buffer = g_strdup_printf (_("Error uninstalling browser.\n%s"), error->message);
+        thread_error (buffer);
+        g_error_free (error);
+        return;
+    }
+
+    thread_message (_("Comparing versions - please wait..."), -1);
+    pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
+}
+
+static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
+{
+    GError *error = NULL;
+    PkResults *results = pk_task_generic_finish (task, res, &error);
+    gchar **ids;
+
+    if (error != NULL)
+    {
+        char *buffer = g_strdup_printf (_("Error comparing versions.\n%s"), error->message);
+        thread_error (buffer);
+        g_error_free (error);
+        return;
+    }
+
+    PkPackageSack *sack = pk_results_get_package_sack (results);
+    PkPackageSack *fsack = pk_package_sack_filter (sack, filter_fn, NULL);
+
+    if (pk_package_sack_get_size (fsack) > 0)
+    {
+        thread_message (_("Getting updates - please wait..."), -1);
+
+        ids = pk_package_sack_get_ids (fsack);
+        pk_task_update_packages_async (task, ids, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) do_updates_done, NULL);
+        g_strfreev (ids);
+    }
+    else
+    {
+        // check reboot flag set by install process
+        if (!access ("/run/reboot-required", F_OK)) reboot = TRUE;
+
+        thread_message (_("System is up to date"), -2);
+    }
+
+    g_object_unref (sack);
+    g_object_unref (fsack);
+}
+
+static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
+{
+    GError *error = NULL;
+    pk_task_generic_finish (task, res, &error);
+
+    if (error != NULL)
+    {
+        char *buffer = g_strdup_printf (_("Error getting updates.\n%s"), error->message);
+        thread_error (buffer);
+        g_error_free (error);
+        return;
+    }
+
+    // check reboot flag set by install process
+    if (!access ("/run/reboot-required", F_OK)) reboot = TRUE;
+
+    // re-set the serial number in case a Chromium update was installed
+    set_marketing_serial ();
+    thread_message (_("System is up to date"), -2);
 }
 
 static gboolean clock_synced (void)
