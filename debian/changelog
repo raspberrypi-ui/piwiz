@@ -1,3 +1,9 @@
+piwiz (0.57) bookworm; urgency=medium
+
+  * Remove overscan
+
+ -- Simon Long <simon@raspberrypi.com>  Tue, 29 Aug 2023 10:28:53 +0100
+
 piwiz (0.56) bookworm; urgency=medium
 
   * Add browser selection
