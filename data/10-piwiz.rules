@@ -1,0 +1,17 @@
+polkit.addRule(function(action, subject) {
+    if (action.id == "org.freedesktop.systemd1.manage-units" &&
+        action.lookup("unit") == "systemd-timesyncd.service" &&
+        subject.user == "rpi-first-boot-wizard") {
+        return polkit.Result.YES;
+    }
+});
+
+polkit.addRule(function(action, subject) {
+    if ((action.id == "org.freedesktop.packagekit.package-install" ||
+        action.id == "org.freedesktop.packagekit.package-reinstall" ||
+        action.id == "org.freedesktop.packagekit.system-update" ||
+        action.id == "org.freedesktop.packagekit.upgrade-system") &&
+        subject.user == "rpi-first-boot-wizard") {
+        return polkit.Result.YES;
+    }
+});
