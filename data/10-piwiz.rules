@@ -9,6 +9,7 @@ polkit.addRule(function(action, subject) {
 polkit.addRule(function(action, subject) {
     if ((action.id == "org.freedesktop.packagekit.package-install" ||
         action.id == "org.freedesktop.packagekit.package-reinstall" ||
+        action.id == "org.freedesktop.packagekit.package-remove" ||
         action.id == "org.freedesktop.packagekit.system-update" ||
         action.id == "org.freedesktop.packagekit.upgrade-system") &&
         subject.user == "rpi-first-boot-wizard") {
