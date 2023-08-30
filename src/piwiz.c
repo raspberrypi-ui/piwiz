@@ -1159,7 +1159,7 @@ void connect_success (void)
         g_source_remove (conn_timeout);
         conn_timeout = 0;
         hide_message ();
-        gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_UPDATE);
+        gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), browser ? PAGE_BROWSER : PAGE_UPDATE);
     }
 }
 
