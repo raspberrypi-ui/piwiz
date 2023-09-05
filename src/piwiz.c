@@ -2549,6 +2549,14 @@ static void set_marketing_serial (void)
             else
                 vsystem ("sudo sed -i /etc/chromium/master_preferences -e s/UNIDENTIFIED/`cat /proc/cpuinfo | grep Serial | sha256sum | cut -d ' ' -f 1`/g");
         }
+
+        if (access ("/usr/share/firefox/distribution/distribution.ini", F_OK) != -1)
+        {
+            if (system ("raspi-config nonint is_pifour") == 0)
+                vsystem ("sudo sed -i /usr/share/firefox/distribution/distribution.ini -e s/UNIDENTIFIED/`vcgencmd otp_dump | grep ^6[45] | sha256sum | cut -d ' ' -f 1`/g");
+            else
+                vsystem ("sudo sed -i /usr/share/firefox/distribution/distribution.ini -e s/UNIDENTIFIED/`cat /proc/cpuinfo | grep Serial | sha256sum | cut -d ' ' -f 1`/g");
+        }
     }
 }
 
