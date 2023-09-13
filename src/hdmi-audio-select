@@ -8,7 +8,7 @@ fi
 
 SINKS=$(sudo -u "#$PAUID" XDG_RUNTIME_DIR=/run/user/$PAUID pactl list short sinks)
 DOUT=$(echo $SINKS | grep -oE bcm2835_audio\\.digital\\-stereo)
-HOUT=$(echo $SINKS | grep -oE [0-9a-f]{8}\\.hdmi\\.[0-9a-z]+\\-stereo | head -n 1)
+HOUT=$(echo $SINKS | grep -oE [0-9a-f]{8,}\\.hdmi\\.[0-9a-z]+\\-stereo | head -n 1)
 
 if ! [ -z $DOUT ] ; then 
     OUTPUT=$DOUT
