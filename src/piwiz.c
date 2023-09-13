@@ -2408,9 +2408,9 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             break;
 
         case PAGE_BROWSER : if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (chromium_rb)))
-                                vsystem ("sudo raspi-config nonint do_browser chromium-browser");
+                                vsystem ("sudo raspi-config nonint do_browser chromium-browser pi");
                             else
-                                vsystem ("sudo raspi-config nonint do_browser firefox");
+                                vsystem ("sudo raspi-config nonint do_browser firefox pi");
                             gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
                             break;
 
@@ -2669,8 +2669,12 @@ int main (int argc, char *argv[])
 
     reboot = TRUE;
     read_inits ();
+#ifdef HOMESCHOOL
+    browser = FALSE;
+#else
     if (vsystem ("raspi-config nonint is_installed chromium-browser")) browser = FALSE;
     if (vsystem ("raspi-config nonint is_installed firefox")) browser = FALSE;
+#endif
 
     set_marketing_serial ();
 
@@ -2736,7 +2740,7 @@ int main (int argc, char *argv[])
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (psk_hide), TRUE);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (eng_chk), FALSE);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (uskey_chk), FALSE);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (chromium_rb), FALSE);
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (chromium_rb), TRUE);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (uninstall_chk), FALSE);
 
     // set up underscan
