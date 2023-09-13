@@ -409,6 +409,7 @@ static void prev_page (GtkButton* btn, gpointer ptr);
 static void skip_page (GtkButton* btn, gpointer ptr);
 static gboolean show_ip (void);
 static void set_marketing_serial (const char *file);
+static void set_hs_serial (void);
 static gboolean net_available (void);
 static int get_pi_keyboard (void);
 static gboolean srprompt (gpointer data);
@@ -2542,11 +2543,23 @@ static gboolean show_ip (void)
 static void set_marketing_serial (const char *file)
 {
 #define WURL "https://welcome.raspberrypi.com/raspberry-pi-os?id="
+
     if (is_pi)
     {
         if (access (file, F_OK) != -1)
         {
             vsystem ("sudo sed -i %s -e s#WELCOME_URL#%s`cat /proc/cpuinfo | grep Serial | sha256sum | cut -d ' ' -f 1`#g", file, WURL);
+        }
+    }
+}
+
+static void set_hs_serial (void)
+{
+    if (is_pi)
+    {
+        if (access ("/etc/chromium/master_preferences", F_OK) != -1)
+        {
+            vsystem ("sudo sed -i /etc/chromium/master_preferences -e s/UNIDENTIFIED/`cat /proc/cpuinfo | grep Serial | sha256sum | cut -d ' ' -f 1`/g");
         }
     }
 }
@@ -2666,15 +2679,16 @@ int main (int argc, char *argv[])
 
     reboot = TRUE;
     read_inits ();
+
 #ifdef HOMESCHOOL
     browser = FALSE;
+    set_hs_serial ();
 #else
     if (vsystem ("raspi-config nonint is_installed chromium-browser")) browser = FALSE;
+    else set_marketing_serial ("/etc/chromium/master_preferences");
     if (vsystem ("raspi-config nonint is_installed firefox")) browser = FALSE;
+    else set_marketing_serial ("/usr/share/firefox/distribution/distribution.ini");
 #endif
-
-    set_marketing_serial ("/etc/chromium/master_preferences");
-    set_marketing_serial ("/usr/share/firefox/distribution/distribution.ini");
 
     // GTK setup
     gtk_init (&argc, &argv);
