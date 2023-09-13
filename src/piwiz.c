@@ -2017,8 +2017,12 @@ static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
     if (!access ("/run/reboot-required", F_OK)) reboot = TRUE;
 
     // re-set the serial number in case a browser update was installed
+#if HOMESCHOOL
+    set_hs_serial ();
+#else
     set_marketing_serial ("/etc/chromium/master_preferences");
     set_marketing_serial ("/usr/share/firefox/distribution/distribution.ini");
+#endif
     thread_message (_("System is up to date"), -2);
 }
 
@@ -2685,9 +2689,9 @@ int main (int argc, char *argv[])
     set_hs_serial ();
 #else
     if (vsystem ("raspi-config nonint is_installed chromium-browser")) browser = FALSE;
-    else set_marketing_serial ("/etc/chromium/master_preferences");
     if (vsystem ("raspi-config nonint is_installed firefox")) browser = FALSE;
-    else set_marketing_serial ("/usr/share/firefox/distribution/distribution.ini");
+    set_marketing_serial ("/etc/chromium/master_preferences");
+    set_marketing_serial ("/usr/share/firefox/distribution/distribution.ini");
 #endif
 
     // GTK setup
