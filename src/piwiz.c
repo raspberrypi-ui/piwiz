@@ -408,7 +408,7 @@ static void next_page (GtkButton* btn, gpointer ptr);
 static void prev_page (GtkButton* btn, gpointer ptr);
 static void skip_page (GtkButton* btn, gpointer ptr);
 static gboolean show_ip (void);
-static void set_marketing_serial (void);
+static void set_marketing_serial (const char *file);
 static gboolean net_available (void);
 static int get_pi_keyboard (void);
 static gboolean srprompt (gpointer data);
@@ -2015,8 +2015,9 @@ static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
     // check reboot flag set by install process
     if (!access ("/run/reboot-required", F_OK)) reboot = TRUE;
 
-    // re-set the serial number in case a Chromium update was installed
-    set_marketing_serial ();
+    // re-set the serial number in case a browser update was installed
+    set_marketing_serial ("/etc/chromium/master_preferences");
+    set_marketing_serial ("/usr/share/firefox/distribution/distribution.ini");
     thread_message (_("System is up to date"), -2);
 }
 
@@ -2538,18 +2539,14 @@ static gboolean show_ip (void)
     return TRUE;
 }
 
-static void set_marketing_serial (void)
+static void set_marketing_serial (const char *file)
 {
+#define WURL "https://welcome.raspberrypi.com/raspberry-pi-os?id="
     if (is_pi)
     {
-        if (access ("/etc/chromium/master_preferences", F_OK) != -1)
+        if (access (file, F_OK) != -1)
         {
-            vsystem ("sudo sed -i /etc/chromium/master_preferences -e s/UNIDENTIFIED/`cat /proc/cpuinfo | grep Serial | sha256sum | cut -d ' ' -f 1`/g");
-        }
-
-        if (access ("/usr/share/firefox/distribution/distribution.ini", F_OK) != -1)
-        {
-            vsystem ("sudo sed -i /usr/share/firefox/distribution/distribution.ini -e s/UNIDENTIFIED/`cat /proc/cpuinfo | grep Serial | sha256sum | cut -d ' ' -f 1`/g");
+            vsystem ("sudo sed -i %s -e s#WELCOME_URL#%s`cat /proc/cpuinfo | grep Serial | sha256sum | cut -d ' ' -f 1`#g", file, WURL);
         }
     }
 }
@@ -2676,7 +2673,8 @@ int main (int argc, char *argv[])
     if (vsystem ("raspi-config nonint is_installed firefox")) browser = FALSE;
 #endif
 
-    set_marketing_serial ();
+    set_marketing_serial ("/etc/chromium/master_preferences");
+    set_marketing_serial ("/usr/share/firefox/distribution/distribution.ini");
 
     // GTK setup
     gtk_init (&argc, &argv);
