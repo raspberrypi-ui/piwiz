@@ -1,3 +1,9 @@
+piwiz (0.63) bookworm; urgency=medium
+
+  * Don't set entire welcome URL in wizard
+
+ -- Simon Long <simon@raspberrypi.com>  Mon, 25 Sep 2023 15:00:57 +0100
+
 piwiz (0.62) bookworm; urgency=medium
 
   * Fix default browser setting

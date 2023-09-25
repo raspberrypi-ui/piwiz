@@ -2546,13 +2546,11 @@ static gboolean show_ip (void)
 
 static void set_marketing_serial (const char *file)
 {
-#define WURL "https://welcome.raspberrypi.com/raspberry-pi-os?id="
-
     if (is_pi)
     {
         if (access (file, F_OK) != -1)
         {
-            vsystem ("sudo sed -i %s -e s#WELCOME_URL#%s`cat /proc/cpuinfo | grep Serial | sha256sum | cut -d ' ' -f 1`#g", file, WURL);
+            vsystem ("sudo sed -i %s -e s/UNIDENTIFIED/`cat /proc/cpuinfo | grep Serial | sha256sum | cut -d ' ' -f 1`/g", file);
         }
     }
 }
