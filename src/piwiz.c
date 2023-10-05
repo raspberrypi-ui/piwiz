@@ -2485,7 +2485,9 @@ static void skip_page (GtkButton* btn, gpointer ptr)
         case PAGE_WIFIPSK : gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), browser ? PAGE_BROWSER : PAGE_UPDATE);
                             break;
 
-        case PAGE_UPDATE :  gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_DONE);
+        case PAGE_UPDATE :  if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (uninstall_chk)))
+                                message (_("If installing updates is skipped, the unused browser will not be uninstalled."), 1, PAGE_DONE, -1, FALSE);
+                            else gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_DONE);
                             break;
 
         default :           gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
