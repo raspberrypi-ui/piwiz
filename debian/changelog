@@ -1,3 +1,9 @@
+piwiz (0.64) bookworm; urgency=medium
+
+  * Add warnings if skipping updates
+
+ -- Simon Long <simon@raspberrypi.com>  Thu, 05 Oct 2023 13:55:36 +0100
+
 piwiz (0.63) bookworm; urgency=medium
 
   * Don't set entire welcome URL in wizard

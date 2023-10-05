@@ -2485,9 +2485,18 @@ static void skip_page (GtkButton* btn, gpointer ptr)
         case PAGE_WIFIPSK : gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), browser ? PAGE_BROWSER : PAGE_UPDATE);
                             break;
 
-        case PAGE_UPDATE :  if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (uninstall_chk)))
+        case PAGE_UPDATE :  gchar *buf = g_strdup_printf ("check-language-support -l %s_%s", lc, cc);
+                            gchar *lpack = get_shell_string (buf, TRUE);
+                            gboolean uninst = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (uninstall_chk));
+                            if (lpack && uninst)
+                                message (_("If installing updates is skipped, translation files will not be installed, and the unused browser will not be uninstalled."), 1, PAGE_DONE, -1, FALSE);
+                            else if (lpack)
+                                message (_("If installing updates is skipped, translation files will not be installed."), 1, PAGE_DONE, -1, FALSE);
+                            else if (uninst)
                                 message (_("If installing updates is skipped, the unused browser will not be uninstalled."), 1, PAGE_DONE, -1, FALSE);
                             else gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_DONE);
+                            g_free (buf);
+                            g_free (lpack);
                             break;
 
         default :           gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
