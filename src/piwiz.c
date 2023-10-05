@@ -2152,6 +2152,9 @@ static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, g
 
         case PAGE_UPDATE :  gtk_widget_show (skip_btn);
                             break;
+
+        case PAGE_BROWSER : gtk_widget_set_visible (uninstall_chk, net_available ());
+                            break;
     }
 
     // restore the keyboard focus
