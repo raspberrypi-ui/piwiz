@@ -1,3 +1,9 @@
+piwiz (0.65) bookworm; urgency=medium
+
+  * Fix setting of character set
+
+ -- Simon Long <simon@raspberrypi.com>  Mon, 30 Oct 2023 07:54:35 +0000
+
 piwiz (0.64) bookworm; urgency=medium
 
   * Add warnings if skipping updates

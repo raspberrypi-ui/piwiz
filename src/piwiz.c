@@ -789,7 +789,7 @@ static gpointer set_locale (gpointer data)
     if (g_strcmp0 (init_country, cc) || g_strcmp0 (init_lang, lc))
     {
         reboot = TRUE;
-        vsystem ("sudo raspi-config nonint do_change_locale_rc_gui %s_%s", lc, cc);
+        vsystem ("sudo raspi-config nonint do_change_locale_rc_gui %s_%s%s", lc, cc, ext);
         if (init_country)
         {
             g_free (init_country);
