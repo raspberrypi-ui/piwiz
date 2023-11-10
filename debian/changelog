@@ -1,3 +1,9 @@
+piwiz (0.66) bookworm; urgency=medium
+
+  * Handle uninstall of packages during update
+
+ -- Simon Long <simon@raspberrypi.com>  Fri, 10 Nov 2023 16:05:58 +0000
+
 piwiz (0.65) bookworm; urgency=medium
 
   * Fix setting of character set

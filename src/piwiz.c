@@ -1746,9 +1746,23 @@ static void progress (PkProgress *progress, PkProgressType *type, gpointer data)
 
 static gboolean filter_fn (PkPackage *package, gpointer user_data)
 {
-    if (is_pi) return TRUE;
-    if (strstr (pk_package_get_arch (package), "amd64")) return FALSE;
-    return TRUE;
+    if (!is_pi && strstr (pk_package_get_arch (package), "amd64")) return FALSE;
+
+    PkInfoEnum info = pk_package_get_info (package);
+	switch (info)
+    {
+        case PK_INFO_ENUM_LOW:
+        case PK_INFO_ENUM_NORMAL:
+        case PK_INFO_ENUM_IMPORTANT:
+        case PK_INFO_ENUM_SECURITY:
+        case PK_INFO_ENUM_BUGFIX:
+        case PK_INFO_ENUM_ENHANCEMENT:
+        case PK_INFO_ENUM_BLOCKED:      return TRUE;
+                                        break;
+
+        default:                        return FALSE;
+                                        break;
+    }
 }
 
 static gpointer refresh_update_cache (gpointer data)
