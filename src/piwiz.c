@@ -137,8 +137,13 @@ gint conn_timeout = 0, pulse_timer = 0;
 gboolean reboot = TRUE, is_pi = TRUE;
 int last_btn = NEXT_BTN;
 int calls;
-gboolean wayfire = FALSE;
 gboolean browser = TRUE;
+
+typedef enum {
+    WM_OPENBOX,
+    WM_WAYFIRE,
+    WM_LABWC } wm_type;
+static wm_type wm;
 
 #ifdef USE_DHCPCD
 gboolean use_nm;
@@ -588,7 +593,6 @@ static void error_box (char *msg)
         g_signal_connect (err_btn, "clicked", G_CALLBACK (ok_clicked), (void *) dest_page);
 
         gtk_widget_show_all (err_dlg);
-        gtk_window_set_decorated (GTK_WINDOW (err_dlg), FALSE);
         g_object_unref (builder);
     }
     else gtk_label_set_text (GTK_LABEL (err_msg), msg);
@@ -663,7 +667,6 @@ static void message (char *msg, int wait, int dest_page, int prog, gboolean puls
     }
 
     gtk_widget_show (msg_dlg);
-    gtk_window_set_decorated (GTK_WINDOW (msg_dlg), FALSE);
 }
 
 static gboolean cb_message (gpointer data)
@@ -2195,7 +2198,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
         case PAGE_INTRO :   // disable Bluetooth autoconnect after first page
                             if (!system ("rfkill list bluetooth | grep -q Bluetooth"))
                             {
-                                if (wayfire) vsystem ("wfpanelctl bluetooth apstop");
+                                if (wm != WM_OPENBOX) vsystem ("wfpanelctl bluetooth apstop");
                                 else vsystem ("lxpanelctl command bluetooth apstop");
                             }
                             gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
@@ -2310,7 +2313,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             user = g_strdup (gtk_entry_get_text (GTK_ENTRY (user_te)));
                             pw = g_strdup (crypt (gtk_entry_get_text (GTK_ENTRY (pwd1_te)), crypt_gensalt (NULL, 0, NULL, 0)));
                             if (chuser != NULL) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_DONE);
-                            else if (is_pi && !wayfire) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
+                            else if (is_pi && wm == WM_OPENBOX) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
                             else
                             {
                                 if (!wifi_if)
@@ -2466,14 +2469,14 @@ static void prev_page (GtkButton* btn, gpointer ptr)
         case PAGE_BROWSER : if (wifi_if) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIAP);
                             else
                             {
-                                if (is_pi && !wayfire)
+                                if (is_pi && wm == WM_OPENBOX)
                                     gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
                                 else
                                     gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
                             }
                             break;
 
-        case PAGE_WIFIAP :  if (is_pi && !wayfire)
+        case PAGE_WIFIAP :  if (is_pi && wm  == WM_OPENBOX)
                                 gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
                             else
                                 gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
@@ -2667,7 +2670,7 @@ static gboolean check_service (char *name)
 
 static int num_screens (void)
 {
-    if (wayfire)
+    if (wm != WM_OPENBOX)
         return get_status ("wlr-randr | grep -cv '^ '");
     else
         return get_status ("xrandr -q | grep -cw connected");
@@ -2690,7 +2693,12 @@ int main (int argc, char *argv[])
 #endif
 
     if (system ("raspi-config nonint is_pi")) is_pi = FALSE;
-    if (getenv ("WAYFIRE_CONFIG_FILE")) wayfire = TRUE;
+    if (getenv ("WAYLAND_DISPLAY"))
+    {
+        if (getenv ("WAYFIRE_CONFIG_FILE")) wm = WM_WAYFIRE;
+        else wm = WM_LABWC;
+    }
+    else wm = WM_OPENBOX;
 
 #ifdef USE_DHCPCD
     use_nm = check_service ("NetworkManager");
@@ -2877,7 +2885,6 @@ int main (int argc, char *argv[])
     g_object_unref (builder);
 
     gtk_widget_show (main_dlg);
-    gtk_window_set_decorated (GTK_WINDOW (main_dlg), FALSE);
     gtk_window_set_default_size (GTK_WINDOW (main_dlg), 1, 1);
     gtk_main ();
 
