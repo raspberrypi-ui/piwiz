@@ -178,8 +178,8 @@ msgid "The username is blank."
 msgstr "Il nome utente è vuoto."
 
 #: ../src/piwiz.c:1634
-msgid "The username must be 32 characters or shorter."
-msgstr "Il nome utente deve essere lungo al massimo di 32 caratteri."
+msgid "The username must be 30 characters or shorter."
+msgstr "Il nome utente deve essere lungo al massimo di 30 caratteri."
 
 #: ../src/piwiz.c:1639
 msgid "The first character of the username must be a lower-case letter."

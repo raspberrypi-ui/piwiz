@@ -2264,9 +2264,9 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                 message (_("The username is blank."), 1, 0, -1, FALSE);
                                 break;
                             }
-                            if (strlen (ccptr) > 32)
+                            if (strlen (ccptr) => 30)
                             {
-                                message (_("The username must be 32 characters or shorter."), 1, 0, -1, FALSE);
+                                message (_("The username must be 30 characters or shorter."), 1, 0, -1, FALSE);
                                 break;
                             }
                             if (*ccptr < 'a' || *ccptr > 'z')

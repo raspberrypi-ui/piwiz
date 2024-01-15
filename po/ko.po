@@ -178,7 +178,7 @@ msgid "The username is blank."
 msgstr "사용자 이름을 입력하세요."
 
 #: ../src/piwiz.c:1638
-msgid "The username must be 32 characters or shorter."
+msgid "The username must be 30 characters or shorter."
 msgstr "사용자 이름은 32자 이하로 설정하세요."
 
 #: ../src/piwiz.c:1643
