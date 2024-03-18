@@ -83,6 +83,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TL_CITY  0
 #define TL_ZONE  1
 #define TL_CCODE 2  // must be the same as LL_CCODE to allow match_country to be used for both
+#define TL_PREF  3
 
 #define AP_SSID      0
 #define AP_SEC_ICON  1
@@ -371,6 +372,7 @@ static void country_changed (GtkComboBox *cb, gpointer ptr);
 static gboolean match_country (GtkTreeModel *model, GtkTreeIter *iter, gpointer data);
 static void read_inits (void);
 static void set_init (GtkTreeModel *model, GtkWidget *cb, int pos, const char *init);
+static void set_init_tz (GtkTreeModel *model, GtkWidget *cb, int pos, const char *init);
 static int find_line (char **lssid, int *secure, int *connected);
 void connect_success (void);
 static gint connect_failure (gpointer data);
@@ -924,7 +926,7 @@ static void read_locales (void)
                     while (cptr3)
                     {
                         gtk_list_store_append (tz_list, &iter);
-                        gtk_list_store_set (tz_list, &iter, TL_ZONE, cptr2, TL_CCODE, cptr3, TL_CITY, cname, -1);
+                        gtk_list_store_set (tz_list, &iter, TL_ZONE, cptr2, TL_CCODE, cptr3, TL_CITY, cname, TL_PREF, TRUE, -1);
                         buffer1 = NULL;
                         len1 = 0;
                         fp1 = fopen ("/usr/share/zoneinfo/tzdata.zi", "rb");
@@ -943,7 +945,7 @@ static void read_locales (void)
                                         if (*cptr == '\n') *cptr = 0;
                                     }
                                     gtk_list_store_append (tz_list, &iter);
-                                    gtk_list_store_set (tz_list, &iter, TL_ZONE, cptr2, TL_CCODE, cptr3, TL_CITY, cname1, -1);
+                                    gtk_list_store_set (tz_list, &iter, TL_ZONE, cptr2, TL_CCODE, cptr3, TL_CITY, cname1, TL_PREF, FALSE, -1);
                                     g_free (cname1);
                                 }
                             }
@@ -1088,8 +1090,25 @@ static void set_init (GtkTreeModel *model, GtkWidget *cb, int pos, const char *i
         if (!g_strcmp0 (init, val))
         {
             gtk_combo_box_set_active_iter (GTK_COMBO_BOX (cb), &iter);
-            g_free (val);
-            return;
+        }
+        g_free (val);
+        if (!gtk_tree_model_iter_next (model, &iter)) break;
+    }
+}
+
+static void set_init_tz (GtkTreeModel *model, GtkWidget *cb, int pos, const char *init)
+{
+    GtkTreeIter iter;
+    char *val;
+    gboolean pref;
+
+    gtk_tree_model_get_iter_first (model, &iter);
+    while (1)
+    {
+        gtk_tree_model_get (model, &iter, pos, &val, TL_PREF, &pref, -1);
+        if (!g_strcmp0 (init, val) && pref)
+        {
+            gtk_combo_box_set_active_iter (GTK_COMBO_BOX (cb), &iter);
         }
         g_free (val);
         if (!gtk_tree_model_iter_next (model, &iter)) break;
@@ -2735,7 +2754,7 @@ int main (int argc, char *argv[])
     // create the master databases
     locale_list = gtk_list_store_new (4, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
     country_list = gtk_list_store_new (2, G_TYPE_STRING, G_TYPE_STRING);
-    tz_list = gtk_list_store_new (3, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
+    tz_list = gtk_list_store_new (4, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_BOOLEAN);
     ap_list = gtk_list_store_new (7, G_TYPE_STRING, GDK_TYPE_PIXBUF, GDK_TYPE_PIXBUF, G_TYPE_INT, G_TYPE_INT, G_TYPE_POINTER, G_TYPE_STRING);
 
     // build the UI
@@ -2823,7 +2842,7 @@ int main (int argc, char *argv[])
     g_signal_connect (country_cb, "changed", G_CALLBACK (country_changed), NULL);
     set_init (GTK_TREE_MODEL (fcount), country_cb, CL_CCODE, kbd ? kb_countries[kbd] : init_country);
     set_init (GTK_TREE_MODEL (slang), language_cb, LL_LCODE, kbd ? kb_langs[kbd] : init_lang);
-    set_init (GTK_TREE_MODEL (fcity), timezone_cb, TL_ZONE, kbd ? kb_tzs[kbd] : init_tz);
+    set_init_tz (GTK_TREE_MODEL (fcity), timezone_cb, TL_ZONE, kbd ? kb_tzs[kbd] : init_tz);
 
     // make an educated guess as to whether a US keyboard override was set
     char *ilay = NULL, *ivar = NULL;
