@@ -1,3 +1,9 @@
+piwiz (0.68) bookworm; urgency=medium
+
+  * For first init of timezone, always use the default for the zone
+
+ -- Simon Long <simon@raspberrypi.com>  Mon, 18 Mar 2024 10:25:08 +0000
+
 piwiz (0.67) bookworm; urgency=medium
 
   * Modify for labwc
