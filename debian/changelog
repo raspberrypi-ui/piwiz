@@ -1,3 +1,9 @@
+piwiz (0.69) bookworm; urgency=medium
+
+  * Add Raspberry Pi Connect page
+
+ -- Simon Long <simon@raspberrypi.com>  Tue, 21 May 2024 09:32:19 +0100
+
 piwiz (0.68) bookworm; urgency=medium
 
   * For first init of timezone, always use the default for the zone

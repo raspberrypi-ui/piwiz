@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: piwiz 1.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-22 15:15+0000\n"
+"POT-Creation-Date: 2024-05-21 09:46+0100\n"
 "PO-Revision-Date: 2019-02-18 15:13+0000\n"
 "Last-Translator: Simon Long <simon@raspberrypi.org>\n"
 "Language-Team: English (British)\n"
@@ -17,79 +17,40 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../src/piwiz.c:1092 ../src/piwiz.c:1535
+#: ../src/piwiz.c:1176 ../src/piwiz.c:1710 ../src/piwiz.c:1723
 msgid "Searching for networks - please wait..."
 msgstr "Searching for networks - please wait..."
 
-#: ../src/piwiz.c:1112
+#: ../src/piwiz.c:1196
 msgid "Failed to connect to network."
 msgstr "Failed to connect to network."
 
-#: ../src/piwiz.c:1233
+#: ../src/piwiz.c:1491
+msgid "Failed to connect - access point not available."
+msgstr "Failed to connect - access point not available."
+
+#: ../src/piwiz.c:1744
 msgid "Reading update list - please wait..."
 msgstr "Reading update list - please wait..."
 
-#: ../src/piwiz.c:1235
+#: ../src/piwiz.c:1746
 msgid "Downloading updates - please wait..."
 msgstr "Downloading updates - please wait..."
 
-#: ../src/piwiz.c:1242
+#: ../src/piwiz.c:1753
 msgid "Installing updates - please wait..."
 msgstr "Installing updates - please wait..."
 
-#: ../src/piwiz.c:1244 ../src/piwiz.c:1375
+#: ../src/piwiz.c:1755 ../src/piwiz.c:1891
 msgid "Installing languages - please wait..."
 msgstr "Installing languages - please wait..."
 
-#: ../src/piwiz.c:1261
-#, c-format
-msgid ""
-"Error getting updates.\n"
-"%s"
-msgstr ""
-"Error getting updates.\n"
-"%s"
+#: ../src/piwiz.c:1762 ../src/piwiz.c:1840 ../src/piwiz.c:1905
+#: ../src/piwiz.c:1941 ../src/piwiz.c:1972
+msgid "Uninstalling browser - please wait..."
+msgstr "Uninstalling browser - please wait..."
 
-#: ../src/piwiz.c:1272 ../src/piwiz.c:1312
-msgid "System is up to date"
-msgstr "System is up to date"
-
-#: ../src/piwiz.c:1290
-#, c-format
-msgid ""
-"Error comparing versions.\n"
-"%s"
-msgstr ""
-"Error comparing versions.\n"
-"%s"
-
-#: ../src/piwiz.c:1301
-msgid "Getting updates - please wait..."
-msgstr "Getting updates - please wait..."
-
-#: ../src/piwiz.c:1326
-#, c-format
-msgid ""
-"Error installing languages.\n"
-"%s"
-msgstr ""
-"Error installing languages.\n"
-"%s"
-
-#: ../src/piwiz.c:1332 ../src/piwiz.c:1383 ../src/piwiz.c:1426
-msgid "Comparing versions - please wait..."
-msgstr "Comparing versions - please wait..."
-
-#: ../src/piwiz.c:1347
-#, c-format
-msgid ""
-"Error finding languages.\n"
-"%s"
-msgstr ""
-"Error finding languages.\n"
-"%s"
-
-#: ../src/piwiz.c:1400
+#: ../src/piwiz.c:1809
 #, c-format
 msgid ""
 "Error checking for updates.\n"
@@ -98,35 +59,93 @@ msgstr ""
 "Error checking for updates.\n"
 "%s"
 
-#: ../src/piwiz.c:1420
+#: ../src/piwiz.c:1830
 msgid "Finding languages - please wait..."
 msgstr "Finding languages - please wait..."
 
-#: ../src/piwiz.c:1469 ../src/piwiz.c:1756
+#: ../src/piwiz.c:1847 ../src/piwiz.c:1912 ../src/piwiz.c:1948
+#: ../src/piwiz.c:1980 ../src/piwiz.c:2001
+msgid "Comparing versions - please wait..."
+msgstr "Comparing versions - please wait..."
+
+#: ../src/piwiz.c:1862
+#, c-format
+msgid ""
+"Error finding languages.\n"
+"%s"
+msgstr ""
+"Error finding languages.\n"
+"%s"
+
+#: ../src/piwiz.c:1927
+#, c-format
+msgid ""
+"Error installing languages.\n"
+"%s"
+msgstr ""
+"Error installing languages.\n"
+"%s"
+
+#: ../src/piwiz.c:1961 ../src/piwiz.c:1995
+#, c-format
+msgid ""
+"Error uninstalling browser.\n"
+"%s"
+msgstr ""
+"Error uninstalling browser.\n"
+"%s"
+
+#: ../src/piwiz.c:2013
+#, c-format
+msgid ""
+"Error comparing versions.\n"
+"%s"
+msgstr ""
+"Error comparing versions.\n"
+"%s"
+
+#: ../src/piwiz.c:2024
+msgid "Getting updates - please wait..."
+msgstr "Getting updates - please wait..."
+
+#: ../src/piwiz.c:2035 ../src/piwiz.c:2065
+msgid "System is up to date"
+msgstr "System is up to date"
+
+#: ../src/piwiz.c:2049
+#, c-format
+msgid ""
+"Error getting updates.\n"
+"%s"
+msgstr ""
+"Error getting updates.\n"
+"%s"
+
+#: ../src/piwiz.c:2097 ../src/piwiz.c:2445
 msgid "Checking for updates - please wait..."
 msgstr "Checking for updates - please wait..."
 
-#: ../src/piwiz.c:1478
+#: ../src/piwiz.c:2106
 msgid "Could not sync time - unable to check for updates"
 msgstr "Could not sync time - unable to check for updates"
 
-#: ../src/piwiz.c:1489 ../data/piwiz.ui.h:61
+#: ../src/piwiz.c:2143 ../data/piwiz.ui.h:73
 msgid "_Next"
 msgstr "_Next"
 
-#: ../src/piwiz.c:1490
+#: ../src/piwiz.c:2144
 msgid "_Back"
 msgstr "_Back"
 
-#: ../src/piwiz.c:1491 ../data/piwiz.ui.h:60
+#: ../src/piwiz.c:2145 ../data/piwiz.ui.h:72
 msgid "_Skip"
 msgstr "_Skip"
 
-#: ../src/piwiz.c:1502
+#: ../src/piwiz.c:2156
 msgid "<b>Rename User</b>"
 msgstr "<b>Rename User</b>"
 
-#: ../src/piwiz.c:1503
+#: ../src/piwiz.c:2157
 #, c-format
 msgid ""
 "Your current user '%s' will be renamed.\n"
@@ -139,70 +158,70 @@ msgstr ""
 "The new username can only contain lower-case letters, digits and hyphens, "
 "and must start with a letter."
 
-#: ../src/piwiz.c:1506
+#: ../src/piwiz.c:2160
 msgid "Press 'Next' to rename the user."
 msgstr "Press 'Next' to rename the user."
 
-#: ../src/piwiz.c:1507 ../src/dhcpcd-gtk/wpa.c:130 ../data/piwiz.ui.h:3
+#: ../src/piwiz.c:2161 ../src/dhcpcd-gtk/wpa.c:130 ../data/piwiz.ui.h:3
 msgid "_Cancel"
 msgstr "_Cancel"
 
-#: ../src/piwiz.c:1514
+#: ../src/piwiz.c:2169
 msgid "_Restart"
 msgstr "_Restart"
 
-#: ../src/piwiz.c:1517
+#: ../src/piwiz.c:2172
 msgid "<b>User Renamed</b>"
 msgstr "<b>User Renamed</b>"
 
-#: ../src/piwiz.c:1518
+#: ../src/piwiz.c:2173
 #, c-format
 msgid "The '%s' user has been renamed to '%s' and the new password set."
 msgstr "The '%s' user has been renamed to '%s' and the new password set."
 
-#: ../src/piwiz.c:1521
+#: ../src/piwiz.c:2176
 msgid "Press 'Restart' to reboot and login as the new user."
 msgstr "Press 'Restart' to reboot and login as the new user."
 
-#: ../src/piwiz.c:1527
+#: ../src/piwiz.c:2182
 msgid "_Done"
 msgstr "_Done"
 
-#: ../src/piwiz.c:1614
+#: ../src/piwiz.c:2270
 msgid "Setting location - please wait..."
 msgstr "Setting location - please wait..."
 
-#: ../src/piwiz.c:1633
+#: ../src/piwiz.c:2289
 msgid "The username is blank."
 msgstr "The username is blank."
 
-#: ../src/piwiz.c:1638
+#: ../src/piwiz.c:2294
 msgid "The username must be 32 characters or shorter."
 msgstr "The username must be 32 characters or shorter."
 
-#: ../src/piwiz.c:1643
+#: ../src/piwiz.c:2299
 msgid "The first character of the username must be a lower-case letter."
 msgstr "The first character of the username must be a lower-case letter."
 
-#: ../src/piwiz.c:1648
+#: ../src/piwiz.c:2304 ../src/piwiz.c:2309
 msgid ""
 "This username is used by the system and cannot be used for a user account."
 msgstr ""
 "This username is used by the system and cannot be used for a user account."
 
-#: ../src/piwiz.c:1657
+#: ../src/piwiz.c:2318
 msgid "Usernames can only contain lower-case letters, digits and hyphens."
 msgstr "Usernames can only contain lower-case letters, digits and hyphens."
 
-#: ../src/piwiz.c:1662
+#: ../src/piwiz.c:2323
 msgid "The password is blank."
 msgstr "The password is blank."
 
-#: ../src/piwiz.c:1667
+#: ../src/piwiz.c:2328
 msgid "The two passwords entered do not match."
 msgstr "The two passwords entered do not match."
 
-#: ../src/piwiz.c:1672
+#: ../src/piwiz.c:2333
 msgid ""
 "You have used a known default value for the username or password.\n"
 "\n"
@@ -212,79 +231,104 @@ msgstr ""
 "\n"
 "We strongly recommend you go back and choose something else."
 
-#: ../src/piwiz.c:1706
+#: ../src/piwiz.c:2367
 #, c-format
 msgid "Enter the password for the WiFi network \"%s\"."
 msgstr "Enter the password for the wireless network \"%s\"."
 
-#: ../src/piwiz.c:1720 ../src/piwiz.c:1731
+#: ../src/piwiz.c:2390 ../src/piwiz.c:2399 ../src/piwiz.c:2414
+#: ../src/piwiz.c:2423
 msgid "Connecting to WiFi network - please wait..."
 msgstr "Connecting to wireless network - please wait..."
 
-#: ../src/piwiz.c:1723 ../src/piwiz.c:1734
+#: ../src/piwiz.c:2402 ../src/piwiz.c:2426
 msgid "Could not connect to this network"
 msgstr "Could not connect to this network"
 
-#: ../src/piwiz.c:1761
+#: ../src/piwiz.c:2436
+msgid "Restarting - please wait..."
+msgstr "Restarting - please wait..."
+
+#: ../src/piwiz.c:2450
 msgid "Synchronising clock - please wait..."
 msgstr "Synchronising clock - please wait..."
 
-#: ../src/piwiz.c:1766
+#: ../src/piwiz.c:2455
 msgid "No network connection found - unable to check for updates"
 msgstr "No network connection found - unable to check for updates"
 
-#: ../src/piwiz.c:1877
+#: ../src/piwiz.c:2544
+msgid ""
+"If installing updates is skipped, translation files will not be installed, "
+"and the unused browser will not be uninstalled."
+msgstr ""
+"If installing updates is skipped, translation files will not be installed, "
+"and the unused browser will not be uninstalled."
+
+#: ../src/piwiz.c:2546
+msgid ""
+"If installing updates is skipped, translation files will not be installed."
+msgstr ""
+"If installing updates is skipped, translation files will not be installed."
+
+#: ../src/piwiz.c:2548
+msgid ""
+"If installing updates is skipped, the unused browser will not be uninstalled."
+msgstr ""
+"If installing updates is skipped, the unused browser will not be uninstalled."
+
+#: ../src/piwiz.c:2603
 #, c-format
 msgid "<span font_desc=\"10.0\">IP : %s</span>"
 msgstr "<span font_desc=\"10.0\">IP : %s</span>"
 
-#: ../src/dhcpcd-gtk/main.c:375
+#: ../src/dhcpcd-gtk/main.c:377
 msgid "Error creating new GIO Channel\n"
 msgstr "Error creating new GIO Channel\n"
 
-#: ../src/dhcpcd-gtk/main.c:380
+#: ../src/dhcpcd-gtk/main.c:382
 msgid "Error creating watch\n"
 msgstr "Error creating watch\n"
 
-#: ../src/dhcpcd-gtk/main.c:387
+#: ../src/dhcpcd-gtk/main.c:389
 msgid "g_try_malloc\n"
 msgstr "g_try_malloc\n"
 
-#: ../src/dhcpcd-gtk/main.c:415
+#: ../src/dhcpcd-gtk/main.c:417
 msgid "Connection to dhcpcd lost"
 msgstr "Connection to dhcpcd lost"
 
-#: ../src/dhcpcd-gtk/main.c:437
+#: ../src/dhcpcd-gtk/main.c:439
 #, c-format
 msgid "Connected to %s-%s"
 msgstr "Connected to %s-%s"
 
-#: ../src/dhcpcd-gtk/main.c:455
+#: ../src/dhcpcd-gtk/main.c:457
 msgid "dhcpcd connection lost"
 msgstr "dhcpcd connection lost"
 
-#: ../src/dhcpcd-gtk/main.c:520
+#: ../src/dhcpcd-gtk/main.c:522
 msgid "Network event"
 msgstr "Network event"
 
-#: ../src/dhcpcd-gtk/main.c:561
+#: ../src/dhcpcd-gtk/main.c:563
 #, c-format
 msgid "dhcpcd WPA connection lost: %s"
 msgstr "dhcpcd WPA connection lost: %s"
 
-#: ../src/dhcpcd-gtk/main.c:640
+#: ../src/dhcpcd-gtk/main.c:642
 msgid "New Access Point"
 msgstr "New Access Point"
 
-#: ../src/dhcpcd-gtk/main.c:649
+#: ../src/dhcpcd-gtk/main.c:651
 msgid "New Access Points"
 msgstr "New Access Points"
 
-#: ../src/dhcpcd-gtk/main.c:738
+#: ../src/dhcpcd-gtk/main.c:740
 msgid "Connecting to dhcpcd ..."
 msgstr "Connecting to dhcpcd ..."
 
-#: ../src/dhcpcd-gtk/main.c:746 ../src/dhcpcd-gtk/main.c:777
+#: ../src/dhcpcd-gtk/main.c:748 ../src/dhcpcd-gtk/main.c:779
 msgid "Connecting ..."
 msgstr "Connecting ..."
 
@@ -294,7 +338,7 @@ msgstr "Failed to disconnect."
 
 #: ../src/dhcpcd-gtk/wpa.c:79
 msgid "Faile to reconfigure."
-msgstr "Faile to reconfigure."
+msgstr "Failed to reconfigure."
 
 #: ../src/dhcpcd-gtk/wpa.c:82
 msgid "Failed to set key management."
@@ -337,10 +381,6 @@ msgstr "_OK"
 #: ../src/dhcpcd-gtk/wpa.c:141
 msgid "Pre Shared Key:"
 msgstr "Pre Shared Key:"
-
-#: ../data/piwiz.ui.h:2
-msgid "label"
-msgstr ""
 
 #: ../data/piwiz.ui.h:4
 msgid "Welcome to Raspberry Pi"
@@ -496,7 +536,7 @@ msgstr ""
 
 #: ../data/piwiz.ui.h:40
 msgid "Reduce the size of the desktop on this monitor"
-msgstr "Reduce the size of the desktop on this monitor"
+msgstr "Reduce the size of the desktop on this monitor:"
 
 #: ../data/piwiz.ui.h:41
 msgid "Turn on to shrink the desktop to fit the monitor"
@@ -504,7 +544,7 @@ msgstr "Turn on to shrink the desktop to fit the monitor"
 
 #: ../data/piwiz.ui.h:42
 msgid "Reduce the size of the desktop on the second monitor"
-msgstr "Reduce the size of the desktop on the second monitor"
+msgstr "Reduce the size of the desktop on the second monitor:"
 
 #: ../data/piwiz.ui.h:43
 msgid "Turn on to shrink the desktop to fit the second monitor"
@@ -547,10 +587,66 @@ msgid "Enter the password for your network"
 msgstr "Enter the password for your wireless network"
 
 #: ../data/piwiz.ui.h:53
+msgid "<b>Choose Browser</b>"
+msgstr "<b>Choose Browser</b>"
+
+#: ../data/piwiz.ui.h:54
+msgid ""
+"Both the Chromium and Firefox web browsers are preinstalled on Raspberry Pi "
+"OS. Select the one you prefer to use."
+msgstr ""
+"Both the Chromium and Firefox web browsers are preinstalled on Raspberry Pi "
+"OS. Select the one you prefer to use."
+
+#: ../data/piwiz.ui.h:55
+msgid "Default Browser:"
+msgstr "Default Browser:"
+
+#: ../data/piwiz.ui.h:56
+msgid "Chromium"
+msgstr "Chromium"
+
+#: ../data/piwiz.ui.h:57
+msgid "Firefox"
+msgstr "Firefox"
+
+#: ../data/piwiz.ui.h:58
+msgid "Tick here to uninstall the unused browser"
+msgstr "Tick here to uninstall the unused browser"
+
+#: ../data/piwiz.ui.h:59
+msgid "Press 'Next' when you have chosen a browser."
+msgstr "Press 'Next' when you have chosen a browser."
+
+#: ../data/piwiz.ui.h:60
+msgid "<b>Enable Raspberry Pi Connect</b>"
+msgstr "<b>Enable Raspberry Pi Connect</b>"
+
+#: ../data/piwiz.ui.h:61
+msgid ""
+"Raspberry Pi Connect is a service which allows you to securely remotely "
+"access your Raspberry Pi's desktop from any computer."
+msgstr ""
+"Raspberry Pi Connect is a service which allows you to securely remotely "
+"access your Raspberry Pi's desktop from any computer."
+
+#: ../data/piwiz.ui.h:62
+msgid "Enable Raspberry Pi Connect"
+msgstr "Enable Raspberry Pi Connect:"
+
+#: ../data/piwiz.ui.h:63
+msgid "Turn on to allow remote access"
+msgstr "Turn on to allow remote access"
+
+#: ../data/piwiz.ui.h:64
+msgid "Press 'Next' when you have made your choice."
+msgstr "Press 'Next' when you have made your choice."
+
+#: ../data/piwiz.ui.h:65
 msgid "<b>Update Software</b>"
 msgstr "<b>Update Software</b>"
 
-#: ../data/piwiz.ui.h:54
+#: ../data/piwiz.ui.h:66
 msgid ""
 "The operating system and applications will now be checked and updated if "
 "necessary. This may involve a large download.\n"
@@ -564,15 +660,15 @@ msgstr ""
 "Press 'Next' to check and update software, or 'Skip' to continue without "
 "checking."
 
-#: ../data/piwiz.ui.h:57
+#: ../data/piwiz.ui.h:69
 msgid "<b>Setup Complete</b>"
 msgstr "<b>Setup Complete</b>"
 
-#: ../data/piwiz.ui.h:58
+#: ../data/piwiz.ui.h:70
 msgid "Your Raspberry Pi is now set up and ready to go."
 msgstr "Your Raspberry Pi is now set up and ready to go."
 
-#: ../data/piwiz.ui.h:59
+#: ../data/piwiz.ui.h:71
 msgid ""
 "Press 'Restart' to restart your Pi so the new settings will take effect."
 msgstr "Press 'Restart' to restart your Raspberry Pi and launch the desktop."
