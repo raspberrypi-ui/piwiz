@@ -2463,9 +2463,9 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             break;
 
         case PAGE_RPC :     if (gtk_switch_get_active (GTK_SWITCH (rpc_sw)))
-                                vsystem ("sudo systemctl --global enable rpi-connect");
+                                vsystem ("sudo systemctl --global enable rpi-connect;sudo systemctl --global enable rpi-connect-wayvnc");
                             else
-                                vsystem ("sudo systemctl --global disable rpi-connect");
+                                vsystem ("sudo systemctl --global disable rpi-connect;sudo systemctl --global disable rpi-connect-wayvnc");
                             gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
                             break;
 
