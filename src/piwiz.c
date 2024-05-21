@@ -2529,7 +2529,6 @@ static void prev_page (GtkButton* btn, gpointer ptr)
 
 static void skip_page (GtkButton* btn, gpointer ptr)
 {
-    printf ("to %d\n", browser ? PAGE_BROWSER : (rpc ? PAGE_RPC : PAGE_UPDATE));
     last_btn = SKIP_BTN;
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
     {
