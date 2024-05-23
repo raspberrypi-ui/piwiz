@@ -394,6 +394,7 @@ static gboolean clock_synced (void);
 static void resync (void);
 static gboolean ntp_check (gpointer data);
 static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, gpointer data);
+static void page_forward (void);
 static void next_page (GtkButton* btn, gpointer ptr);
 static void prev_page (GtkButton* btn, gpointer ptr);
 static void skip_page (GtkButton* btn, gpointer ptr);
@@ -1123,7 +1124,7 @@ void connect_success (void)
         g_source_remove (conn_timeout);
         conn_timeout = 0;
         hide_message ();
-        gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), browser ? PAGE_BROWSER : (rpc ? PAGE_RPC : PAGE_UPDATE));
+        page_forward ();
     }
 }
 
@@ -2020,6 +2021,58 @@ static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, g
     }
 }
 
+static void page_forward (void)
+{
+    int next;
+
+    switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
+    {
+        case PAGE_INTRO :   next = PAGE_LOCALE;
+                            break;
+
+        case PAGE_LOCALE :  next = PAGE_PASSWD;
+                            break;
+
+        case PAGE_PASSWD :  if (chuser != NULL)
+                            {
+                                next = PAGE_DONE;
+                                break;
+                            }
+                            else if (is_pi && wm == WM_OPENBOX)
+                            {
+                                next = PAGE_OSCAN;
+                                break;
+                            }
+
+        case PAGE_OSCAN :   if (wifi_if)
+                            {
+                                next = PAGE_WIFIAP;
+                                break;
+                            }
+
+        case PAGE_WIFIAP :
+        case PAGE_WIFIPSK : if (browser)
+                            {
+                                next = PAGE_BROWSER;
+                                break;
+                            }
+
+        case PAGE_BROWSER : if (rpc)
+                            {
+                                next = PAGE_RPC;
+                                break;
+                            }
+
+        case PAGE_RPC :     next = PAGE_UPDATE;
+                            break;
+
+        case PAGE_UPDATE :
+        default :           next = PAGE_DONE;
+                            break;
+    }
+    gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), next);
+}
+
 static void next_page (GtkButton* btn, gpointer ptr)
 {
     GtkTreeModel *model;
@@ -2037,7 +2090,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                 if (wm != WM_OPENBOX) vsystem ("wfpanelctl bluetooth apstop");
                                 else vsystem ("lxpanelctl command bluetooth apstop");
                             }
-                            gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
+                            page_forward ();
                             break;
 
         case PAGE_LOCALE :  // get the combo entries and look up relevant codes in database
@@ -2084,7 +2137,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                 message (_("Setting location - please wait..."), 0, 0, -1, TRUE);
                                 g_thread_new (NULL, set_locale, NULL);
                             }
-                            else gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
+                            else page_forward ();
                             break;
 
         case PAGE_PASSWD :  if (user != NULL)
@@ -2148,35 +2201,19 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             }
                             user = g_strdup (gtk_entry_get_text (GTK_ENTRY (user_te)));
                             pw = g_strdup (crypt (gtk_entry_get_text (GTK_ENTRY (pwd1_te)), crypt_gensalt (NULL, 0, NULL, 0)));
-                            if (chuser != NULL) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_DONE);
-                            else if (is_pi && wm == WM_OPENBOX) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
-                            else
-                            {
-                                if (!wifi_if)
-                                    gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), browser ? PAGE_BROWSER : (rpc ? PAGE_RPC : PAGE_UPDATE));
-                                else
-                                    gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIAP);
-                            }
+                            page_forward ();
                             break;
 
-        case PAGE_OSCAN :   if (!wifi_if)
-                                gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), browser ? PAGE_BROWSER : (rpc ? PAGE_RPC : PAGE_UPDATE));
-                            else
-                                gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIAP);
+        case PAGE_OSCAN :   page_forward ();
                             break;
 
         case PAGE_WIFIAP :  if (ssid) g_free (ssid);
                             ssid = NULL;
-                            if (!find_line (&ssid, &secure, &connected))
-                                gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), browser ? PAGE_BROWSER : (rpc ? PAGE_RPC : PAGE_UPDATE));
+                            if (!find_line (&ssid, &secure, &connected)) page_forward ();
                             else
                             {
-                                if (connected)
-                                {
-                                    gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), browser ? PAGE_BROWSER : (rpc ? PAGE_RPC : PAGE_UPDATE));
-                                    break;
-                                }
-                                if (secure)
+                                if (connected) page_forward ();
+                                else if (secure)
                                 {
                                     text = g_strdup_printf (_("Enter the password for the WiFi network \"%s\"."), ssid);
                                     gtk_label_set_text (GTK_LABEL (psk_label), text);
@@ -2184,7 +2221,6 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                     text = nm_find_psk_for_network (ssid);
                                     gtk_entry_set_text (GTK_ENTRY (psk_te), text ? text : "");
                                     if (text) g_free (text);
-
                                     gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIPSK);
                                 }
                                 else
@@ -2206,14 +2242,14 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                 vsystem ("sudo raspi-config nonint do_browser chromium-browser pi");
                             else
                                 vsystem ("sudo raspi-config nonint do_browser firefox pi");
-                            gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), rpc ? PAGE_RPC : PAGE_UPDATE);
+                            page_forward ();
                             break;
 
         case PAGE_RPC :     if (gtk_switch_get_active (GTK_SWITCH (rpc_sw)))
                                 vsystem ("sudo systemctl --global enable rpi-connect;sudo systemctl --global enable rpi-connect-wayvnc");
                             else
                                 vsystem ("sudo systemctl --global disable rpi-connect;sudo systemctl --global disable rpi-connect-wayvnc");
-                            gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
+                            page_forward ();
                             break;
 
         case PAGE_UPDATE :  if (net_available ())
@@ -2233,23 +2269,55 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             else message (_("No network connection found - unable to check for updates"), 1, PAGE_DONE, -1, FALSE);
                             break;
 
-        case PAGE_DONE :
-                            nm_stop_scan ();
+        case PAGE_DONE :    nm_stop_scan ();
                             message (_("Restarting - please wait..."), 0, 0, -1, TRUE);
                             gtk_widget_hide (main_dlg);
                             g_thread_new (NULL, final_setup, NULL);
-                            break;
-
-        default :           gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
                             break;
     }
 }
 
 static void prev_page (GtkButton* btn, gpointer ptr)
 {
+    int prev;
+
     last_btn = PREV_BTN;
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
     {
+        case PAGE_DONE :    if (chuser != NULL)
+                                prev = PAGE_PASSWD;
+                            else
+                                prev = PAGE_UPDATE;
+                            break;
+
+        case PAGE_UPDATE :  if (rpc)
+                            {
+                                prev = PAGE_RPC;
+                                break;
+                            }
+
+        case PAGE_RPC :     if (browser)
+                            {
+                                prev = PAGE_BROWSER;
+                                break;
+                            }
+
+        case PAGE_BROWSER :
+        case PAGE_WIFIPSK : if (wifi_if)
+                            {
+                                prev = PAGE_WIFIAP;
+                                break;
+                            }
+
+        case PAGE_WIFIAP :  if (is_pi && wm  == WM_OPENBOX)
+                            {
+                                prev = PAGE_OSCAN;
+                                break;
+                            }
+
+        case PAGE_OSCAN :   prev = PAGE_PASSWD;
+                            break;
+
         case PAGE_PASSWD :  if (chuser != NULL)
                             {
                                 // call the script to cancel renaming and reset original user
@@ -2257,45 +2325,14 @@ static void prev_page (GtkButton* btn, gpointer ptr)
                                 vsystem ("sync;reboot");
                                 gtk_main_quit ();
                             }
-                            else
-                                gtk_notebook_prev_page (GTK_NOTEBOOK (wizard_nb));
+                            else prev = PAGE_LOCALE;
                             break;
 
-        case PAGE_UPDATE :  if (rpc)
-                            {
-                                gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_RPC);
-                                break;
-                            } // fallthrough
-        case PAGE_RPC :     if (browser)
-                            {
-                                gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_BROWSER);
-                                break;
-                            } // fallthrough
-        case PAGE_BROWSER : if (wifi_if) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_WIFIAP);
-                            else
-                            {
-                                if (is_pi && wm == WM_OPENBOX)
-                                    gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
-                                else
-                                    gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
-                            }
-                            break;
-
-        case PAGE_WIFIAP :  if (is_pi && wm  == WM_OPENBOX)
-                                gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_OSCAN);
-                            else
-                                gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
-                            break;
-
-        case PAGE_DONE :    if (chuser != NULL)
-                                gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_PASSWD);
-                            else
-                                gtk_notebook_prev_page (GTK_NOTEBOOK (wizard_nb));
-                            break;
-
-        default :           gtk_notebook_prev_page (GTK_NOTEBOOK (wizard_nb));
+        case PAGE_LOCALE :
+        default :           prev = PAGE_INTRO;
                             break;
     }
+    gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), prev);
 }
 
 static void skip_page (GtkButton* btn, gpointer ptr)
@@ -2304,7 +2341,7 @@ static void skip_page (GtkButton* btn, gpointer ptr)
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
     {
         case PAGE_WIFIAP :
-        case PAGE_WIFIPSK : gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), browser ? PAGE_BROWSER : (rpc ? PAGE_RPC : PAGE_UPDATE));
+        case PAGE_WIFIPSK : page_forward ();
                             break;
 
         case PAGE_UPDATE :  gchar *buf = g_strdup_printf ("check-language-support -l %s_%s", lc, cc);
@@ -2316,12 +2353,9 @@ static void skip_page (GtkButton* btn, gpointer ptr)
                                 message (_("If installing updates is skipped, translation files will not be installed."), 1, PAGE_DONE, -1, FALSE);
                             else if (uninst)
                                 message (_("If installing updates is skipped, the unused browser will not be uninstalled."), 1, PAGE_DONE, -1, FALSE);
-                            else gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_DONE);
+                            else page_forward ();
                             g_free (buf);
                             g_free (lpack);
-                            break;
-
-        default :           gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
                             break;
     }
 }
