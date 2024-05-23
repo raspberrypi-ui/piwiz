@@ -2031,13 +2031,14 @@ static gboolean page_shown (int page)
     {
         case PAGE_OSCAN :   return (is_pi && wm == WM_OPENBOX);
 
-        case PAGE_WIFIAP :
-        case PAGE_WIFIPSK : if (wifi_if) return TRUE;
+        case PAGE_WIFIAP :  if (wifi_if) return TRUE;
                             else return FALSE;
 
         case PAGE_BROWSER : return browser;
 
         case PAGE_RPC :     return rpc;
+
+        case PAGE_WIFIPSK : return FALSE;
 
         case PAGE_INTRO :
         case PAGE_LOCALE :
@@ -2054,7 +2055,6 @@ static void change_page (int dir)
 
     for (; dir == BACKWARD ? page >= PAGE_INTRO : page < PAGE_DONE; page += dir)
     {
-        if (page == PAGE_WIFIPSK) page += dir;  // go to this page explicitly when needed
         if (page_shown (page))
         {
             gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), page);
