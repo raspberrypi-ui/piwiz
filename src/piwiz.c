@@ -51,11 +51,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <NetworkManager.h>
 
-#ifdef USE_DHCPCD
-#include "dhcpcd.h"
-#include "dhcpcd-gtk.h"
-#endif
-
 #define PAGE_INTRO 0
 #define PAGE_LOCALE 1
 #define PAGE_PASSWD 2
@@ -149,9 +144,6 @@ typedef enum {
     WM_LABWC } wm_type;
 static wm_type wm;
 
-#ifdef USE_DHCPCD
-gboolean use_nm;
-#endif
 NMClient *nm_client = NULL;
 gboolean nm_scanning = FALSE;
 NMDevice *nm_dev;
@@ -344,13 +336,6 @@ static const char kb_tzs[MAX_KBS][20] = {
     "Asia/Seoul"
 };
 
-/* In dhcpcd-gtk/main.c */
-
-#ifdef USE_DHCPCD
-void init_dhcpcd (void);
-extern DHCPCD_CONNECTION *con;
-#endif
-
 /* Local prototypes */
 
 static char *get_shell_string (char *cmd, gboolean all);
@@ -379,11 +364,6 @@ static void set_init_tz (GtkTreeModel *model, GtkWidget *cb, int pos, const char
 static int find_line (char **lssid, int *secure, int *connected);
 void connect_success (void);
 static gint connect_failure (gpointer data);
-#ifdef USE_DHCPCD
-static void scans_add (char *str, int match, int secure, int signal, int connected);
-static gboolean select_ssid (char *lssid, const char *psk);
-static char *find_psk_for_network (char *ssid);
-#endif
 static void nm_start_scan (void);
 static void nm_stop_scan (void);
 static void nm_req_scan_finish_cb (GObject *device, GAsyncResult *result, gpointer data);
@@ -1120,40 +1100,6 @@ static void set_init_tz (GtkTreeModel *model, GtkWidget *cb, int pos, const char
 
 /* WiFi */
 
-#ifdef USE_DHCPCD
-static void scans_add (char *str, int match, int secure, int signal, int connected)
-{
-    GtkTreeIter iter, siter, fiter;
-    GdkPixbuf *sec_icon = NULL, *sig_icon = NULL;
-    char *icon;
-    int dsig;
-
-    gtk_list_store_append (ap_list, &iter);
-    if (secure)
-        sec_icon = gtk_icon_theme_load_icon (gtk_icon_theme_get_default(), "network-wireless-encrypted", 16, 0, NULL);
-    if (signal >= 0)
-    {
-        if (signal > 80) dsig = 100;
-        else if (signal > 55) dsig = 75;
-        else if (signal > 30) dsig = 50;
-        else if (signal > 5) dsig = 25;
-        else dsig = 0;
-
-        icon = g_strdup_printf ("network-wireless-connected-%02d", dsig);
-        sig_icon = gtk_icon_theme_load_icon (gtk_icon_theme_get_default(), icon, 16, 0, NULL);
-        g_free (icon);
-    }
-    gtk_list_store_set (ap_list, &iter, AP_SSID, str, AP_SEC_ICON, sec_icon, AP_SIG_ICON, sig_icon, AP_SECURE, secure, AP_CONNECTED, connected, -1);
-
-    if (match)
-    {
-        gtk_tree_model_sort_convert_child_iter_to_iter (GTK_TREE_MODEL_SORT (sap), &siter, &iter);
-        gtk_tree_model_filter_convert_child_iter_to_iter (GTK_TREE_MODEL_FILTER (fap), &fiter, &siter);
-        gtk_tree_selection_select_iter (gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv)), &fiter);
-    }
-}
-#endif
-
 static int find_line (char **lssid, int *secure, int *connected)
 {
     GtkTreeModel *model;
@@ -1163,16 +1109,8 @@ static int find_line (char **lssid, int *secure, int *connected)
     sel = gtk_tree_view_get_selection (GTK_TREE_VIEW (ap_tv));
     if (sel && gtk_tree_selection_get_selected (sel, &model, &iter))
     {
-#ifdef USE_DHCPCD
-        if (use_nm)
-        {
-#endif
-            if (nm_ap_id) g_free (nm_ap_id);
-            gtk_tree_model_get (model, &iter, AP_SSID, lssid, AP_SECURE, secure, AP_CONNECTED, connected, AP_DEVICE, &nm_dev, AP_AP, &nm_ap_id, -1);
-#ifdef USE_DHCPCD
-        }
-        else gtk_tree_model_get (model, &iter, AP_SSID, lssid, AP_SECURE, secure, AP_CONNECTED, connected, -1);
-#endif
+        if (nm_ap_id) g_free (nm_ap_id);
+        gtk_tree_model_get (model, &iter, AP_SSID, lssid, AP_SECURE, secure, AP_CONNECTED, connected, AP_DEVICE, &nm_dev, AP_AP, &nm_ap_id, -1);
         if (g_strcmp0 (*lssid, _("Searching for networks - please wait..."))) return 1;
     } 
     return 0;
@@ -1196,114 +1134,6 @@ static gint connect_failure (gpointer data)
     message (_("Failed to connect to network."), 1, 0, -1, FALSE);
     return FALSE;
 }
-
-#ifdef USE_DHCPCD
-static gboolean select_ssid (char *lssid, const char *psk)
-{
-    DHCPCD_WI_SCAN scan, *s;
-    WI_SCAN *w;
-
-    TAILQ_FOREACH (w, &wi_scans, next)
-    {
-        for (s = w->scans; s; s = s->next)
-        {
-            if (!g_strcmp0 (lssid, s->ssid))
-            {
-                DHCPCD_CONNECTION *dcon = dhcpcd_if_connection (w->interface);
-                if (!dcon) return FALSE;
-
-                DHCPCD_WPA *wpa = dhcpcd_wpa_find (dcon, w->interface->ifname);
-                if (!wpa) return FALSE;
-
-                /* Take a copy of scan in case it's destroyed by a scan update */
-                memcpy (&scan, s, sizeof (scan));
-                scan.next = NULL;
-
-                if (!(scan.flags & WSF_PSK))
-                    dhcpcd_wpa_configure (wpa, &scan, NULL);
-                else if (*psk == '\0')
-                    dhcpcd_wpa_select (wpa, &scan);
-                else
-                    dhcpcd_wpa_configure (wpa, &scan, psk);
-
-                return TRUE;
-            }
-        }
-    }
-    return FALSE;
-}
-
-void menu_update_scans (WI_SCAN *wi, DHCPCD_WI_SCAN *scans)
-{
-    DHCPCD_WI_SCAN *s;
-    char *lssid = NULL;
-    int active, selected, connected;
-
-    // get the selected line in the list of SSIDs - values in active and connected are ignored here
-    selected = find_line (&lssid, &active, &connected);
-
-    // erase the current list
-    gtk_list_store_clear (ap_list);
-
-    // loop through scan results
-    for (s = scans; s; s = s->next)
-    {
-        // only include SSIDs which have either PSK or no security
-        if (s->flags & WSF_SECURE && !(s->flags & WSF_PSK)) continue;
-
-        // if this AP matches the SSID previously selected, select it in the new list
-        if (!g_strcmp0 (lssid, s->ssid)) active = 1;
-        else active = 0;
-
-        // is this network already active? - potentially confusing; not convinced this is a good idea... !!!!
-        connected = dhcpcd_wi_associated (wi->interface, s);
-        if (!selected && connected) active = 1;
-
-        // add this SSID to the new list
-        scans_add (s->ssid, active, (s->flags & WSF_SECURE) && (s->flags & WSF_PSK), s->strength.value, connected);
-
-        gtk_widget_set_sensitive (ap_tv, TRUE);
-    }
-
-    if (lssid) g_free (lssid);
-    dhcpcd_wi_scans_free (wi->scans);
-    wi->scans = scans;
-}
-
-static char *find_psk_for_network (char *ssid)
-{
-    FILE *fp;
-    char *line = NULL, *seek, *res, *ret = NULL;
-    size_t len = 0;
-    int state = 0;
-
-    seek = g_strdup_printf ("ssid=\"%s\"", ssid);
-    fp = fopen ("/etc/wpa_supplicant/wpa_supplicant.conf", "rb");
-    if (fp)
-    {
-        while (getline (&line, &len, fp) > 0)
-        {
-            // state : 1 in a network block; 2 in network block with matching ssid; 0 otherwise
-            if (strstr (line, "network={")) state = 1;
-            else if (strstr (line, "}")) state = 0;
-            else if (state)
-            {
-                if (strstr (line, seek)) state = 2;
-                else if (state == 2 && (res = strstr (line, "psk=")))
-                {
-                    strtok (res, "\"");
-                    ret = g_strdup (strtok (NULL, "\""));
-                    break;
-                }
-            }
-        }
-        g_free (line);
-        fclose (fp);
-    }
-    g_free (seek);
-    return ret;
-}
-#endif
 
 /* Network Manager - scanning */
 
@@ -1696,35 +1526,19 @@ static char *nm_find_psk_for_network (char *ssid)
 // initiate scan for networks
 static void start_scanning (void)
 {
-     if (!wifi_if) return;
-#ifdef USE_DHCPCD
-    if (use_nm)
+    if (!wifi_if) return;
+
+    if (!nm_client)
     {
-#endif
-        if (!nm_client)
-        {
-            GtkTreeIter iter;
-            nm_client = nm_client_new (NULL, NULL);
-            gtk_list_store_clear (ap_list);
-            gtk_list_store_append (ap_list, &iter);
-            gtk_list_store_set (ap_list, &iter, AP_SSID, _("Searching for networks - please wait..."),
-                AP_SEC_ICON, NULL, AP_SIG_ICON, NULL, AP_AP, NULL, -1);
-            gtk_widget_set_sensitive (ap_tv, FALSE);
-        }
-        nm_start_scan ();
-#ifdef USE_DHCPCD
+        GtkTreeIter iter;
+        nm_client = nm_client_new (NULL, NULL);
+        gtk_list_store_clear (ap_list);
+        gtk_list_store_append (ap_list, &iter);
+        gtk_list_store_set (ap_list, &iter, AP_SSID, _("Searching for networks - please wait..."),
+            AP_SEC_ICON, NULL, AP_SIG_ICON, NULL, AP_AP, NULL, -1);
+        gtk_widget_set_sensitive (ap_tv, FALSE);
     }
-    else
-    {
-        if (!con)
-        {
-            init_dhcpcd ();
-            gtk_list_store_clear (ap_list);
-            scans_add (_("Searching for networks - please wait..."), 0, 0, -1, 0);
-            gtk_widget_set_sensitive (ap_tv, FALSE);
-        }
-    }
-#endif
+    nm_start_scan ();
 }
 
 
@@ -2367,15 +2181,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                     text = g_strdup_printf (_("Enter the password for the WiFi network \"%s\"."), ssid);
                                     gtk_label_set_text (GTK_LABEL (psk_label), text);
                                     g_free (text);
-
-#ifdef USE_DHCPCD
-                                    if (use_nm)
-#endif
-                                        text = nm_find_psk_for_network (ssid);
-#ifdef USE_DHCPCD
-                                    else
-                                        text = find_psk_for_network (ssid);
-#endif
+                                    text = nm_find_psk_for_network (ssid);
                                     gtk_entry_set_text (GTK_ENTRY (psk_te), text ? text : "");
                                     if (text) g_free (text);
 
@@ -2383,59 +2189,31 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                 }
                                 else
                                 {
-#ifdef USE_DHCPCD
-                                    if (use_nm)
-                                    {
-#endif
-                                        message (_("Connecting to WiFi network - please wait..."), 0, 0, -1, TRUE);
-                                        conn_timeout = g_timeout_add (30000, connect_failure, NULL);
-                                        nm_connect_wifi (NULL);
-#ifdef USE_DHCPCD
-                                    }
-                                    else
-                                    {
-                                        if (select_ssid (ssid, NULL))
-                                        {
-                                            message (_("Connecting to WiFi network - please wait..."), 0, 0, -1, TRUE);
-                                            conn_timeout = g_timeout_add (30000, connect_failure, NULL);
-                                        }
-                                        else message (_("Could not connect to this network"), 1, 0, -1, FALSE);
-                                    }
-#endif
+                                    message (_("Connecting to WiFi network - please wait..."), 0, 0, -1, TRUE);
+                                    conn_timeout = g_timeout_add (30000, connect_failure, NULL);
+                                    nm_connect_wifi (NULL);
                                 }
                             }
                             break;
 
         case PAGE_WIFIPSK : ccptr = gtk_entry_get_text (GTK_ENTRY (psk_te));
-#ifdef USE_DHCPCD
-                            if (use_nm)
-                            {
-#endif
-                                message (_("Connecting to WiFi network - please wait..."), 0, 0, -1, TRUE);
-                                conn_timeout = g_timeout_add (30000, connect_failure, NULL);
-                                nm_connect_wifi (ccptr);
-#ifdef USE_DHCPCD
-                            }
-                            else
-                            {
-                                if (select_ssid (ssid, ccptr))
-                                {
-                                    message (_("Connecting to WiFi network - please wait..."), 0, 0, -1, TRUE);
-                                    conn_timeout = g_timeout_add (30000, connect_failure, NULL);
-                                }
-                                else message (_("Could not connect to this network"), 1, 0, -1, FALSE);
-                            }
-#endif
+                            message (_("Connecting to WiFi network - please wait..."), 0, 0, -1, TRUE);
+                            conn_timeout = g_timeout_add (30000, connect_failure, NULL);
+                            nm_connect_wifi (ccptr);
                             break;
 
-        case PAGE_DONE :
-#ifdef USE_DHCPCD
-                            if (use_nm)
-#endif
-                            nm_stop_scan ();
-                            message (_("Restarting - please wait..."), 0, 0, -1, TRUE);
-                            gtk_widget_hide (main_dlg);
-                            g_thread_new (NULL, final_setup, NULL);
+        case PAGE_BROWSER : if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (chromium_rb)))
+                                vsystem ("sudo raspi-config nonint do_browser chromium-browser pi");
+                            else
+                                vsystem ("sudo raspi-config nonint do_browser firefox pi");
+                            gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), rpc ? PAGE_RPC : PAGE_UPDATE);
+                            break;
+
+        case PAGE_RPC :     if (gtk_switch_get_active (GTK_SWITCH (rpc_sw)))
+                                vsystem ("sudo systemctl --global enable rpi-connect;sudo systemctl --global enable rpi-connect-wayvnc");
+                            else
+                                vsystem ("sudo systemctl --global disable rpi-connect;sudo systemctl --global disable rpi-connect-wayvnc");
+                            gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
                             break;
 
         case PAGE_UPDATE :  if (net_available ())
@@ -2455,18 +2233,11 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             else message (_("No network connection found - unable to check for updates"), 1, PAGE_DONE, -1, FALSE);
                             break;
 
-        case PAGE_BROWSER : if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (chromium_rb)))
-                                vsystem ("sudo raspi-config nonint do_browser chromium-browser pi");
-                            else
-                                vsystem ("sudo raspi-config nonint do_browser firefox pi");
-                            gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
-                            break;
-
-        case PAGE_RPC :     if (gtk_switch_get_active (GTK_SWITCH (rpc_sw)))
-                                vsystem ("sudo systemctl --global enable rpi-connect;sudo systemctl --global enable rpi-connect-wayvnc");
-                            else
-                                vsystem ("sudo systemctl --global disable rpi-connect;sudo systemctl --global disable rpi-connect-wayvnc");
-                            gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
+        case PAGE_DONE :
+                            nm_stop_scan ();
+                            message (_("Restarting - please wait..."), 0, 0, -1, TRUE);
+                            gtk_widget_hide (main_dlg);
+                            g_thread_new (NULL, final_setup, NULL);
                             break;
 
         default :           gtk_notebook_next_page (GTK_NOTEBOOK (wizard_nb));
@@ -2682,26 +2453,6 @@ static void uscan_toggle (GtkSwitch *sw, gpointer ptr)
         vsystem ("sudo raspi-config nonint do_overscan_kms 1 %d", enable);
 }
 
-#ifdef USE_DHCPCD
-static gboolean check_service (char *name)
-{
-    int res;
-    char *buf;
-
-    buf = g_strdup_printf ("systemctl status %s 2> /dev/null | grep -qw Active:", name);
-    res = system (buf);
-    g_free (buf);
-
-    if (res) return FALSE;
-
-    buf = g_strdup_printf ("systemctl status %s 2> /dev/null | grep -w Active: | grep -qw inactive", name);
-    res = system (buf);
-    g_free (buf);
-
-    return !!res;
-}
-#endif
-
 static int num_screens (void)
 {
     if (wm != WM_OPENBOX)
@@ -2733,10 +2484,6 @@ int main (int argc, char *argv[])
         else wm = WM_LABWC;
     }
     else wm = WM_OPENBOX;
-
-#ifdef USE_DHCPCD
-    use_nm = check_service ("NetworkManager");
-#endif
 
     // set the audio output to HDMI if there is one, otherwise the analog jack
     vsystem ("hdmi-audio-select");

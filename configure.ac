@@ -51,7 +51,6 @@ AC_ARG_ENABLE(dhcpcd,
        [enable_dhcpcd="${enableval}"],
        [enable_dhcpcd=no]
 )
-AM_CONDITIONAL([USE_DHCPCD], [test x"$enable_dhcpcd" = x"yes"])
 
 PACKAGE_CFLAGS="$PACKAGE_CFLAGS $ADDITIONAL_FLAGS"
 PACKAGE_LIBS="$PACKAGE_LIBS"

@@ -16,20 +16,6 @@ piwiz_CFLAGS = \
 
 piwiz_SOURCES = piwiz.c
 
-if USE_DHCPCD
-piwiz_SOURCES += \
-		libdhcpcd/config.c \
-		libdhcpcd/dhcpcd.c \
-		libdhcpcd/wpa.c \
-		dhcpcd-gtk/wpa.c \
-		dhcpcd-gtk/main.c
-
-piwiz_CFLAGS += \
-	-DUSE_DHCPCD \
-	-I$(srcdir)/libdhcpcd \
-	-I$(srcdir)/dhcpcd-gtk
-endif
-
 piwiz_includedir = $(includedir)/piwiz
 
 piwiz_include_HEADERS =
@@ -56,20 +42,6 @@ piwizhs_CFLAGS = \
 	-Wall
 
 piwizhs_SOURCES = piwiz.c
-
-if USE_DHCPCD
-piwizhs_SOURCES += \
-		libdhcpcd/config.c \
-		libdhcpcd/dhcpcd.c \
-		libdhcpcd/wpa.c \
-		dhcpcd-gtk/wpa.c \
-		dhcpcd-gtk/main.c
-
-piwizhs_CFLAGS += \
-	-DUSE_DHCPCD \
-	-I$(srcdir)/libdhcpcd \
-	-I$(srcdir)/dhcpcd-gtk
-endif
 
 piwizhs_includedir = $(includedir)/piwiz
 
