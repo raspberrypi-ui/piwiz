@@ -2052,9 +2052,9 @@ static void change_page (int dir)
 {
     int page = gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)) + dir;
 
-    for (; dir == -1 ? page >= PAGE_INTRO : page < PAGE_DONE; page += dir)
+    for (; dir == BACKWARD ? page >= PAGE_INTRO : page < PAGE_DONE; page += dir)
     {
-        if (page == PAGE_WIFIPSK) page += dir;  // only jump to this one explicitly when needed
+        if (page == PAGE_WIFIPSK) page += dir;  // go to this page explicitly when needed
         if (page_shown (page))
         {
             gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), page);
