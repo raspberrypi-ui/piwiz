@@ -69,8 +69,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FORWARD 1
 #define BACKWARD -1
 
-#define PROG_NONE -1
-#define PROG_PULSE -2
+#define MSG_PULSE -1
+#define MSG_WAIT -2
+#define MSG_TERM -3
 
 // columns in localisation list stores
 
@@ -101,7 +102,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 typedef struct {
     char *msg;
-    int prog;
+    int type;
 } prog_msg;
 
 static prog_msg pm;
@@ -352,9 +353,9 @@ static int vsystem (const char *fmt, ...);
 static void error_box (char *msg);
 static gboolean cb_error (gpointer data);
 static void thread_error (char *msg);
-static void message (char *msg, gboolean wait, int dest_page, int progress);
+static void message (char *msg, int type);
 static gboolean cb_message (gpointer data);
-static void thread_message (char *msg, int prog);
+static void thread_message (char *msg, int type);
 static void hide_message (void);
 static gboolean ok_clicked (GtkButton *button, gpointer data);
 static gboolean loc_done (gpointer data);
@@ -386,7 +387,7 @@ static char *nm_ap_get_id (NMAccessPoint *ap);
 static const char *nm_ap_get_path (char *id);
 static gboolean nm_filter_dup_ap (GtkTreeModel *model, GtkTreeIter *iter, gpointer data);
 static char *nm_find_psk_for_network (char *ssid);
-static void progress (PkProgress *progress, PkProgressType *type, gpointer data);
+static void progress (PkProgress *progress, PkProgressType type, gpointer data);
 static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data);
 static gboolean filter_fn (PkPackage *package, gpointer user_data);
 static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data);
@@ -406,8 +407,11 @@ static void next_page (GtkButton* btn, gpointer ptr);
 static void prev_page (GtkButton* btn, gpointer ptr);
 static void skip_page (GtkButton* btn, gpointer ptr);
 static gboolean show_ip (void);
+#ifndef HOMESCHOOL
 static void set_marketing_serial (const char *file);
+#else
 static void set_hs_serial (void);
+#endif
 static gboolean net_available (void);
 static int get_pi_keyboard (void);
 static gboolean srprompt (gpointer data);
@@ -455,10 +459,7 @@ static int get_status (char *cmd)
     if (fp == NULL) return 0;
     if (getline (&buf, &res, fp) > 0)
     {
-        if (sscanf (buf, "%d", &res) == 1)
-        {
-            val = res;
-        }
+        if (sscanf (buf, "%d", &val) != 1) val = 0;
     }
     pclose (fp);
     g_free (buf);
@@ -560,8 +561,6 @@ static gboolean pulse_pb (gpointer data)
 
 static void error_box (char *msg)
 {
-    int dest_page = PAGE_DONE;
-
     if (msg_dlg)
     {
         // clear any existing message box
@@ -583,7 +582,7 @@ static void error_box (char *msg)
 
         gtk_label_set_text (GTK_LABEL (err_msg), msg);
 
-        g_signal_connect (err_btn, "clicked", G_CALLBACK (ok_clicked), (void *) dest_page);
+        g_signal_connect (err_btn, "clicked", G_CALLBACK (ok_clicked), (void *) 1);
 
         gtk_widget_show_all (err_dlg);
         g_object_unref (builder);
@@ -602,7 +601,7 @@ static void thread_error (char *msg)
     gdk_threads_add_idle (cb_error, msg);
 }
 
-static void message (char *msg, gboolean wait, int dest_page, int progress)
+static void message (char *msg, int type)
 {
     GtkWidget *wid;
 
@@ -633,27 +632,31 @@ static void message (char *msg, gboolean wait, int dest_page, int progress)
 
     if (pulse_timer) g_source_remove (pulse_timer);
     pulse_timer = 0;
-    if (wait)
+
+    if (type == MSG_WAIT || type == MSG_TERM)
     {
+        // type = MSG_WAIT is a dialog waiting for OK to be clicked, at which point it closes
+        // type = MSG_TERM is the same, but on closing the wizard jumps to the last page
         gtk_widget_hide (msg_pb);
         gtk_widget_show (msg_btn);
-        g_signal_connect (msg_btn, "clicked", G_CALLBACK (ok_clicked), (void *) dest_page);
+        g_signal_connect (msg_btn, "clicked", G_CALLBACK (ok_clicked), type == MSG_TERM ? (void *) 1 : (void *) 0);
         gtk_widget_grab_focus (msg_btn);
+    }
+    else if (type == MSG_PULSE)
+    {
+        // type = MSG_PULSE shows a pulsing progress bar
+        gtk_widget_hide (msg_btn);
+        gtk_widget_show (msg_pb);
+        gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
+        pulse_timer = g_timeout_add (200, pulse_pb, NULL);
     }
     else
     {
+        // any other values of type are a percentage progress value
         gtk_widget_hide (msg_btn);
         gtk_widget_show (msg_pb);
-        if (progress == PROG_PULSE)
-        {
-            gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
-            pulse_timer = g_timeout_add (200, pulse_pb, NULL);
-        }
-        else if (progress != PROG_NONE)
-        {
-            float fprogress = progress / 100.0;
-            gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (msg_pb), fprogress);
-        }
+        float fprogress = type / 100.0;
+        gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (msg_pb), fprogress);
     }
 
     gtk_widget_show (msg_dlg);
@@ -662,17 +665,14 @@ static void message (char *msg, gboolean wait, int dest_page, int progress)
 static gboolean cb_message (gpointer data)
 {
     prog_msg *pm = (prog_msg *) data;
-    if (pm->prog == -2)
-        message (pm->msg, TRUE, PAGE_DONE, PROG_NONE);
-    else
-        message (pm->msg, FALSE, 0, pm->prog);
+    message (pm->msg, pm->type);
     return FALSE;
 }
 
-static void thread_message (char *msg, int prog)
+static void thread_message (char *msg, int type)
 {
     pm.msg = msg;
-    pm.prog = prog;
+    pm.type = type;
     gdk_threads_add_idle (cb_message, &pm);
 }
 
@@ -696,7 +696,7 @@ static void hide_message (void)
 static gboolean ok_clicked (GtkButton *button, gpointer data)
 {
     hide_message ();
-    if (data) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), (int) data);
+    if (data) gtk_notebook_set_current_page (GTK_NOTEBOOK (wizard_nb), PAGE_DONE);
     return FALSE;
 }
 
@@ -1136,7 +1136,7 @@ static gint connect_failure (gpointer data)
 {
     conn_timeout = 0;
     hide_message ();
-    message (_("Failed to connect to network."), TRUE, 0, PROG_NONE);
+    message (_("Failed to connect to network."), MSG_WAIT);
     return FALSE;
 }
 
@@ -1323,7 +1323,7 @@ static void nm_connect_wifi (const char *password)
             g_source_remove (conn_timeout);
             conn_timeout = 0;
         }
-        message (_("Failed to connect - access point not available."), TRUE, 0, PROG_NONE);
+        message (_("Failed to connect - access point not available."), MSG_WAIT);
         return;
     }
 
@@ -1549,7 +1549,7 @@ static void start_scanning (void)
 
 /* Updates */
 
-static void progress (PkProgress *progress, PkProgressType *type, gpointer data)
+static void progress (PkProgress *progress, PkProgressType type, gpointer data)
 {
     int role = pk_progress_get_role (progress);
 
@@ -1557,7 +1557,7 @@ static void progress (PkProgress *progress, PkProgressType *type, gpointer data)
     {
         switch (pk_progress_get_status (progress))
         {
-            case PK_STATUS_ENUM_DOWNLOAD :  if ((int) type == PK_PROGRESS_TYPE_PERCENTAGE)
+            case PK_STATUS_ENUM_DOWNLOAD :  if (type == PK_PROGRESS_TYPE_PERCENTAGE)
                                             {
                                                 if (role == PK_ROLE_ENUM_REFRESH_CACHE)
                                                     thread_message (_("Reading update list - please wait..."), pk_progress_get_percentage (progress));
@@ -1566,7 +1566,7 @@ static void progress (PkProgress *progress, PkProgressType *type, gpointer data)
                                             }
                                             break;
 
-            case PK_STATUS_ENUM_INSTALL :   if ((int) type == PK_PROGRESS_TYPE_PERCENTAGE)
+            case PK_STATUS_ENUM_INSTALL :   if (type == PK_PROGRESS_TYPE_PERCENTAGE)
                                             {
                                                 if (role == PK_ROLE_ENUM_UPDATE_PACKAGES)
                                                     thread_message (_("Installing updates - please wait..."), pk_progress_get_percentage (progress));
@@ -1575,7 +1575,7 @@ static void progress (PkProgress *progress, PkProgressType *type, gpointer data)
                                             }
                                             break;
 
-            case PK_STATUS_ENUM_REMOVE :    if ((int) type == PK_PROGRESS_TYPE_PERCENTAGE)
+            case PK_STATUS_ENUM_REMOVE :    if (type == PK_PROGRESS_TYPE_PERCENTAGE)
                                             {
                                                 if (role == PK_ROLE_ENUM_REMOVE_PACKAGES)
                                                     thread_message (_("Uninstalling browser - please wait..."), pk_progress_get_percentage (progress));
@@ -1646,7 +1646,7 @@ static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data)
     {
         pack_array = g_strsplit (lpack, " ", -1);
 
-        thread_message (_("Finding languages - please wait..."), -1);
+        thread_message (_("Finding languages - please wait..."), MSG_PULSE);
         pk_client_resolve_async (PK_CLIENT (task), 0, pack_array, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) resolve_lang_done, NULL);
         g_strfreev (pack_array);
         g_free (lpack);
@@ -1656,14 +1656,14 @@ static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data)
         if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (chromium_rb))) lpack = g_strdup ("firefox");
         else lpack = g_strdup ("chromium-browser");
         pack_array = g_strsplit (lpack, " ", -1);
-        thread_message (_("Uninstalling browser - please wait..."), -1);
+        thread_message (_("Uninstalling browser - please wait..."), MSG_PULSE);
         pk_client_resolve_async (PK_CLIENT (task), 0, pack_array, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) resolve_browser_done, NULL);
         g_strfreev (pack_array);
         g_free (lpack);
     }
     else
     {
-        thread_message (_("Comparing versions - please wait..."), -1);
+        thread_message (_("Comparing versions - please wait..."), MSG_PULSE);
         pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
     }
 }
@@ -1707,7 +1707,7 @@ static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
 
     if (pk_package_sack_get_size (fsack) > 0)
     {
-        thread_message (_("Installing languages - please wait..."), -1);
+        thread_message (_("Installing languages - please wait..."), MSG_PULSE);
 
         ids = pk_package_sack_get_ids (fsack);
         pk_task_install_packages_async (task, ids, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) install_lang_done, NULL);
@@ -1721,14 +1721,14 @@ static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
         if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (chromium_rb))) lpack = g_strdup ("firefox");
         else lpack = g_strdup ("chromium-browser");
         pack_array = g_strsplit (lpack, " ", -1);
-        thread_message (_("Uninstalling browser - please wait..."), -1);
+        thread_message (_("Uninstalling browser - please wait..."), MSG_PULSE);
         pk_client_resolve_async (PK_CLIENT (task), 0, pack_array, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) resolve_browser_done, NULL);
         g_strfreev (pack_array);
         g_free (lpack);
     }
     else
     {
-        thread_message (_("Comparing versions - please wait..."), -1);
+        thread_message (_("Comparing versions - please wait..."), MSG_PULSE);
         pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
     }
 
@@ -1757,14 +1757,14 @@ static void install_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
         if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (chromium_rb))) lpack = g_strdup ("firefox");
         else lpack = g_strdup ("chromium-browser");
         pack_array = g_strsplit (lpack, " ", -1);
-        thread_message (_("Uninstalling browser - please wait..."), -1);
+        thread_message (_("Uninstalling browser - please wait..."), MSG_PULSE);
         pk_client_resolve_async (PK_CLIENT (task), 0, pack_array, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) resolve_browser_done, NULL);
         g_strfreev (pack_array);
         g_free (lpack);
     }
     else
     {
-        thread_message (_("Comparing versions - please wait..."), -1);
+        thread_message (_("Comparing versions - please wait..."), MSG_PULSE);
         pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
     }
 }
@@ -1788,7 +1788,7 @@ static void resolve_browser_done (PkTask *task, GAsyncResult *res, gpointer data
 
     if (pk_package_sack_get_size (fsack) > 0)
     {
-        thread_message (_("Uninstalling browser - please wait..."), -1);
+        thread_message (_("Uninstalling browser - please wait..."), MSG_PULSE);
 
         ids = pk_package_sack_get_ids (fsack);
         pk_task_remove_packages_async (task, ids, TRUE, TRUE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) uninstall_browser_done, NULL);
@@ -1796,7 +1796,7 @@ static void resolve_browser_done (PkTask *task, GAsyncResult *res, gpointer data
     }
     else
     {
-        thread_message (_("Comparing versions - please wait..."), -1);
+        thread_message (_("Comparing versions - please wait..."), MSG_PULSE);
         pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
     }
 
@@ -1817,7 +1817,7 @@ static void uninstall_browser_done (PkTask *task, GAsyncResult *res, gpointer da
         return;
     }
 
-    thread_message (_("Comparing versions - please wait..."), -1);
+    thread_message (_("Comparing versions - please wait..."), MSG_PULSE);
     pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
 }
 
@@ -1840,7 +1840,7 @@ static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
 
     if (pk_package_sack_get_size (fsack) > 0)
     {
-        thread_message (_("Getting updates - please wait..."), -1);
+        thread_message (_("Getting updates - please wait..."), MSG_PULSE);
 
         ids = pk_package_sack_get_ids (fsack);
         pk_task_update_packages_async (task, ids, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) do_updates_done, NULL);
@@ -1851,7 +1851,7 @@ static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
         // check reboot flag set by install process
         if (!access ("/run/reboot-required", F_OK)) reboot = TRUE;
 
-        thread_message (_("System is up to date"), -2);
+        thread_message (_("System is up to date"), MSG_TERM);
     }
 
     g_object_unref (sack);
@@ -1881,7 +1881,7 @@ static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
     set_marketing_serial ("/etc/chromium/master_preferences");
     set_marketing_serial ("/usr/share/firefox/distribution/distribution.ini");
 #endif
-    thread_message (_("System is up to date"), -2);
+    thread_message (_("System is up to date"), MSG_TERM);
 }
 
 static gboolean clock_synced (void)
@@ -1913,7 +1913,7 @@ static gboolean ntp_check (gpointer data)
 {
     if (clock_synced ())
     {
-        message (_("Checking for updates - please wait..."), FALSE, 0, PROG_NONE);
+        message (_("Checking for updates - please wait..."), MSG_PULSE);
         g_thread_new (NULL, refresh_update_cache, NULL);
         return FALSE;
     }
@@ -1922,7 +1922,7 @@ static gboolean ntp_check (gpointer data)
 
     if (calls++ > 120)
     {
-        message (_("Could not sync time - unable to check for updates"), TRUE, PAGE_DONE, PROG_NONE);
+        message (_("Could not sync time - unable to check for updates"), MSG_TERM);
         return FALSE;
     }
 
@@ -2125,7 +2125,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                 || g_strcmp0 (init_lang, lc) || g_ascii_strcasecmp (init_kb, lay)
                                 || g_strcmp0 (init_var, var))
                             {
-                                message (_("Setting location - please wait..."), FALSE, 0, PROG_PULSE);
+                                message (_("Setting location - please wait..."), MSG_PULSE);
                                 g_thread_new (NULL, set_locale, NULL);
                             }
                             else change_page (FORWARD);
@@ -2144,27 +2144,27 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             ccptr = gtk_entry_get_text (GTK_ENTRY (user_te));
                             if (!strlen (ccptr))
                             {
-                                message (_("The username is blank."), TRUE, 0, PROG_NONE);
+                                message (_("The username is blank."), MSG_WAIT);
                                 break;
                             }
                             if (strlen (ccptr) > 32)
                             {
-                                message (_("The username must be 32 characters or shorter."), TRUE, 0, PROG_NONE);
+                                message (_("The username must be 32 characters or shorter."), MSG_WAIT);
                                 break;
                             }
                             if (*ccptr < 'a' || *ccptr > 'z')
                             {
-                                message (_("The first character of the username must be a lower-case letter."), TRUE, 0, PROG_NONE);
+                                message (_("The first character of the username must be a lower-case letter."), MSG_WAIT);
                                 break;
                             }
                             if (!g_strcmp0 (gtk_entry_get_text (GTK_ENTRY (user_te)), "rpi-first-boot-wizard"))
                             {
-                                message (_("This username is used by the system and cannot be used for a user account."), TRUE, 0, PROG_NONE);
+                                message (_("This username is used by the system and cannot be used for a user account."), MSG_WAIT);
                                 break;
                             }
                             if (!g_strcmp0 (gtk_entry_get_text (GTK_ENTRY (user_te)), "root"))
                             {
-                                message (_("This username is used by the system and cannot be used for a user account."), TRUE, 0, PROG_NONE);
+                                message (_("This username is used by the system and cannot be used for a user account."), MSG_WAIT);
                                 break;
                             }
                             while (*++ccptr)
@@ -2173,22 +2173,22 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             }
                             if (*ccptr)
                             {
-                                message (_("Usernames can only contain lower-case letters, digits and hyphens."), TRUE, 0, PROG_NONE);
+                                message (_("Usernames can only contain lower-case letters, digits and hyphens."), MSG_WAIT);
                                 break;
                             }
                             if (!strlen (gtk_entry_get_text (GTK_ENTRY (pwd1_te))) || !strlen (gtk_entry_get_text (GTK_ENTRY (pwd2_te))))
                             {
-                                message (_("The password is blank."), TRUE, 0, PROG_NONE);
+                                message (_("The password is blank."), MSG_WAIT);
                                 break;
                             }
                             if (g_strcmp0 (gtk_entry_get_text (GTK_ENTRY (pwd1_te)), gtk_entry_get_text (GTK_ENTRY (pwd2_te))))
                             {
-                                message (_("The two passwords entered do not match."), TRUE, 0, PROG_NONE);
+                                message (_("The two passwords entered do not match."), MSG_WAIT);
                                 break;
                             }
                             if (!g_strcmp0 (gtk_entry_get_text (GTK_ENTRY (user_te)), "pi") || !g_strcmp0 (gtk_entry_get_text (GTK_ENTRY (pwd1_te)), "raspberry"))
                             {
-                                message (_("You have used a known default value for the username or password.\n\nWe strongly recommend you go back and choose something else."), TRUE, 0, PROG_NONE);
+                                message (_("You have used a known default value for the username or password.\n\nWe strongly recommend you go back and choose something else."), MSG_WAIT);
                             }
                             user = g_strdup (gtk_entry_get_text (GTK_ENTRY (user_te)));
                             pw = g_strdup (crypt (gtk_entry_get_text (GTK_ENTRY (pwd1_te)), crypt_gensalt (NULL, 0, NULL, 0)));
@@ -2217,7 +2217,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                 }
                                 else
                                 {
-                                    message (_("Connecting to WiFi network - please wait..."), FALSE, 0, PROG_PULSE);
+                                    message (_("Connecting to WiFi network - please wait..."), MSG_PULSE);
                                     conn_timeout = g_timeout_add (30000, connect_failure, NULL);
                                     nm_connect_wifi (NULL);
                                 }
@@ -2225,7 +2225,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             break;
 
         case PAGE_WIFIPSK : ccptr = gtk_entry_get_text (GTK_ENTRY (psk_te));
-                            message (_("Connecting to WiFi network - please wait..."), FALSE, 0, PROG_PULSE);
+                            message (_("Connecting to WiFi network - please wait..."), MSG_PULSE);
                             conn_timeout = g_timeout_add (30000, connect_failure, NULL);
                             nm_connect_wifi (ccptr);
                             break;
@@ -2248,21 +2248,21 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             {
                                 if (clock_synced ())
                                 {
-                                    message (_("Checking for updates - please wait..."), FALSE, 0, PROG_NONE);
+                                    message (_("Checking for updates - please wait..."), MSG_PULSE);
                                     g_thread_new (NULL, refresh_update_cache, NULL);
                                 }
                                 else
                                 {
-                                    message (_("Synchronising clock - please wait..."), FALSE, 0, PROG_PULSE);
+                                    message (_("Synchronising clock - please wait..."), MSG_PULSE);
                                     calls = 0;
                                     g_timeout_add_seconds (1, ntp_check, NULL);
                                 }
                             }
-                            else message (_("No network connection found - unable to check for updates"), TRUE, PAGE_DONE, PROG_NONE);
+                            else message (_("No network connection found - unable to check for updates"), MSG_TERM);
                             break;
 
         case PAGE_DONE :    nm_stop_scan ();
-                            message (_("Restarting - please wait..."), FALSE, 0, PROG_PULSE);
+                            message (_("Restarting - please wait..."), MSG_PULSE);
                             gtk_widget_hide (main_dlg);
                             g_thread_new (NULL, final_setup, NULL);
                             break;
@@ -2301,11 +2301,11 @@ static void skip_page (GtkButton* btn, gpointer ptr)
                             gchar *lpack = get_shell_string (buf, TRUE);
                             gboolean uninst = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (uninstall_chk));
                             if (lpack && uninst)
-                                message (_("If installing updates is skipped, translation files will not be installed, and the unused browser will not be uninstalled."), TRUE, PAGE_DONE, PROG_NONE);
+                                message (_("If installing updates is skipped, translation files will not be installed, and the unused browser will not be uninstalled."), MSG_TERM);
                             else if (lpack)
-                                message (_("If installing updates is skipped, translation files will not be installed."), TRUE, PAGE_DONE, PROG_NONE);
+                                message (_("If installing updates is skipped, translation files will not be installed."), MSG_TERM);
                             else if (uninst)
-                                message (_("If installing updates is skipped, the unused browser will not be uninstalled."), TRUE, PAGE_DONE, PROG_NONE);
+                                message (_("If installing updates is skipped, the unused browser will not be uninstalled."), MSG_TERM);
                             else change_page (FORWARD);
                             g_free (buf);
                             g_free (lpack);
@@ -2367,6 +2367,7 @@ static gboolean show_ip (void)
     return TRUE;
 }
 
+#ifndef HOMESCHOOL
 static void set_marketing_serial (const char *file)
 {
     if (is_pi)
@@ -2377,7 +2378,7 @@ static void set_marketing_serial (const char *file)
         }
     }
 }
-
+#else
 static void set_hs_serial (void)
 {
     if (is_pi)
@@ -2388,6 +2389,7 @@ static void set_hs_serial (void)
         }
     }
 }
+#endif
 
 static gboolean net_available (void)
 {
