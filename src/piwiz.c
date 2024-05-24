@@ -1549,6 +1549,63 @@ static void start_scanning (void)
 
 /* Updates */
 
+#if 0
+static void progress (PkProgress *progress, PkProgressType type, gpointer data)
+{
+    int role = pk_progress_get_role (progress);
+    int status = pk_progress_get_status (progress);
+
+    printf ("progress %d %d %d %d %s\n", role, type, status, pk_progress_get_percentage (progress), pk_progress_get_package_id (progress));
+
+    if (msg_dlg)
+    {
+        switch (role)
+        {
+            case PK_ROLE_ENUM_REFRESH_CACHE :       if (status == PK_STATUS_ENUM_LOADING_CACHE)
+                                                        message (_("Reading update list - please wait..."), pk_progress_get_percentage (progress));
+                                                    else
+                                                        gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
+                                                    break;
+
+            case PK_ROLE_ENUM_RESOLVE :             if (status == PK_STATUS_ENUM_LOADING_CACHE)
+                                                        message (_("Finding packages - please wait..."), pk_progress_get_percentage (progress));
+                                                    else
+                                                        gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
+                                                    break;
+
+            case PK_ROLE_ENUM_GET_DETAILS :         if (status == PK_STATUS_ENUM_LOADING_CACHE)
+                                                        message (_("Reading package details - please wait..."), pk_progress_get_percentage (progress));
+                                                    else
+                                                        gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
+                                                    break;
+
+            case PK_ROLE_ENUM_UPDATE_PACKAGES :     if (status == PK_STATUS_ENUM_DOWNLOAD)
+                                                        message (_("Downloading updates - please wait..."), pk_progress_get_percentage (progress));
+                                                    else if (status == PK_STATUS_ENUM_INSTALL)
+                                                        message (_("Installing updates - please wait..."), pk_progress_get_percentage (progress));
+                                                    else
+                                                        gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
+                                                    break;
+
+            case PK_ROLE_ENUM_INSTALL_PACKAGES :    if (status == PK_STATUS_ENUM_DOWNLOAD)
+                                                        message (_("Downloading languages - please wait..."), pk_progress_get_percentage (progress));
+                                                    else if (status == PK_STATUS_ENUM_INSTALL)
+                                                        message (_("Installing languages - please wait..."), pk_progress_get_percentage (progress));
+                                                    else
+                                                        gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
+                                                    break;
+
+            case PK_ROLE_ENUM_REMOVE_PACKAGES :     if (status == PK_STATUS_ENUM_REMOVE)
+                                                        message (_("Uninstalling browser - please wait..."), pk_progress_get_percentage (progress));
+                                                    else
+                                                        gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
+                                                    break;
+        }
+    }
+}
+#endif
+
+
 static void progress (PkProgress *progress, PkProgressType type, gpointer data)
 {
     int role = pk_progress_get_role (progress);
@@ -1602,6 +1659,21 @@ static gboolean filter_fn (PkPackage *package, gpointer user_data)
         case PK_INFO_ENUM_BUGFIX:
         case PK_INFO_ENUM_ENHANCEMENT:
         case PK_INFO_ENUM_BLOCKED:      return TRUE;
+                                        break;
+
+        default:                        return FALSE;
+                                        break;
+    }
+}
+
+static gboolean rem_filter_fn (PkPackage *package, gpointer user_data)
+{
+    if (!is_pi && strstr (pk_package_get_arch (package), "amd64")) return FALSE;
+
+    PkInfoEnum info = pk_package_get_info (package);
+	switch (info)
+    {
+        case PK_INFO_ENUM_INSTALLED:    return TRUE;
                                         break;
 
         default:                        return FALSE;
@@ -1784,7 +1856,7 @@ static void resolve_browser_done (PkTask *task, GAsyncResult *res, gpointer data
     }
 
     PkPackageSack *sack = pk_results_get_package_sack (results);
-    PkPackageSack *fsack = pk_package_sack_filter (sack, filter_fn, NULL);
+    PkPackageSack *fsack = pk_package_sack_filter (sack, rem_filter_fn, NULL);
 
     if (pk_package_sack_get_size (fsack) > 0)
     {
