@@ -389,7 +389,9 @@ static gboolean nm_filter_dup_ap (GtkTreeModel *model, GtkTreeIter *iter, gpoint
 static char *nm_find_psk_for_network (char *ssid);
 static void progress (PkProgress *progress, PkProgressType type, gpointer data);
 static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data);
-static gboolean filter_fn (PkPackage *package, gpointer user_data);
+static gboolean inst_filter_fn (PkPackage *package, gpointer user_data);
+static gboolean rem_filter_fn (PkPackage *package, gpointer user_data);
+static gboolean upd_filter_fn (PkPackage *package, gpointer user_data);
 static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data);
 static void install_lang_done (PkTask *task, GAsyncResult *res, gpointer data);
 static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data);
@@ -1645,20 +1647,14 @@ static void progress (PkProgress *progress, PkProgressType type, gpointer data)
     }
 }
 
-static gboolean filter_fn (PkPackage *package, gpointer user_data)
+static gboolean inst_filter_fn (PkPackage *package, gpointer user_data)
 {
     if (!is_pi && strstr (pk_package_get_arch (package), "amd64")) return FALSE;
 
     PkInfoEnum info = pk_package_get_info (package);
 	switch (info)
     {
-        case PK_INFO_ENUM_LOW:
-        case PK_INFO_ENUM_NORMAL:
-        case PK_INFO_ENUM_IMPORTANT:
-        case PK_INFO_ENUM_SECURITY:
-        case PK_INFO_ENUM_BUGFIX:
-        case PK_INFO_ENUM_ENHANCEMENT:
-        case PK_INFO_ENUM_BLOCKED:      return TRUE;
+        case PK_INFO_ENUM_AVAILABLE:    return TRUE;
                                         break;
 
         default:                        return FALSE;
@@ -1674,6 +1670,27 @@ static gboolean rem_filter_fn (PkPackage *package, gpointer user_data)
 	switch (info)
     {
         case PK_INFO_ENUM_INSTALLED:    return TRUE;
+                                        break;
+
+        default:                        return FALSE;
+                                        break;
+    }
+}
+
+static gboolean upd_filter_fn (PkPackage *package, gpointer user_data)
+{
+    if (!is_pi && strstr (pk_package_get_arch (package), "amd64")) return FALSE;
+
+    PkInfoEnum info = pk_package_get_info (package);
+	switch (info)
+    {
+        case PK_INFO_ENUM_LOW:
+        case PK_INFO_ENUM_NORMAL:
+        case PK_INFO_ENUM_IMPORTANT:
+        case PK_INFO_ENUM_SECURITY:
+        case PK_INFO_ENUM_BUGFIX:
+        case PK_INFO_ENUM_ENHANCEMENT:
+        case PK_INFO_ENUM_BLOCKED:      return TRUE;
                                         break;
 
         default:                        return FALSE;
@@ -1757,7 +1774,7 @@ static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
     }
 
     PkPackageSack *sack = pk_results_get_package_sack (results);
-    PkPackageSack *fsack = pk_package_sack_filter (sack, filter_fn, NULL);
+    PkPackageSack *fsack = pk_package_sack_filter (sack, inst_filter_fn, NULL);
 
     // remove armhf packages for which there is an arm64 equivalent...
     GPtrArray *array = pk_package_sack_get_array (fsack);
@@ -1908,7 +1925,7 @@ static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
     }
 
     PkPackageSack *sack = pk_results_get_package_sack (results);
-    PkPackageSack *fsack = pk_package_sack_filter (sack, filter_fn, NULL);
+    PkPackageSack *fsack = pk_package_sack_filter (sack, upd_filter_fn, NULL);
 
     if (pk_package_sack_get_size (fsack) > 0)
     {
