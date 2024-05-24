@@ -349,7 +349,7 @@ static int vsystem (const char *fmt, ...);
 static void error_box (char *msg);
 static gboolean cb_error (gpointer data);
 static void thread_error (char *msg);
-static void message (char *msg, int wait, int dest_page, int prog, gboolean pulse);
+static void message (char *msg, gboolean wait, int dest_page, int prog, gboolean pulse);
 static gboolean cb_message (gpointer data);
 static void thread_message (char *msg, int prog);
 static void hide_message (void);
@@ -599,7 +599,7 @@ static void thread_error (char *msg)
     gdk_threads_add_idle (cb_error, msg);
 }
 
-static void message (char *msg, int wait, int dest_page, int prog, gboolean pulse)
+static void message (char *msg, gboolean wait, int dest_page, int prog, gboolean pulse)
 {
     GtkWidget *wid;
 
@@ -663,9 +663,9 @@ static gboolean cb_message (gpointer data)
 {
     prog_msg *pm = (prog_msg *) data;
     if (pm->prog == -2)
-        message (pm->msg, 1, PAGE_DONE, -1, FALSE);
+        message (pm->msg, TRUE, PAGE_DONE, -1, FALSE);
     else
-        message (pm->msg, 0, 0, pm->prog, FALSE);
+        message (pm->msg, FALSE, 0, pm->prog, FALSE);
     return FALSE;
 }
 
@@ -1136,7 +1136,7 @@ static gint connect_failure (gpointer data)
 {
     conn_timeout = 0;
     hide_message ();
-    message (_("Failed to connect to network."), 1, 0, -1, FALSE);
+    message (_("Failed to connect to network."), TRUE, 0, -1, FALSE);
     return FALSE;
 }
 
@@ -1323,7 +1323,7 @@ static void nm_connect_wifi (const char *password)
             g_source_remove (conn_timeout);
             conn_timeout = 0;
         }
-        message (_("Failed to connect - access point not available."), 1, 0, -1, FALSE);
+        message (_("Failed to connect - access point not available."), TRUE, 0, -1, FALSE);
         return;
     }
 
@@ -1913,7 +1913,7 @@ static gboolean ntp_check (gpointer data)
 {
     if (clock_synced ())
     {
-        message (_("Checking for updates - please wait..."), 0, 0, -1, FALSE);
+        message (_("Checking for updates - please wait..."), FALSE, 0, -1, FALSE);
         g_thread_new (NULL, refresh_update_cache, NULL);
         return FALSE;
     }
@@ -1922,7 +1922,7 @@ static gboolean ntp_check (gpointer data)
 
     if (calls++ > 120)
     {
-        message (_("Could not sync time - unable to check for updates"), 1, PAGE_DONE, -1, FALSE);
+        message (_("Could not sync time - unable to check for updates"), TRUE, PAGE_DONE, -1, FALSE);
         return FALSE;
     }
 
@@ -2125,7 +2125,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                 || g_strcmp0 (init_lang, lc) || g_ascii_strcasecmp (init_kb, lay)
                                 || g_strcmp0 (init_var, var))
                             {
-                                message (_("Setting location - please wait..."), 0, 0, -1, TRUE);
+                                message (_("Setting location - please wait..."), FALSE, 0, -1, TRUE);
                                 g_thread_new (NULL, set_locale, NULL);
                             }
                             else change_page (FORWARD);
@@ -2144,27 +2144,27 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             ccptr = gtk_entry_get_text (GTK_ENTRY (user_te));
                             if (!strlen (ccptr))
                             {
-                                message (_("The username is blank."), 1, 0, -1, FALSE);
+                                message (_("The username is blank."), TRUE, 0, -1, FALSE);
                                 break;
                             }
                             if (strlen (ccptr) > 32)
                             {
-                                message (_("The username must be 32 characters or shorter."), 1, 0, -1, FALSE);
+                                message (_("The username must be 32 characters or shorter."), TRUE, 0, -1, FALSE);
                                 break;
                             }
                             if (*ccptr < 'a' || *ccptr > 'z')
                             {
-                                message (_("The first character of the username must be a lower-case letter."), 1, 0, -1, FALSE);
+                                message (_("The first character of the username must be a lower-case letter."), TRUE, 0, -1, FALSE);
                                 break;
                             }
                             if (!g_strcmp0 (gtk_entry_get_text (GTK_ENTRY (user_te)), "rpi-first-boot-wizard"))
                             {
-                                message (_("This username is used by the system and cannot be used for a user account."), 1, 0, -1, FALSE);
+                                message (_("This username is used by the system and cannot be used for a user account."), TRUE, 0, -1, FALSE);
                                 break;
                             }
                             if (!g_strcmp0 (gtk_entry_get_text (GTK_ENTRY (user_te)), "root"))
                             {
-                                message (_("This username is used by the system and cannot be used for a user account."), 1, 0, -1, FALSE);
+                                message (_("This username is used by the system and cannot be used for a user account."), TRUE, 0, -1, FALSE);
                                 break;
                             }
                             while (*++ccptr)
@@ -2173,22 +2173,22 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             }
                             if (*ccptr)
                             {
-                                message (_("Usernames can only contain lower-case letters, digits and hyphens."), 1, 0, -1, FALSE);
+                                message (_("Usernames can only contain lower-case letters, digits and hyphens."), TRUE, 0, -1, FALSE);
                                 break;
                             }
                             if (!strlen (gtk_entry_get_text (GTK_ENTRY (pwd1_te))) || !strlen (gtk_entry_get_text (GTK_ENTRY (pwd2_te))))
                             {
-                                message (_("The password is blank."), 1, 0, -1, FALSE);
+                                message (_("The password is blank."), TRUE, 0, -1, FALSE);
                                 break;
                             }
                             if (g_strcmp0 (gtk_entry_get_text (GTK_ENTRY (pwd1_te)), gtk_entry_get_text (GTK_ENTRY (pwd2_te))))
                             {
-                                message (_("The two passwords entered do not match."), 1, 0, -1, FALSE);
+                                message (_("The two passwords entered do not match."), TRUE, 0, -1, FALSE);
                                 break;
                             }
                             if (!g_strcmp0 (gtk_entry_get_text (GTK_ENTRY (user_te)), "pi") || !g_strcmp0 (gtk_entry_get_text (GTK_ENTRY (pwd1_te)), "raspberry"))
                             {
-                                message (_("You have used a known default value for the username or password.\n\nWe strongly recommend you go back and choose something else."), 1, 0, -1, FALSE);
+                                message (_("You have used a known default value for the username or password.\n\nWe strongly recommend you go back and choose something else."), TRUE, 0, -1, FALSE);
                             }
                             user = g_strdup (gtk_entry_get_text (GTK_ENTRY (user_te)));
                             pw = g_strdup (crypt (gtk_entry_get_text (GTK_ENTRY (pwd1_te)), crypt_gensalt (NULL, 0, NULL, 0)));
@@ -2217,7 +2217,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                                 }
                                 else
                                 {
-                                    message (_("Connecting to WiFi network - please wait..."), 0, 0, -1, TRUE);
+                                    message (_("Connecting to WiFi network - please wait..."), FALSE, 0, -1, TRUE);
                                     conn_timeout = g_timeout_add (30000, connect_failure, NULL);
                                     nm_connect_wifi (NULL);
                                 }
@@ -2225,7 +2225,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             break;
 
         case PAGE_WIFIPSK : ccptr = gtk_entry_get_text (GTK_ENTRY (psk_te));
-                            message (_("Connecting to WiFi network - please wait..."), 0, 0, -1, TRUE);
+                            message (_("Connecting to WiFi network - please wait..."), FALSE, 0, -1, TRUE);
                             conn_timeout = g_timeout_add (30000, connect_failure, NULL);
                             nm_connect_wifi (ccptr);
                             break;
@@ -2248,21 +2248,21 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             {
                                 if (clock_synced ())
                                 {
-                                    message (_("Checking for updates - please wait..."), 0, 0, -1, FALSE);
+                                    message (_("Checking for updates - please wait..."), FALSE, 0, -1, FALSE);
                                     g_thread_new (NULL, refresh_update_cache, NULL);
                                 }
                                 else
                                 {
-                                    message (_("Synchronising clock - please wait..."), 0, 0, -1, TRUE);
+                                    message (_("Synchronising clock - please wait..."), FALSE, 0, -1, TRUE);
                                     calls = 0;
                                     g_timeout_add_seconds (1, ntp_check, NULL);
                                 }
                             }
-                            else message (_("No network connection found - unable to check for updates"), 1, PAGE_DONE, -1, FALSE);
+                            else message (_("No network connection found - unable to check for updates"), TRUE, PAGE_DONE, -1, FALSE);
                             break;
 
         case PAGE_DONE :    nm_stop_scan ();
-                            message (_("Restarting - please wait..."), 0, 0, -1, TRUE);
+                            message (_("Restarting - please wait..."), FALSE, 0, -1, TRUE);
                             gtk_widget_hide (main_dlg);
                             g_thread_new (NULL, final_setup, NULL);
                             break;
@@ -2301,11 +2301,11 @@ static void skip_page (GtkButton* btn, gpointer ptr)
                             gchar *lpack = get_shell_string (buf, TRUE);
                             gboolean uninst = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (uninstall_chk));
                             if (lpack && uninst)
-                                message (_("If installing updates is skipped, translation files will not be installed, and the unused browser will not be uninstalled."), 1, PAGE_DONE, -1, FALSE);
+                                message (_("If installing updates is skipped, translation files will not be installed, and the unused browser will not be uninstalled."), TRUE, PAGE_DONE, -1, FALSE);
                             else if (lpack)
-                                message (_("If installing updates is skipped, translation files will not be installed."), 1, PAGE_DONE, -1, FALSE);
+                                message (_("If installing updates is skipped, translation files will not be installed."), TRUE, PAGE_DONE, -1, FALSE);
                             else if (uninst)
-                                message (_("If installing updates is skipped, the unused browser will not be uninstalled."), 1, PAGE_DONE, -1, FALSE);
+                                message (_("If installing updates is skipped, the unused browser will not be uninstalled."), TRUE, PAGE_DONE, -1, FALSE);
                             else change_page (FORWARD);
                             g_free (buf);
                             g_free (lpack);
