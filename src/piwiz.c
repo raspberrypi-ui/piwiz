@@ -1555,45 +1555,41 @@ static void progress (PkProgress *progress, PkProgressType type, gpointer data)
 {
     int role = pk_progress_get_role (progress);
     int status = pk_progress_get_status (progress);
+    int percent = pk_progress_get_percentage (progress);
 
     if (msg_dlg)
     {
-        switch (role)
+        if (type == PK_PROGRESS_TYPE_PERCENTAGE && percent >= 0 && percent <= 100)
         {
-            case PK_ROLE_ENUM_REFRESH_CACHE :       if (status == PK_STATUS_ENUM_LOADING_CACHE)
-                                                        message (_("Reading update list - please wait..."), pk_progress_get_percentage (progress));
-                                                    else
-                                                        gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
-                                                    break;
+            switch (role)
+            {
+                case PK_ROLE_ENUM_UPDATE_PACKAGES :     if (status == PK_STATUS_ENUM_DOWNLOAD)
+                                                            message (_("Downloading updates - please wait..."), percent);
+                                                        else if (status == PK_STATUS_ENUM_RUNNING)
+                                                            message (_("Installing updates - please wait..."), percent);
+                                                        else
+                                                            gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
+                                                        break;
 
-            case PK_ROLE_ENUM_RESOLVE :             if (status == PK_STATUS_ENUM_LOADING_CACHE)
-                                                        message (_("Finding packages - please wait..."), pk_progress_get_percentage (progress));
-                                                    else
-                                                        gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
-                                                    break;
+                case PK_ROLE_ENUM_INSTALL_PACKAGES :    if (status == PK_STATUS_ENUM_DOWNLOAD)
+                                                            message (_("Downloading languages - please wait..."), percent);
+                                                        else if (status == PK_STATUS_ENUM_RUNNING)
+                                                            message (_("Installing languages - please wait..."), percent);
+                                                        else
+                                                            gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
+                                                        break;
 
-            case PK_ROLE_ENUM_UPDATE_PACKAGES :     if (status == PK_STATUS_ENUM_DOWNLOAD)
-                                                        message (_("Downloading updates - please wait..."), pk_progress_get_percentage (progress));
-                                                    else if (status == PK_STATUS_ENUM_RUNNING)
-                                                        message (_("Installing updates - please wait..."), pk_progress_get_percentage (progress));
-                                                    else
-                                                        gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
-                                                    break;
+                case PK_ROLE_ENUM_REMOVE_PACKAGES :     if (status == PK_STATUS_ENUM_RUNNING)
+                                                            message (_("Uninstalling browser - please wait..."), percent);
+                                                        else
+                                                            gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
+                                                        break;
 
-            case PK_ROLE_ENUM_INSTALL_PACKAGES :    if (status == PK_STATUS_ENUM_DOWNLOAD)
-                                                        message (_("Downloading languages - please wait..."), pk_progress_get_percentage (progress));
-                                                    else if (status == PK_STATUS_ENUM_RUNNING)
-                                                        message (_("Installing languages - please wait..."), pk_progress_get_percentage (progress));
-                                                    else
-                                                        gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
-                                                    break;
-
-            case PK_ROLE_ENUM_REMOVE_PACKAGES :     if (status == PK_STATUS_ENUM_RUNNING)
-                                                        message (_("Uninstalling browser - please wait..."), pk_progress_get_percentage (progress));
-                                                    else
-                                                        gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
-                                                    break;
+                default :                               gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
+                                                        break;
+            }
         }
+        else gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
     }
 }
 
@@ -1702,7 +1698,7 @@ static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data)
     }
     else
     {
-        thread_message (_("Comparing versions - please wait..."), MSG_PULSE);
+        thread_message (_("Getting updates - please wait..."), MSG_PULSE);
         pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
     }
 }
@@ -1767,7 +1763,7 @@ static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
     }
     else
     {
-        thread_message (_("Comparing versions - please wait..."), MSG_PULSE);
+        thread_message (_("Getting updates - please wait..."), MSG_PULSE);
         pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
     }
 
@@ -1803,7 +1799,7 @@ static void install_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
     }
     else
     {
-        thread_message (_("Comparing versions - please wait..."), MSG_PULSE);
+        thread_message (_("Getting updates - please wait..."), MSG_PULSE);
         pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
     }
 }
@@ -1835,7 +1831,7 @@ static void resolve_browser_done (PkTask *task, GAsyncResult *res, gpointer data
     }
     else
     {
-        thread_message (_("Comparing versions - please wait..."), MSG_PULSE);
+        thread_message (_("Getting updates - please wait..."), MSG_PULSE);
         pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
     }
 
@@ -1856,7 +1852,7 @@ static void uninstall_browser_done (PkTask *task, GAsyncResult *res, gpointer da
         return;
     }
 
-    thread_message (_("Comparing versions - please wait..."), MSG_PULSE);
+    thread_message (_("Getting updates - please wait..."), MSG_PULSE);
     pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
 }
 
