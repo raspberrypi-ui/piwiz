@@ -1566,8 +1566,8 @@ static void progress (PkProgress *progress, PkProgressType type, gpointer data)
     if (msg_dlg)
     {
         if ((type == PK_PROGRESS_TYPE_PERCENTAGE || type == PK_PROGRESS_TYPE_ITEM_PROGRESS
-            || type == PK_PROGRESS_TYPE_PACKAGE || type == PK_PROGRESS_TYPE_PACKAGE_ID)
-            && percent >= 0 && percent <= 100)
+            || type == PK_PROGRESS_TYPE_PACKAGE || type == PK_PROGRESS_TYPE_PACKAGE_ID
+            || type == PK_PROGRESS_TYPE_DOWNLOAD_SIZE_REMAINING) && percent >= 0 && percent <= 100)
         {
             switch (role)
             {
