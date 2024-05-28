@@ -1675,7 +1675,7 @@ static void next_update (PkTask *task, update_type update_stage)
             {
                 pack_array = g_strsplit (lpack, " ", -1);
 
-                thread_message (_("Finding languages - please wait..."), MSG_PULSE);
+                thread_message (_("Installing languages - please wait..."), MSG_PULSE);
                 pk_client_resolve_async (PK_CLIENT (task), 0, pack_array, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) resolve_lang_done, NULL);
                 g_strfreev (pack_array);
                 g_free (lpack);
@@ -1734,7 +1734,7 @@ static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
 
     if (error != NULL)
     {
-        char *buffer = g_strdup_printf (_("Error finding languages.\n%s"), error->message);
+        char *buffer = g_strdup_printf (_("Error installing languages.\n%s"), error->message);
         thread_error (buffer);
         g_error_free (error);
         return;
@@ -1846,7 +1846,7 @@ static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
 
     if (error != NULL)
     {
-        char *buffer = g_strdup_printf (_("Error comparing versions.\n%s"), error->message);
+        char *buffer = g_strdup_printf (_("Error getting updates.\n%s"), error->message);
         thread_error (buffer);
         g_error_free (error);
         return;
