@@ -1,5 +1,2 @@
-#!/usr/bin/dh-exec
-src/piwiz => /usr/bin/piwiz
-src/hdmi-audio-select => /usr/bin/hdmi-audio-select
-usr/share/* usr/share
-data/10-piwiz.rules => /etc/polkit-1/rules.d/10-piwiz.rules
+src/hdmi-audio-select usr/bin
+data/10-piwiz.rules etc/polkit-1/rules.d
