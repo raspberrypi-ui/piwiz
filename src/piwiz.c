@@ -415,11 +415,7 @@ static void next_page (GtkButton* btn, gpointer ptr);
 static void prev_page (GtkButton* btn, gpointer ptr);
 static void skip_page (GtkButton* btn, gpointer ptr);
 static gboolean show_ip (void);
-#ifndef HOMESCHOOL
 static void set_marketing_serial (const char *file);
-#else
-static void set_hs_serial (void);
-#endif
 static gboolean net_available (void);
 static int get_pi_keyboard (void);
 static gboolean srprompt (gpointer data);
@@ -1892,12 +1888,8 @@ static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
     if (!access ("/run/reboot-required", F_OK)) reboot = TRUE;
 
     // re-set the serial number in case a browser update was installed
-#if HOMESCHOOL
-    set_hs_serial ();
-#else
     set_marketing_serial ("/etc/chromium/master_preferences");
     set_marketing_serial ("/usr/share/firefox/distribution/distribution.ini");
-#endif
     thread_message (_("System is up to date"), MSG_TERM);
 }
 
@@ -1950,14 +1942,6 @@ static gboolean ntp_check (gpointer data)
 
 static gpointer final_setup (gpointer ptr)
 {
-#ifdef HOMESCHOOL
-    if (chuser == NULL)
-    {
-        vsystem ("sudo cp /usr/share/applications/chromium-browser.desktop /etc/xdg/autostart/");
-        vsystem ("sudo mkdir -p /home/pi/Desktop; sudo chown pi:pi /home/pi/Desktop/");
-        vsystem ("echo \"[Desktop Entry]\nType=Link\nName=Web Browser\nIcon=applications-internet\nURL=/usr/share/applications/chromium-browser.desktop\" | sudo tee /home/pi/Desktop/chromium-browser.desktop; sudo chown pi:pi /home/pi/Desktop/chromium-browser.desktop");
-    }
-#endif
     // copy the wayfire config file for the new user
     if (!chuser) vsystem ("sudo mkdir -p /home/pi/.config/; sudo chown pi:pi /home/pi/.config/; sudo cp /home/rpi-first-boot-wizard/.config/wayfire.ini /home/pi/.config/wayfire.ini; sudo chown pi:pi /home/pi/.config/wayfire.ini");
 
@@ -2384,7 +2368,6 @@ static gboolean show_ip (void)
     return TRUE;
 }
 
-#ifndef HOMESCHOOL
 static void set_marketing_serial (const char *file)
 {
     if (is_pi)
@@ -2395,18 +2378,6 @@ static void set_marketing_serial (const char *file)
         }
     }
 }
-#else
-static void set_hs_serial (void)
-{
-    if (is_pi)
-    {
-        if (access ("/etc/chromium/master_preferences", F_OK) != -1)
-        {
-            vsystem ("sudo sed -i /etc/chromium/master_preferences -e s/UNIDENTIFIED/`cat /proc/cpuinfo | grep Serial | sha256sum | cut -d ' ' -f 1`/g");
-        }
-    }
-}
-#endif
 
 static gboolean net_available (void)
 {
@@ -2498,22 +2469,13 @@ int main (int argc, char *argv[])
     kbd = get_pi_keyboard ();
     if (kbd > MAX_KBS - 1) kbd = 0;
 
-#ifdef HOMESCHOOL
-    vsystem ("sudo familyshield on");
-#endif
-
     reboot = TRUE;
     read_inits ();
 
-#ifdef HOMESCHOOL
-    browser = FALSE;
-    set_hs_serial ();
-#else
     if (vsystem ("raspi-config nonint is_installed chromium-browser")) browser = FALSE;
     if (vsystem ("raspi-config nonint is_installed firefox")) browser = FALSE;
     set_marketing_serial ("/etc/chromium/master_preferences");
     set_marketing_serial ("/usr/share/firefox/distribution/distribution.ini");
-#endif
 
     if (vsystem ("raspi-config nonint is_installed rpi-connect")) rpc = FALSE;
     if (wm == WM_OPENBOX) rpc = FALSE;
