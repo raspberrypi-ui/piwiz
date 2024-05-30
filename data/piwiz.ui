@@ -141,22 +141,6 @@
           <object class="GtkBox" id="modal_buttons">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="spacing">20</property>
-            <child>
-              <object class="GtkButton" id="modal_cancel">
-                <property name="label" translatable="yes">_Cancel</property>
-                <property name="width-request">100</property>
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="receives-default">True</property>
-                <property name="use-underline">True</property>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">False</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
             <child>
               <object class="GtkButton" id="modal_ok">
                 <property name="label" translatable="yes">_OK</property>
@@ -169,7 +153,7 @@
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">False</property>
-                <property name="position">1</property>
+                <property name="position">0</property>
               </packing>
             </child>
           </object>

@@ -69,9 +69,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FORWARD 1
 #define BACKWARD -1
 
-#define MSG_PULSE -1
-#define MSG_WAIT -2
-#define MSG_TERM -3
+#define MSG_PULSE  -1
+#define MSG_PROMPT -2
+#define MSG_TERM   -3
 
 // columns in localisation list stores
 
@@ -398,6 +398,7 @@ static gboolean inst_filter_fn (PkPackage *package, gpointer user_data);
 static gboolean rem_filter_fn (PkPackage *package, gpointer user_data);
 static gboolean upd_filter_fn (PkPackage *package, gpointer user_data);
 static void next_update (PkTask *task, update_type update_stage);
+static PkResults *error_handler (PkTask *task, GAsyncResult *res, char *desc);
 static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data);
 static void install_lang_done (PkTask *task, GAsyncResult *res, gpointer data);
 static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data);
@@ -607,8 +608,6 @@ static void thread_error (char *msg)
 
 static void message (char *msg, int type)
 {
-    GtkWidget *wid;
-
     if (!msg_dlg)
     {
         GtkBuilder *builder;
@@ -616,51 +615,46 @@ static void message (char *msg, int type)
         builder = gtk_builder_new_from_file (PACKAGE_DATA_DIR "/piwiz.ui");
 
         msg_dlg = (GtkWidget *) gtk_builder_get_object (builder, "modal");
-        gtk_window_set_transient_for (GTK_WINDOW (msg_dlg), GTK_WINDOW (main_dlg));
-
         msg_msg = (GtkWidget *) gtk_builder_get_object (builder, "modal_msg");
         msg_pb = (GtkWidget *) gtk_builder_get_object (builder, "modal_pb");
         msg_btn = (GtkWidget *) gtk_builder_get_object (builder, "modal_ok");
-        wid = (GtkWidget *) gtk_builder_get_object (builder, "modal_cancel");
-        gtk_widget_hide (wid);
-
-        gtk_label_set_text (GTK_LABEL (msg_msg), msg);
 
         gtk_widget_set_sensitive (prev_btn, FALSE);
         gtk_widget_set_sensitive (next_btn, FALSE);
         gtk_widget_set_sensitive (skip_btn, FALSE);
+        gtk_window_set_transient_for (GTK_WINDOW (msg_dlg), GTK_WINDOW (main_dlg));
 
         g_object_unref (builder);
     }
-    else gtk_label_set_text (GTK_LABEL (msg_msg), msg);
+
+    gtk_label_set_text (GTK_LABEL (msg_msg), msg);
 
     if (pulse_timer) g_source_remove (pulse_timer);
     pulse_timer = 0;
 
-    if (type == MSG_WAIT || type == MSG_TERM)
+    gtk_widget_hide (msg_pb);
+    gtk_widget_hide (msg_btn);
+
+    switch (type)
     {
-        // type = MSG_WAIT is a dialog waiting for OK to be clicked, at which point it closes
-        // type = MSG_TERM is the same, but on closing the wizard jumps to the last page
-        gtk_widget_hide (msg_pb);
-        gtk_widget_show (msg_btn);
-        g_signal_connect (msg_btn, "clicked", G_CALLBACK (ok_clicked), type == MSG_TERM ? (void *) 1 : (void *) 0);
-        gtk_widget_grab_focus (msg_btn);
-    }
-    else if (type == MSG_PULSE)
-    {
-        // type = MSG_PULSE shows a pulsing progress bar
-        gtk_widget_hide (msg_btn);
-        gtk_widget_show (msg_pb);
-        gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
-        pulse_timer = g_timeout_add (200, pulse_pb, NULL);
-    }
-    else
-    {
-        // any other values of type are a percentage progress value
-        gtk_widget_hide (msg_btn);
-        gtk_widget_show (msg_pb);
-        float fprogress = type / 100.0;
-        gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (msg_pb), fprogress);
+        case MSG_PROMPT :   g_signal_connect (msg_btn, "clicked", G_CALLBACK (ok_clicked), (void *) 0);
+                            gtk_widget_show (msg_btn);
+                            gtk_widget_grab_focus (msg_btn);
+                            break;
+
+        case MSG_TERM :     g_signal_connect (msg_btn, "clicked", G_CALLBACK (ok_clicked), (void *) 1);
+                            gtk_widget_show (msg_btn);
+                            gtk_widget_grab_focus (msg_btn);
+                            break;
+
+        case MSG_PULSE :    gtk_widget_show (msg_pb);
+                            gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
+                            pulse_timer = g_timeout_add (200, pulse_pb, NULL);
+                            break;
+
+        default :           gtk_widget_show (msg_pb);
+                            gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (msg_pb), (type / 100.0));
+                            break;
     }
 
     gtk_widget_show (msg_dlg);
@@ -1140,7 +1134,7 @@ static gint connect_failure (gpointer data)
 {
     conn_timeout = 0;
     hide_message ();
-    message (_("Failed to connect to network."), MSG_WAIT);
+    message (_("Failed to connect to network."), MSG_PROMPT);
     return FALSE;
 }
 
@@ -1327,7 +1321,7 @@ static void nm_connect_wifi (const char *password)
             g_source_remove (conn_timeout);
             conn_timeout = 0;
         }
-        message (_("Failed to connect - access point not available."), MSG_WAIT);
+        message (_("Failed to connect - access point not available."), MSG_PROMPT);
         return;
     }
 
@@ -1697,6 +1691,36 @@ static void next_update (PkTask *task, update_type update_stage)
     }
 }
 
+static PkResults *error_handler (PkTask *task, GAsyncResult *res, char *desc)
+{
+    PkResults *results;
+    PkError *pkerror;
+    GError *error = NULL;
+    gchar *buf;
+
+    results = pk_task_generic_finish (task, res, &error);
+    if (error != NULL)
+    {
+        buf = g_strdup_printf (_("Error %s - %s"), desc, error->message);
+        thread_error (buf);
+        g_free (buf);
+        g_error_free (error);
+        return NULL;
+    }
+
+    pkerror = pk_results_get_error_code (results);
+    if (pkerror != NULL)
+    {
+        buf = g_strdup_printf (_("Error %s - %s"), desc, pk_error_get_details (pkerror));
+        thread_error (buf);
+        g_free (buf);
+        g_object_unref (pkerror);
+        return NULL;
+    }
+
+    return results;
+}
+
 static gpointer refresh_update_cache (gpointer data)
 {
     PkTask *task = pk_task_new ();
@@ -1706,35 +1730,16 @@ static gpointer refresh_update_cache (gpointer data)
 
 static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data)
 {
-    GError *error = NULL;
-    pk_task_generic_finish (task, res, &error);
-
-    if (error != NULL)
-    {
-        char *buffer = g_strdup_printf (_("Error checking for updates.\n%s"), error->message);
-        thread_error (buffer);
-        g_error_free (error);
-        return;
-    }
-
+    if (!error_handler (task, res, _("checking for updates"))) return;
     next_update (task, INSTALL_LANGUAGES);
 }
 
 static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
 {
-    GError *error = NULL;
-    PkResults *results = pk_task_generic_finish (task, res, &error);
-    PkPackage *item;
-    gchar **ids;
     int i;
 
-    if (error != NULL)
-    {
-        char *buffer = g_strdup_printf (_("Error installing languages.\n%s"), error->message);
-        thread_error (buffer);
-        g_error_free (error);
-        return;
-    }
+    PkResults *results = error_handler (task, res, _("installing languages"));
+    if (!results) return;
 
     PkPackageSack *sack = pk_results_get_package_sack (results);
     PkPackageSack *fsack = pk_package_sack_filter (sack, inst_filter_fn, NULL);
@@ -1744,7 +1749,7 @@ static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
     for (i = 0; i < array->len; i++)
     {
         gchar *package_id, *arch;
-        item = g_ptr_array_index (array, i);
+        PkPackage *item = g_ptr_array_index (array, i);
         g_object_get (item, "package-id", &package_id, NULL);
         if ((arch = strstr (package_id, "arm64")))
         {
@@ -1761,7 +1766,7 @@ static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
     {
         thread_message (_("Installing languages - please wait..."), MSG_PULSE);
 
-        ids = pk_package_sack_get_ids (fsack);
+        gchar **ids = pk_package_sack_get_ids (fsack);
         pk_task_install_packages_async (task, ids, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) install_lang_done, NULL);
         g_strfreev (ids);
     }
@@ -1773,33 +1778,14 @@ static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
 
 static void install_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
 {
-    GError *error = NULL;
-    pk_task_generic_finish (task, res, &error);
-
-    if (error != NULL)
-    {
-        char *buffer = g_strdup_printf (_("Error installing languages.\n%s"), error->message);
-        thread_error (buffer);
-        g_error_free (error);
-        return;
-    }
-
+    if (!error_handler (task, res, _("installing languages"))) return;
     next_update (task, UNINSTALL_BROWSER);
 }
 
 static void resolve_browser_done (PkTask *task, GAsyncResult *res, gpointer data)
 {
-    GError *error = NULL;
-    PkResults *results = pk_task_generic_finish (task, res, &error);
-    gchar **ids;
-
-    if (error != NULL)
-    {
-        char *buffer = g_strdup_printf (_("Error uninstalling browser.\n%s"), error->message);
-        thread_error (buffer);
-        g_error_free (error);
-        return;
-    }
+    PkResults *results = error_handler (task, res, _("uninstalling browser"));
+    if (!results) return;
 
     PkPackageSack *sack = pk_results_get_package_sack (results);
     PkPackageSack *fsack = pk_package_sack_filter (sack, rem_filter_fn, NULL);
@@ -1808,7 +1794,7 @@ static void resolve_browser_done (PkTask *task, GAsyncResult *res, gpointer data
     {
         thread_message (_("Uninstalling browser - please wait..."), MSG_PULSE);
 
-        ids = pk_package_sack_get_ids (fsack);
+        gchar **ids = pk_package_sack_get_ids (fsack);
         pk_task_remove_packages_async (task, ids, TRUE, TRUE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) uninstall_browser_done, NULL);
         g_strfreev (ids);
     }
@@ -1820,33 +1806,14 @@ static void resolve_browser_done (PkTask *task, GAsyncResult *res, gpointer data
 
 static void uninstall_browser_done (PkTask *task, GAsyncResult *res, gpointer data)
 {
-    GError *error = NULL;
-    pk_task_generic_finish (task, res, &error);
-
-    if (error != NULL)
-    {
-        char *buffer = g_strdup_printf (_("Error uninstalling browser.\n%s"), error->message);
-        thread_error (buffer);
-        g_error_free (error);
-        return;
-    }
-
+    if (!error_handler (task, res, _("uninstalling browser"))) return;
     next_update (task, INSTALL_UPDATES);
 }
 
 static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
 {
-    GError *error = NULL;
-    PkResults *results = pk_task_generic_finish (task, res, &error);
-    gchar **ids;
-
-    if (error != NULL)
-    {
-        char *buffer = g_strdup_printf (_("Error getting updates.\n%s"), error->message);
-        thread_error (buffer);
-        g_error_free (error);
-        return;
-    }
+    PkResults *results = error_handler (task, res, _("getting updates"));
+    if (!results) return;
 
     PkPackageSack *sack = pk_results_get_package_sack (results);
     PkPackageSack *fsack = pk_package_sack_filter (sack, upd_filter_fn, NULL);
@@ -1855,7 +1822,7 @@ static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
     {
         thread_message (_("Getting updates - please wait..."), MSG_PULSE);
 
-        ids = pk_package_sack_get_ids (fsack);
+        gchar **ids = pk_package_sack_get_ids (fsack);
         pk_task_update_packages_async (task, ids, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) do_updates_done, NULL);
         g_strfreev (ids);
     }
@@ -1873,16 +1840,7 @@ static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
 
 static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
 {
-    GError *error = NULL;
-    pk_task_generic_finish (task, res, &error);
-
-    if (error != NULL)
-    {
-        char *buffer = g_strdup_printf (_("Error getting updates.\n%s"), error->message);
-        thread_error (buffer);
-        g_error_free (error);
-        return;
-    }
+    if (!error_handler (task, res, _("getting updates"))) return;
 
     // check reboot flag set by install process
     if (!access ("/run/reboot-required", F_OK)) reboot = TRUE;
@@ -2145,27 +2103,27 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             ccptr = gtk_entry_get_text (GTK_ENTRY (user_te));
                             if (!strlen (ccptr))
                             {
-                                message (_("The username is blank."), MSG_WAIT);
+                                message (_("The username is blank."), MSG_PROMPT);
                                 break;
                             }
                             if (strlen (ccptr) > 32)
                             {
-                                message (_("The username must be 32 characters or shorter."), MSG_WAIT);
+                                message (_("The username must be 32 characters or shorter."), MSG_PROMPT);
                                 break;
                             }
                             if (*ccptr < 'a' || *ccptr > 'z')
                             {
-                                message (_("The first character of the username must be a lower-case letter."), MSG_WAIT);
+                                message (_("The first character of the username must be a lower-case letter."), MSG_PROMPT);
                                 break;
                             }
                             if (!g_strcmp0 (gtk_entry_get_text (GTK_ENTRY (user_te)), "rpi-first-boot-wizard"))
                             {
-                                message (_("This username is used by the system and cannot be used for a user account."), MSG_WAIT);
+                                message (_("This username is used by the system and cannot be used for a user account."), MSG_PROMPT);
                                 break;
                             }
                             if (!g_strcmp0 (gtk_entry_get_text (GTK_ENTRY (user_te)), "root"))
                             {
-                                message (_("This username is used by the system and cannot be used for a user account."), MSG_WAIT);
+                                message (_("This username is used by the system and cannot be used for a user account."), MSG_PROMPT);
                                 break;
                             }
                             while (*++ccptr)
@@ -2174,22 +2132,22 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             }
                             if (*ccptr)
                             {
-                                message (_("Usernames can only contain lower-case letters, digits and hyphens."), MSG_WAIT);
+                                message (_("Usernames can only contain lower-case letters, digits and hyphens."), MSG_PROMPT);
                                 break;
                             }
                             if (!strlen (gtk_entry_get_text (GTK_ENTRY (pwd1_te))) || !strlen (gtk_entry_get_text (GTK_ENTRY (pwd2_te))))
                             {
-                                message (_("The password is blank."), MSG_WAIT);
+                                message (_("The password is blank."), MSG_PROMPT);
                                 break;
                             }
                             if (g_strcmp0 (gtk_entry_get_text (GTK_ENTRY (pwd1_te)), gtk_entry_get_text (GTK_ENTRY (pwd2_te))))
                             {
-                                message (_("The two passwords entered do not match."), MSG_WAIT);
+                                message (_("The two passwords entered do not match."), MSG_PROMPT);
                                 break;
                             }
                             if (!g_strcmp0 (gtk_entry_get_text (GTK_ENTRY (user_te)), "pi") || !g_strcmp0 (gtk_entry_get_text (GTK_ENTRY (pwd1_te)), "raspberry"))
                             {
-                                message (_("You have used a known default value for the username or password.\n\nWe strongly recommend you go back and choose something else."), MSG_WAIT);
+                                message (_("You have used a known default value for the username or password.\n\nWe strongly recommend you go back and choose something else."), MSG_PROMPT);
                             }
                             user = g_strdup (gtk_entry_get_text (GTK_ENTRY (user_te)));
                             pw = g_strdup (crypt (gtk_entry_get_text (GTK_ENTRY (pwd1_te)), crypt_gensalt (NULL, 0, NULL, 0)));
