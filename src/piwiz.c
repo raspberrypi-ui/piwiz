@@ -1563,7 +1563,7 @@ static void progress (PkProgress *progress, PkProgressType type, gpointer data)
             {
                 case PK_ROLE_ENUM_UPDATE_PACKAGES :     if (status == PK_STATUS_ENUM_DOWNLOAD)
                                                             message (_("Downloading updates - please wait..."), percent);
-                                                        else if (status == PK_STATUS_ENUM_RUNNING)
+                                                        else if (status == PK_STATUS_ENUM_INSTALL || status == PK_STATUS_ENUM_RUNNING)
                                                             message (_("Installing updates - please wait..."), percent);
                                                         else
                                                             gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
@@ -1571,13 +1571,13 @@ static void progress (PkProgress *progress, PkProgressType type, gpointer data)
 
                 case PK_ROLE_ENUM_INSTALL_PACKAGES :    if (status == PK_STATUS_ENUM_DOWNLOAD)
                                                             message (_("Downloading languages - please wait..."), percent);
-                                                        else if (status == PK_STATUS_ENUM_RUNNING)
+                                                        else if (status == PK_STATUS_ENUM_INSTALL || status == PK_STATUS_ENUM_RUNNING)
                                                             message (_("Installing languages - please wait..."), percent);
                                                         else
                                                             gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
                                                         break;
 
-                case PK_ROLE_ENUM_REMOVE_PACKAGES :     if (status == PK_STATUS_ENUM_RUNNING)
+                case PK_ROLE_ENUM_REMOVE_PACKAGES :     if (status == PK_STATUS_ENUM_REMOVE || status == PK_STATUS_ENUM_RUNNING)
                                                             message (_("Uninstalling browser - please wait..."), percent);
                                                         else
                                                             gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
