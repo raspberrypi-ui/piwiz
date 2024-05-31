@@ -1665,7 +1665,7 @@ static void next_update (PkTask *task, update_type update_stage)
             {
                 pack_array = g_strsplit (lpack, " ", -1);
 
-                thread_message (_("Installing languages - please wait..."), MSG_PULSE);
+                thread_message (_("Downloading languages - please wait..."), MSG_PULSE);
                 pk_client_resolve_async (PK_CLIENT (task), 0, pack_array, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) resolve_lang_done, NULL);
                 g_strfreev (pack_array);
                 g_free (lpack);
@@ -1764,7 +1764,7 @@ static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
 
     if (pk_package_sack_get_size (fsack) > 0)
     {
-        thread_message (_("Installing languages - please wait..."), MSG_PULSE);
+        thread_message (_("Downloading languages - please wait..."), MSG_PULSE);
 
         gchar **ids = pk_package_sack_get_ids (fsack);
         pk_task_install_packages_async (task, ids, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) install_lang_done, NULL);
