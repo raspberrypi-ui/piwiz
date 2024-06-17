@@ -2014,7 +2014,7 @@ static void change_page (int dir)
     int page;
 
     for (page = gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)) + dir;
-        dir == BACKWARD ? page >= PAGE_INTRO : page < PAGE_DONE; page += dir)
+        dir == BACKWARD ? page >= PAGE_INTRO : page <= PAGE_DONE; page += dir)
     {
         if (page_shown (page))
         {
