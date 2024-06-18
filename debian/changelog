@@ -1,3 +1,9 @@
+piwiz (0.72) bookworm; urgency=medium
+
+  * Hide RPC page on 32-bit systems
+
+ -- Simon Long <simon@raspberrypi.com>  Tue, 18 Jun 2024 14:16:11 +0100
+
 piwiz (0.71) bookworm; urgency=medium
 
   * Fix skip on update page

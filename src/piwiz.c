@@ -2437,7 +2437,9 @@ int main (int argc, char *argv[])
     set_marketing_serial ("/usr/share/firefox/distribution/distribution.ini");
 
     if (vsystem ("raspi-config nonint is_installed rpi-connect")) rpc = FALSE;
+    if (vsystem ("dpkg-architecture -q DEB_BUILD_ARCH | grep -q arm64")) rpc = FALSE;
     if (wm == WM_OPENBOX) rpc = FALSE;
+    if (is_pi == FALSE) rpc = FALSE;
 
     // GTK setup
     gtk_init (&argc, &argv);
