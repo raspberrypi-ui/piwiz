@@ -137,7 +137,7 @@ GtkTreeModel *sap, *fap;
 char *wifi_if, *init_country, *init_lang, *init_kb, *init_var, *init_tz;
 char *cc, *lc, *city, *ext, *lay, *var;
 char *ssid;
-char *user = NULL, *pw = NULL, *chuser = NULL;
+char *user = NULL, *pw = NULL, *chuser = NULL, *init_user = NULL;
 gint conn_timeout = 0, pulse_timer = 0;
 gboolean reboot = TRUE, is_pi = TRUE;
 int last_btn = NEXT_BTN;
@@ -1902,10 +1902,11 @@ static gboolean ntp_check (gpointer data)
 static gpointer final_setup (gpointer ptr)
 {
     // copy the wayfire config file for the new user
-    if (!chuser) vsystem ("sudo mkdir -p /home/pi/.config/; sudo chown pi:pi /home/pi/.config/; sudo cp /home/rpi-first-boot-wizard/.config/wayfire.ini /home/pi/.config/wayfire.ini; sudo chown pi:pi /home/pi/.config/wayfire.ini");
+    if (!chuser) vsystem ("sudo mkdir -p /home/%s/.config/; sudo chown %s:%s /home/%s/.config/; sudo cp /home/rpi-first-boot-wizard/.config/wayfire.ini /home/%s/.config/wayfire.ini; sudo chown %s:%s /home/%s/.config/wayfire.ini",
+        init_user, init_user, init_user, init_user, init_user, init_user, init_user, init_user);
 
     // rename the pi user to the new user and set the password
-    vsystem ("sudo /usr/lib/userconf-pi/userconf %s %s '%s'", chuser ? chuser : "pi", user, pw);
+    vsystem ("sudo /usr/lib/userconf-pi/userconf %s %s '%s'", chuser ? chuser : init_user, user, pw);
 
     // set an autostart to set HDMI audio on reboot as new user
     if (chuser == NULL) vsystem ("echo \"[Desktop Entry]\nType=Application\nName=Select HDMI Audio\nExec=sh -c '/usr/bin/hdmi-audio-select; sudo rm /etc/xdg/autostart/hdmiaudio.desktop'\" | sudo tee /etc/xdg/autostart/hdmiaudio.desktop", user);
@@ -2191,9 +2192,9 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             break;
 
         case PAGE_BROWSER : if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (chromium_rb)))
-                                vsystem ("sudo raspi-config nonint do_browser chromium-browser pi");
+                                vsystem ("sudo raspi-config nonint do_browser chromium-browser %s", init_user);
                             else
-                                vsystem ("sudo raspi-config nonint do_browser firefox pi");
+                                vsystem ("sudo raspi-config nonint do_browser firefox %s", init_user);
                             change_page (FORWARD);
                             break;
 
@@ -2420,6 +2421,9 @@ int main (int argc, char *argv[])
         else wm = WM_LABWC;
     }
     else wm = WM_OPENBOX;
+
+    init_user = get_string ("getent passwd 1000 | cut -d: -f1");
+    if (!init_user) init_user = g_strdup ("pi");
 
     // set the audio output to HDMI if there is one, otherwise the analog jack
     vsystem ("hdmi-audio-select");
