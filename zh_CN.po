@@ -1,0 +1,678 @@
+# Simplified Chinese translations for piwiz package.
+# Copyright (C) 2019 Raspberry Pi Ltd
+# This file is distributed under the same license as the piwiz package.
+# ykla <yklaxds@gmail>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: piwiz 1.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-05-28 13:01+0200\n"
+"PO-Revision-Date: 2024-07-14 16:14+0800\n"
+"Last-Translator: ykla <yklaxds@gmail.com>\n"
+"Language-Team: ykla <yklaxds@gmail.com>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 3.4.4\n"
+
+#: ../src/piwiz.c:1127 ../src/piwiz.c:1550
+msgid "Searching for networks - please wait..."
+msgstr "正在搜索网络——请稍后……"
+
+#: ../src/piwiz.c:1147
+msgid "Failed to connect to network."
+msgstr "网络连接失败。"
+
+#: ../src/piwiz.c:1334
+msgid "Failed to connect - access point not available."
+msgstr "连接错误——接入点不可用。"
+
+#: ../src/piwiz.c:1575
+msgid "Downloading updates - please wait..."
+msgstr "正在下载更新——请稍后……"
+
+#: ../src/piwiz.c:1577
+msgid "Installing updates - please wait..."
+msgstr "正在安装更新——请稍后……"
+
+#: ../src/piwiz.c:1583
+msgid "Downloading languages - please wait..."
+msgstr "正在下载语言文件——请稍后……"
+
+#: ../src/piwiz.c:1585 ../src/piwiz.c:1678 ../src/piwiz.c:1766
+msgid "Installing languages - please wait..."
+msgstr "正在安装语言文件——请稍后……"
+
+#: ../src/piwiz.c:1591 ../src/piwiz.c:1691 ../src/piwiz.c:1813
+msgid "Uninstalling browser - please wait..."
+msgstr "正在卸载浏览器——请稍后……"
+
+#: ../src/piwiz.c:1699 ../src/piwiz.c:1860
+msgid "Getting updates - please wait..."
+msgstr "正在获取更新——请稍后……"
+
+#: ../src/piwiz.c:1718
+#, c-format
+msgid ""
+"Error checking for updates.\n"
+"%s"
+msgstr ""
+"检查更新时发生错误。\n"
+"%s"
+
+#: ../src/piwiz.c:1737 ../src/piwiz.c:1785
+#, c-format
+msgid ""
+"Error installing languages.\n"
+"%s"
+msgstr ""
+"安装语言文件时发生错误。\n"
+"%s"
+
+#: ../src/piwiz.c:1802 ../src/piwiz.c:1832
+#, c-format
+msgid ""
+"Error uninstalling browser.\n"
+"%s"
+msgstr ""
+"卸载浏览器时发生错误。\n"
+"%s"
+
+#: ../src/piwiz.c:1849 ../src/piwiz.c:1885
+#, c-format
+msgid ""
+"Error getting updates.\n"
+"%s"
+msgstr ""
+"获取更新时发生错误。\n"
+"%s"
+
+#: ../src/piwiz.c:1871 ../src/piwiz.c:1901
+msgid "System is up to date"
+msgstr "系统已是最新"
+
+#: ../src/piwiz.c:1933 ../src/piwiz.c:2268
+msgid "Checking for updates - please wait..."
+msgstr "正在检查更新——请稍后……"
+
+#: ../src/piwiz.c:1942
+msgid "Could not sync time - unable to check for updates"
+msgstr "无法同步时钟——无法检查更新"
+
+#: ../src/piwiz.c:1979 ../data/piwiz.ui.h:72
+msgid "_Next"
+msgstr "_下一步"
+
+#: ../src/piwiz.c:1980
+msgid "_Back"
+msgstr "_返回"
+
+#: ../src/piwiz.c:1981 ../data/piwiz.ui.h:71
+msgid "_Skip"
+msgstr "_跳过"
+
+#: ../src/piwiz.c:1992
+msgid "<b>Rename User</b>"
+msgstr "<b>重命名用户</b>"
+
+#: ../src/piwiz.c:1993
+#, c-format
+msgid ""
+"Your current user '%s' will be renamed.\n"
+"\n"
+"The new username can only contain lower-case letters, digits and hyphens, "
+"and must start with a letter."
+msgstr ""
+"您当前的用户 '%s' 将被重命名。\n"
+"\n"
+"新用户名只能包含小写字母、数字和连字符 -，并且必须以字母开头。"
+
+#: ../src/piwiz.c:1996
+msgid "Press 'Next' to rename the user."
+msgstr "请点击“下一步”以重命名用户"
+
+#: ../src/piwiz.c:1997 ../data/piwiz.ui.h:2
+msgid "_Cancel"
+msgstr "_取消"
+
+#: ../src/piwiz.c:2005
+msgid "_Restart"
+msgstr "_重启"
+
+#: ../src/piwiz.c:2008
+msgid "<b>User Renamed</b>"
+msgstr "<b>用户重命名成功</b>"
+
+#: ../src/piwiz.c:2009
+#, c-format
+msgid "The '%s' user has been renamed to '%s' and the new password set."
+msgstr "用户 '%s' 已重命名为 '%s' 并设置了新密码。"
+
+#: ../src/piwiz.c:2012
+msgid "Press 'Restart' to reboot and login as the new user."
+msgstr "按下“重启”以重新启动，并登录到新用户。"
+
+#: ../src/piwiz.c:2018
+msgid "_Done"
+msgstr "_完成"
+
+#: ../src/piwiz.c:2145
+msgid "Setting location - please wait..."
+msgstr "正在设置本地化——请稍后……"
+
+#: ../src/piwiz.c:2164
+msgid "The username is blank."
+msgstr "用户名为空"
+
+#: ../src/piwiz.c:2169
+msgid "The username must be 32 characters or shorter."
+msgstr "用户名必须在 32 个字符以内。"
+
+#: ../src/piwiz.c:2174
+msgid "The first character of the username must be a lower-case letter."
+msgstr "用户名必须以小写字母开头。"
+
+#: ../src/piwiz.c:2179 ../src/piwiz.c:2184
+msgid ""
+"This username is used by the system and cannot be used for a user account."
+msgstr "此用户名已被系统占用，无法用作用户账户。"
+
+#: ../src/piwiz.c:2193
+msgid "Usernames can only contain lower-case letters, digits and hyphens."
+msgstr "用户名只能包含小写字母、数字和连字符 -。"
+
+#: ../src/piwiz.c:2198
+msgid "The password is blank."
+msgstr "密码为空"
+
+#: ../src/piwiz.c:2203
+msgid "The two passwords entered do not match."
+msgstr "两次输入的密码不一致"
+
+#: ../src/piwiz.c:2208
+msgid ""
+"You have used a known default value for the username or password.\n"
+"\n"
+"We strongly recommend you go back and choose something else."
+msgstr ""
+"您使用了已知的默认用户名和密码。\n"
+"\n"
+"我们强烈建议您返回，重新设置。"
+
+#: ../src/piwiz.c:2227
+#, c-format
+msgid "Enter the password for the WiFi network \"%s\"."
+msgstr "请输入 WiFi 网络 \"%s\" 的密码。"
+
+#: ../src/piwiz.c:2237 ../src/piwiz.c:2245
+msgid "Connecting to WiFi network - please wait..."
+msgstr "正在搜索 WiFi 网络——请稍后……"
+
+#: ../src/piwiz.c:2273
+msgid "Synchronising clock - please wait..."
+msgstr "正在同步时钟——请稍后……"
+
+#: ../src/piwiz.c:2278
+msgid "No network connection found - unable to check for updates"
+msgstr "无可用网络连接——无法检查更新"
+
+#: ../src/piwiz.c:2282
+msgid "Restarting - please wait..."
+msgstr "正在重启——请稍后……"
+
+#: ../src/piwiz.c:2321
+msgid ""
+"If installing updates is skipped, translation files will not be installed, "
+"and the unused browser will not be uninstalled."
+msgstr "如果跳过安装更新，则不会安装语言文件，且不会卸载未使用的浏览器。"
+
+#: ../src/piwiz.c:2323
+msgid ""
+"If installing updates is skipped, translation files will not be installed."
+msgstr "如果跳过了安装更新，将不会安装语言文件。"
+
+#: ../src/piwiz.c:2325
+msgid ""
+"If installing updates is skipped, the unused browser will not be uninstalled."
+msgstr "如果跳过了安装更新，将不会卸载未使用的浏览器。"
+
+#: ../src/piwiz.c:2377
+#, c-format
+msgid "<span font_desc=\"10.0\">IP : %s</span>"
+msgstr "<span font_desc=\"10.0\">IP：%s</span>"
+
+#: ../data/piwiz.ui.h:1
+msgid "_OK"
+msgstr "_完成"
+
+#: ../data/piwiz.ui.h:3
+msgid "Welcome to Raspberry Pi"
+msgstr "欢迎使用树莓派"
+
+#: ../data/piwiz.ui.h:4
+msgid ""
+"Welcome to the Raspberry Pi Desktop!\n"
+"\n"
+"Before you start using it, there are a few things to set up.\n"
+"\n"
+"Press 'Next' to get started. "
+msgstr ""
+"欢迎使用树莓派桌面！\n"
+"\n"
+"在开始使用之前，有几件事情需要设置。\n"
+"\n"
+"点击“下一步”开始。 "
+
+#: ../data/piwiz.ui.h:9
+msgid ""
+"If you are using a Bluetooth keyboard or mouse, put them into pairing mode "
+"and wait for them to connect."
+msgstr ""
+"如果您正在使用蓝牙键盘和蓝牙鼠标，请将它们置于配对模式并等待它们的连接。"
+
+#: ../data/piwiz.ui.h:10
+msgid "<span font_desc=\"10.0\"> </span>"
+msgstr "<span font_desc=\"10.0\"> </span>"
+
+#: ../data/piwiz.ui.h:11
+msgid "<b>Set Country</b>"
+msgstr "<b>设置区域</b>"
+
+#: ../data/piwiz.ui.h:12
+msgid ""
+"Enter the details of your location. This is used to set the language, time "
+"zone, keyboard and other international settings."
+msgstr "请输入您的位置详情。这将用于设置语言、时区、键盘和其他国际化设置。"
+
+#: ../data/piwiz.ui.h:13
+msgid "Country:"
+msgstr "区域："
+
+#: ../data/piwiz.ui.h:14
+msgid "Set the country in which you are using your Pi"
+msgstr "设置您树莓派的使用区域"
+
+#: ../data/piwiz.ui.h:15
+msgid "Language:"
+msgstr "语言："
+
+#: ../data/piwiz.ui.h:16
+msgid "Set the language in which applications should appear"
+msgstr "设置应用程序显示的语言"
+
+#: ../data/piwiz.ui.h:17
+msgid "Timezone:"
+msgstr "时区："
+
+#: ../data/piwiz.ui.h:18
+msgid "Set the closest city to your location"
+msgstr "设置距您位置最近的城市"
+
+#: ../data/piwiz.ui.h:19
+msgid "Use US keyboard"
+msgstr "使用美式键盘"
+
+#: ../data/piwiz.ui.h:20
+msgid ""
+"Use the US keyboard layout instead of the default keyboard for your country"
+msgstr "使用美式键盘布局，而不是您所在地区的默认键盘布局"
+
+#: ../data/piwiz.ui.h:21
+msgid "Use English language"
+msgstr "使用英语"
+
+#: ../data/piwiz.ui.h:22
+msgid "Use English instead of the default language for your country"
+msgstr "使用英语而不是您所在地区的默认语言"
+
+#: ../data/piwiz.ui.h:23
+msgid "Press 'Next' when you have made your selection."
+msgstr "在您选择后，请按“下一步”。"
+
+#: ../data/piwiz.ui.h:24
+msgid "<b>Create User</b>"
+msgstr "<b>创建用户</b>"
+
+#: ../data/piwiz.ui.h:25
+msgid ""
+"You need to create a user account to log in to your Raspberry Pi.\n"
+"\n"
+"The username can only contain lower-case letters, digits and hyphens, and "
+"must start with a letter."
+msgstr ""
+"您需要创建一个用户账户来登录到您的树莓派。\n"
+"\n"
+"用户名只能包含小写字母、数字和连字符 -，并且必须以字母开头。"
+
+#: ../data/piwiz.ui.h:28
+msgid "Enter password:"
+msgstr "输入密码："
+
+#: ../data/piwiz.ui.h:29
+msgid "Confirm password:"
+msgstr "确认密码："
+
+#: ../data/piwiz.ui.h:30
+msgid "Enter username:"
+msgstr "输入用户名："
+
+#: ../data/piwiz.ui.h:31
+msgid "Enter a password"
+msgstr "输入密码"
+
+#: ../data/piwiz.ui.h:32
+msgid "Enter the password again"
+msgstr "再次输入密码"
+
+#: ../data/piwiz.ui.h:33
+msgid "Enter a username"
+msgstr "输入用户名"
+
+#: ../data/piwiz.ui.h:34
+msgid "Hide characters"
+msgstr "隐藏密码"
+
+#: ../data/piwiz.ui.h:35
+msgid "Show or hide the characters in your password"
+msgstr "显示或隐藏密码"
+
+#: ../data/piwiz.ui.h:36
+msgid "Press 'Next' to create your account."
+msgstr "按“下一步”来创建您的账户。"
+
+#: ../data/piwiz.ui.h:37
+msgid "<b>Set Up Screen</b>"
+msgstr "<b>屏幕设置</b>"
+
+#: ../data/piwiz.ui.h:38
+msgid ""
+"On some monitors, the desktop is larger than the screen and the edges are "
+"cut off. You can adjust this here."
+msgstr ""
+"在某些显示器上，桌面的大小超过了屏幕，导致边缘溢出。您可以在这里进行调整。"
+
+#: ../data/piwiz.ui.h:39
+msgid "Reduce the size of the desktop on this monitor"
+msgstr "缩放显示器上的桌面"
+
+#: ../data/piwiz.ui.h:40
+msgid "Turn on to shrink the desktop to fit the monitor"
+msgstr "打开缩放桌面以适应显示器"
+
+#: ../data/piwiz.ui.h:41
+msgid "Reduce the size of the desktop on the second monitor"
+msgstr "缩放第二显示器上的桌面"
+
+#: ../data/piwiz.ui.h:42
+msgid "Turn on to shrink the desktop to fit the second monitor"
+msgstr "打开此选项缩放桌面，以适应第二个显示器。"
+
+#: ../data/piwiz.ui.h:43
+msgid "Press 'Next' when the screen looks correct."
+msgstr "当屏幕显示正常时，请按“下一步”。"
+
+#: ../data/piwiz.ui.h:44
+msgid "<b>Select WiFi Network</b>"
+msgstr "<b>选择 WiFi 网络</b>"
+
+#: ../data/piwiz.ui.h:45
+msgid "Select your WiFi network from the list."
+msgstr "从列表中选择您的 WiFi 网络。"
+
+#: ../data/piwiz.ui.h:46
+msgid "Click the name of your network to select it"
+msgstr "点击您的网络名称可进行选择。"
+
+#: ../data/piwiz.ui.h:47
+msgid "Press 'Next' to connect, or 'Skip' to continue without connecting."
+msgstr "点击“下一步”进行连接，或者按“跳过”继续，而不连接。"
+
+#: ../data/piwiz.ui.h:48
+msgid "<b>Enter WiFi Password</b>"
+msgstr "<b>输入 WiFi 密码</b>"
+
+#: ../data/piwiz.ui.h:49
+msgid "Enter the password for your WiFi network."
+msgstr "请输入您 WiFi 网络的密码。"
+
+#: ../data/piwiz.ui.h:50
+msgid "Password:"
+msgstr "密码："
+
+#: ../data/piwiz.ui.h:51
+msgid "Enter the password for your network"
+msgstr "输入您网络的密码"
+
+#: ../data/piwiz.ui.h:52
+msgid "<b>Choose Browser</b>"
+msgstr "<b>选择浏览器</b>"
+
+#: ../data/piwiz.ui.h:53
+msgid ""
+"Both the Chromium and Firefox web browsers are preinstalled on Raspberry Pi "
+"OS. Select the one you prefer to use."
+msgstr ""
+"树莓派操作系统预装了网页浏览器 Chromium 和 Firefox 。请选择您喜欢用的浏览器。"
+
+#: ../data/piwiz.ui.h:54
+msgid "Default Browser:"
+msgstr "默认浏览器："
+
+#: ../data/piwiz.ui.h:55
+msgid "Chromium"
+msgstr "Chromium"
+
+#: ../data/piwiz.ui.h:56
+msgid "Firefox"
+msgstr "Firefox（火狐）"
+
+#: ../data/piwiz.ui.h:57
+msgid "Tick here to uninstall the unused browser"
+msgstr "点击此处卸载非默认浏览器"
+
+#: ../data/piwiz.ui.h:58
+msgid "Press 'Next' when you have chosen a browser."
+msgstr "选择浏览器后，按“下一步”。"
+
+#: ../data/piwiz.ui.h:59
+msgid "<b>Enable Raspberry Pi Connect</b>"
+msgstr "<b>开启树莓派连接（Raspberry Pi Connect）</b>"
+
+#: ../data/piwiz.ui.h:60
+msgid ""
+"Raspberry Pi Connect is a service which allows you to securely remotely "
+"access your Raspberry Pi's desktop from any computer."
+msgstr ""
+"树莓派连接是一项服务（Raspberry Pi Connect），能让您在其他计算机上，安全地远"
+"程访问您的树莓派桌面。"
+
+#: ../data/piwiz.ui.h:61
+msgid "Enable Raspberry Pi Connect"
+msgstr "开启树莓派连接"
+
+#: ../data/piwiz.ui.h:62
+msgid "Turn on to allow remote access"
+msgstr "打开以允许远程访问"
+
+#: ../data/piwiz.ui.h:63
+msgid "Press 'Next' when you have made your choice."
+msgstr "做出选择后按“下一步”。"
+
+#: ../data/piwiz.ui.h:64
+msgid "<b>Update Software</b>"
+msgstr "<b>更新软件</b>"
+
+#: ../data/piwiz.ui.h:65
+msgid ""
+"The operating system and applications will now be checked and updated if "
+"necessary. This may involve a large download.\n"
+"\n"
+"Press 'Next' to check and update software, or 'Skip' to continue without "
+"checking."
+msgstr ""
+"现在将检查操作系统和应用程序，并在必要时进行更新。这可能涉及大量下载。\n"
+"\n"
+"按下“下一步”检查和更新软件，或按“跳过”以继续而不进行此检查。"
+
+#: ../data/piwiz.ui.h:68
+msgid "<b>Setup Complete</b>"
+msgstr "<b>设置完成</b>"
+
+#: ../data/piwiz.ui.h:69
+msgid "Your Raspberry Pi is now set up and ready to go."
+msgstr "您的树莓派已经设置完成并准备就绪"
+
+#: ../data/piwiz.ui.h:70
+msgid ""
+"Press 'Restart' to restart your Pi so the new settings will take effect."
+msgstr "按“重启”重新启动树莓派，使新设置生效。"
+
+#~ msgid "Reading update list - please wait..."
+#~ msgstr "Reading update list - please wait..."
+
+#~ msgid "Finding languages - please wait..."
+#~ msgstr "Finding languages - please wait..."
+
+#~ msgid "Comparing versions - please wait..."
+#~ msgstr "Comparing versions - please wait..."
+
+#, c-format
+#~ msgid ""
+#~ "Error finding languages.\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Error finding languages.\n"
+#~ "%s"
+
+#, c-format
+#~ msgid ""
+#~ "Error comparing versions.\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Error comparing versions.\n"
+#~ "%s"
+
+#~ msgid "Could not connect to this network"
+#~ msgstr "Could not connect to this network"
+
+#~ msgid "Error creating new GIO Channel\n"
+#~ msgstr "Error creating new GIO Channel\n"
+
+#~ msgid "Error creating watch\n"
+#~ msgstr "Error creating watch\n"
+
+#~ msgid "g_try_malloc\n"
+#~ msgstr "g_try_malloc\n"
+
+#~ msgid "Connection to dhcpcd lost"
+#~ msgstr "Connection to dhcpcd lost"
+
+#, c-format
+#~ msgid "Connected to %s-%s"
+#~ msgstr "Connected to %s-%s"
+
+#~ msgid "dhcpcd connection lost"
+#~ msgstr "dhcpcd connection lost"
+
+#~ msgid "Network event"
+#~ msgstr "Network event"
+
+#, c-format
+#~ msgid "dhcpcd WPA connection lost: %s"
+#~ msgstr "dhcpcd WPA connection lost: %s"
+
+#~ msgid "New Access Point"
+#~ msgstr "New Access Point"
+
+#~ msgid "New Access Points"
+#~ msgstr "New Access Points"
+
+#~ msgid "Connecting to dhcpcd ..."
+#~ msgstr "Connecting to dhcpcd ..."
+
+#~ msgid "Connecting ..."
+#~ msgstr "Connecting ..."
+
+#~ msgid "Failed to disconnect."
+#~ msgstr "Failed to disconnect."
+
+#~ msgid "Faile to reconfigure."
+#~ msgstr "Failed to reconfigure."
+
+#~ msgid "Failed to set key management."
+#~ msgstr "Failed to set key management."
+
+#~ msgid "Failed to set password, probably too short."
+#~ msgstr "Failed to set password, probably too short."
+
+#~ msgid "Failed to enable the network."
+#~ msgstr "Failed to enable the network."
+
+#~ msgid "Failed to select the network."
+#~ msgstr "Failed to select the network."
+
+#~ msgid "Failed to start association."
+#~ msgstr "Failed to start association."
+
+#~ msgid ""
+#~ "Failed to save wpa_supplicant configuration.\n"
+#~ "\n"
+#~ "You should add update_config=1 to /etc/wpa_supplicant.conf."
+#~ msgstr ""
+#~ "Failed to save wpa_supplicant configuration.\n"
+#~ "\n"
+#~ "You should add update_config=1 to /etc/wpa_supplicant.conf."
+
+#~ msgid "Error enabling network"
+#~ msgstr "Error enabling network"
+
+#~ msgid "Pre Shared Key:"
+#~ msgstr "Pre Shared Key:"
+
+#~ msgid "_Later"
+#~ msgstr "_Later"
+
+#, c-format
+#~ msgid "%s: Received scan results"
+#~ msgstr "%s: Received scan results"
+
+#~ msgid ""
+#~ "The default 'pi' user account currently has the password 'raspberry'. It "
+#~ "is strongly recommended that you change this to a different password that "
+#~ "only you know."
+#~ msgstr ""
+#~ "The default 'pi' user account currently has the password 'raspberry'. It "
+#~ "is strongly recommended that you change this to a different password that "
+#~ "only you know."
+
+#~ msgid ""
+#~ "You should be able to see the taskbar along the top of the screen.\n"
+#~ "Tick the box if some or all of it does not fit on the screen."
+#~ msgstr ""
+#~ "You should be able to see the taskbar along the top of the screen.\n"
+#~ "Tick the box if some or all of it does not fit on the screen."
+
+#~ msgid "The taskbar does not fit onto the screen"
+#~ msgstr "The taskbar does not fit onto the screen"
+
+#~ msgid "Tick this box if the taskbar is not completely visible"
+#~ msgstr "Tick this box if the taskbar is not completely visible"
+
+#~ msgid ""
+#~ "The change will take effect when the Pi is restarted.\n"
+#~ "\n"
+#~ "Press 'Next' to save your setting."
+#~ msgstr ""
+#~ "The change will take effect when the Pi is restarted.\n"
+#~ "\n"
+#~ "Press 'Next' to save your setting."
+
+#~ msgid ""
+#~ "To run applications, click the raspberry icon in the top left corner of "
+#~ "the screen to open the menu."
+#~ msgstr ""
+#~ "To run applications, click the raspberry icon in the top left corner of "
+#~ "the screen to open the menu."
