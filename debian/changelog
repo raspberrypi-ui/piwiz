@@ -1,3 +1,9 @@
+piwiz (0.74) bookworm; urgency=medium
+
+  * Translation update
+
+ -- Simon Long <simon@raspberrypi.com>  Tue, 16 Jul 2024 07:50:23 +0100
+
 piwiz (0.73) bookworm; urgency=medium
 
   * Reinstate RPC page on 32-bit and X
