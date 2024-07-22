@@ -1,3 +1,9 @@
+piwiz (0.75) bookworm; urgency=medium
+
+  * Translation corrected
+
+ -- Simon Long <simon@raspberrypi.com>  Mon, 22 Jul 2024 07:41:53 +0100
+
 piwiz (0.74) bookworm; urgency=medium
 
   * Translation update
