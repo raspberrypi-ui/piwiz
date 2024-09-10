@@ -1,3 +1,9 @@
+piwiz (0.76) bookworm; urgency=medium
+
+  * Use flag file for autopair
+
+ -- Simon Long <simon@raspberrypi.com>  Tue, 10 Sep 2024 15:29:32 +0100
+
 piwiz (0.75) bookworm; urgency=medium
 
   * Translation corrected
