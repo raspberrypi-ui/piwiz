@@ -1911,6 +1911,9 @@ static gpointer final_setup (gpointer ptr)
     // set an autostart to set HDMI audio on reboot as new user
     if (chuser == NULL) vsystem ("echo \"[Desktop Entry]\nType=Application\nName=Select HDMI Audio\nExec=sh -c '/usr/bin/hdmi-audio-select; sudo rm /etc/xdg/autostart/hdmiaudio.desktop'\" | sudo tee /etc/xdg/autostart/hdmiaudio.desktop", user);
 
+    // delete autopair flag
+    vsystem ("sudo rm -f /boot/btautopair");
+
     if (reboot) vsystem ("sync; sudo reboot");
     gtk_main_quit ();
     return NULL;
@@ -2355,7 +2358,15 @@ static gboolean net_available (void)
 
 static gboolean check_bluetooth (void)
 {
-    if (!system ("rfkill list bluetooth | grep -q Bluetooth")) gtk_widget_show (bt_prompt);
+    if (!system ("rfkill list bluetooth | grep -q Bluetooth"))
+    {
+        if (system ("test -f /boot/btautopair"))
+        {
+            system ("sudo touch /boot/btautopair");
+            gtk_label_set_text (GTK_LABEL (bt_prompt), _("To auto-pair a Bluetooth mouse and keyboard, please restart now by disconnecting and reconnecting the power cable."));
+        }
+        gtk_widget_show (bt_prompt);
+    }
     return FALSE;
 }
 
