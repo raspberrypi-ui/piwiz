@@ -13,7 +13,7 @@
     <property name="type-hint">dialog</property>
     <property name="skip-taskbar-hint">True</property>
     <property name="skip-pager-hint">True</property>
-    <property name="decorated">False</property>
+    <property name="decorated">True</property>
     <child>
       <object class="GtkBox" id="errvbox">
         <property name="visible">True</property>
@@ -82,7 +82,7 @@
     </child>
     <child type="titlebar">
       <object class="GtkHeaderBar">
-        <property name="visible">True</property>
+        <property name="visible">False</property>
         <property name="can-focus">False</property>
         <child>
           <placeholder/>
@@ -101,7 +101,7 @@
     <property name="type-hint">dialog</property>
     <property name="skip-taskbar-hint">True</property>
     <property name="skip-pager-hint">True</property>
-    <property name="decorated">False</property>
+    <property name="decorated">True</property>
     <child>
       <object class="GtkBox">
         <property name="visible">True</property>
@@ -167,7 +167,7 @@
     </child>
     <child type="titlebar">
       <object class="GtkHeaderBar">
-        <property name="visible">True</property>
+        <property name="visible">False</property>
         <property name="can-focus">False</property>
         <child>
           <placeholder/>
@@ -183,7 +183,7 @@
     <property name="window-position">center-always</property>
     <property name="icon-name">rpi</property>
     <property name="type-hint">dialog</property>
-    <property name="decorated">False</property>
+    <property name="decorated">True</property>
     <child>
       <object class="GtkBox" id="wizard_vbox">
         <property name="visible">True</property>
@@ -1437,7 +1437,7 @@ Press 'Next' to check and update software, or 'Skip' to continue without checkin
     </child>
     <child type="titlebar">
       <object class="GtkHeaderBar">
-        <property name="visible">True</property>
+        <property name="visible">False</property>
         <property name="can-focus">False</property>
         <child>
           <placeholder/>

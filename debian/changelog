@@ -1,3 +1,9 @@
+piwiz (0.77) bookworm; urgency=medium
+
+  * Fix shadows on undecorated windows
+
+ -- Simon Long <simon@raspberrypi.com>  Thu, 12 Sep 2024 12:01:20 +0100
+
 piwiz (0.76) bookworm; urgency=medium
 
   * Use flag file for autopair
