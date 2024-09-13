@@ -589,7 +589,7 @@ static void error_box (char *msg)
 
         g_signal_connect (err_btn, "clicked", G_CALLBACK (ok_clicked), (void *) 1);
 
-        gtk_widget_show_all (err_dlg);
+        gtk_widget_show (err_dlg);
         g_object_unref (builder);
     }
     else gtk_label_set_text (GTK_LABEL (err_msg), msg);
