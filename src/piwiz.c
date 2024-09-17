@@ -1677,7 +1677,7 @@ static void next_update (PkTask *task, update_type update_stage)
             if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (uninstall_chk)))
             {
                 if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (chromium_rb))) lpack = g_strdup ("firefox");
-                else lpack = g_strdup ("chromium-browser");
+                else lpack = g_strdup ("chromium");
                 pack_array = g_strsplit (lpack, " ", -1);
                 thread_message (_("Uninstalling browser - please wait..."), MSG_PULSE);
                 pk_client_resolve_async (PK_CLIENT (task), 0, pack_array, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) resolve_browser_done, NULL);
@@ -1912,7 +1912,7 @@ static gpointer final_setup (gpointer ptr)
     if (chuser == NULL) vsystem ("echo \"[Desktop Entry]\nType=Application\nName=Select HDMI Audio\nExec=sh -c '/usr/bin/hdmi-audio-select; sudo rm /etc/xdg/autostart/hdmiaudio.desktop'\" | sudo tee /etc/xdg/autostart/hdmiaudio.desktop", user);
 
     // delete autopair flag
-    vsystem ("sudo rm -f /boot/btautopair");
+    vsystem ("sudo rm -f /boot/firmware/btautopair");
 
     if (reboot) vsystem ("sync; sudo reboot");
     gtk_main_quit ();
@@ -2195,7 +2195,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             break;
 
         case PAGE_BROWSER : if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (chromium_rb)))
-                                vsystem ("sudo raspi-config nonint do_browser chromium-browser %s", init_user);
+                                vsystem ("sudo raspi-config nonint do_browser chromium %s", init_user);
                             else
                                 vsystem ("sudo raspi-config nonint do_browser firefox %s", init_user);
                             change_page (FORWARD);
@@ -2360,9 +2360,9 @@ static gboolean check_bluetooth (void)
 {
     if (!system ("rfkill list bluetooth | grep -q Bluetooth"))
     {
-        if (system ("test -f /boot/btautopair"))
+        if (system ("test -f /boot/firmware/btautopair"))
         {
-            system ("sudo touch /boot/btautopair");
+            system ("sudo touch /boot/firmware/btautopair");
             gtk_label_set_text (GTK_LABEL (bt_prompt), _("To auto-pair a Bluetooth mouse and keyboard, please restart now by disconnecting and reconnecting the power cable."));
         }
         gtk_widget_show (bt_prompt);
@@ -2446,7 +2446,7 @@ int main (int argc, char *argv[])
     reboot = TRUE;
     read_inits ();
 
-    if (vsystem ("raspi-config nonint is_installed chromium-browser")) browser = FALSE;
+    if (vsystem ("raspi-config nonint is_installed chromium")) browser = FALSE;
     if (vsystem ("raspi-config nonint is_installed firefox")) browser = FALSE;
     set_marketing_serial ("/etc/chromium/master_preferences");
     set_marketing_serial ("/usr/share/firefox/distribution/distribution.ini");
