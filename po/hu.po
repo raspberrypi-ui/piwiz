@@ -1,0 +1,698 @@
+# English translations for piwiz package.
+# Copyright (C) 2019 Raspberry Pi Ltd
+# This file is distributed under the same license as the piwiz package.
+# Simon Long <simon@raspberrypi.org>, 2019.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: piwiz 1.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-05-28 13:01+0200\n"
+"PO-Revision-Date: 2024-09-20 04:48+0200\n"
+"Last-Translator: Dr. Hornos Tamás <tom.hornos@gmail.com>\n"
+"Language-Team: Superprimo (Hungarian)\n"
+"Language: hu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.5\n"
+
+#: ../src/piwiz.c:1127 ../src/piwiz.c:1550
+msgid "Searching for networks - please wait..."
+msgstr "Elérhető hálózatok keresése - kérem várjon…"
+
+#: ../src/piwiz.c:1147
+msgid "Failed to connect to network."
+msgstr "Nem sikerült csatlakozni a hálózathoz."
+
+#: ../src/piwiz.c:1334
+msgid "Failed to connect - access point not available."
+msgstr "Csatlakozás sikertelen - a hozzáférési pont nem elérhető."
+
+#: ../src/piwiz.c:1575
+msgid "Downloading updates - please wait..."
+msgstr "Frissítések letöltése - kérem várjon…"
+
+#: ../src/piwiz.c:1577
+msgid "Installing updates - please wait..."
+msgstr "Frissítések telepítése - kérem várjon…"
+
+#: ../src/piwiz.c:1583
+msgid "Downloading languages - please wait..."
+msgstr "Nyelvi elemek letöltése - kérem várjon…"
+
+#: ../src/piwiz.c:1585 ../src/piwiz.c:1678 ../src/piwiz.c:1766
+msgid "Installing languages - please wait..."
+msgstr "Nyelvi csomagok telepítése - kérem várjon…"
+
+#: ../src/piwiz.c:1591 ../src/piwiz.c:1691 ../src/piwiz.c:1813
+msgid "Uninstalling browser - please wait..."
+msgstr "Böngésző eltávolítása - kérem várjon…"
+
+#: ../src/piwiz.c:1699 ../src/piwiz.c:1860
+msgid "Getting updates - please wait..."
+msgstr "Frissítések beszerzése - kérem várjon…"
+
+#: ../src/piwiz.c:1718
+#, c-format
+msgid ""
+"Error checking for updates.\n"
+"%s"
+msgstr ""
+"Hiba a frissítések ellenőrzésében.\n"
+"%s"
+
+#: ../src/piwiz.c:1737 ../src/piwiz.c:1785
+#, c-format
+msgid ""
+"Error installing languages.\n"
+"%s"
+msgstr ""
+"Hiba a nyelvek telepítésekor.\n"
+"%s"
+
+#: ../src/piwiz.c:1802 ../src/piwiz.c:1832
+#, c-format
+msgid ""
+"Error uninstalling browser.\n"
+"%s"
+msgstr ""
+"Hiba a böngésző eltávolításakor.\n"
+"%s"
+
+#: ../src/piwiz.c:1849 ../src/piwiz.c:1885
+#, c-format
+msgid ""
+"Error getting updates.\n"
+"%s"
+msgstr ""
+"Hiba a frissítések beszerzésekor.\n"
+"%s"
+
+#: ../src/piwiz.c:1871 ../src/piwiz.c:1901
+msgid "System is up to date"
+msgstr "A rendszer naprakész"
+
+#: ../src/piwiz.c:1933 ../src/piwiz.c:2268
+msgid "Checking for updates - please wait..."
+msgstr "Frissítések keresése - kérem várjon…"
+
+#: ../src/piwiz.c:1942
+msgid "Could not sync time - unable to check for updates"
+msgstr "Sikertelen időszinkronizáció - nem sikerült a frissítések ellenőrzése"
+
+#: ../src/piwiz.c:1979 ../data/piwiz.ui.h:72
+msgid "_Next"
+msgstr "_Következő"
+
+#: ../src/piwiz.c:1980
+msgid "_Back"
+msgstr "_Vissza"
+
+#: ../src/piwiz.c:1981 ../data/piwiz.ui.h:71
+msgid "_Skip"
+msgstr "_Kihagy"
+
+#: ../src/piwiz.c:1992
+msgid "<b>Rename User</b>"
+msgstr "<b>Felhasználó átnevezése</b>"
+
+#: ../src/piwiz.c:1993
+#, c-format
+msgid ""
+"Your current user '%s' will be renamed.\n"
+"\n"
+"The new username can only contain lower-case letters, digits and hyphens, "
+"and must start with a letter."
+msgstr ""
+"Jelenlegi “%s” felhasználója át lesz nevezve.\n"
+"\n"
+"Az új felhasználónév csak kisbetűket, számokat, kötőjelet tartalmazhat "
+"valamint betűvel kell kezdődnie."
+
+#: ../src/piwiz.c:1996
+msgid "Press 'Next' to rename the user."
+msgstr "A felhasználó átnevezéséhez nyomja le a ‘Következő’-t."
+
+#: ../src/piwiz.c:1997 ../data/piwiz.ui.h:2
+msgid "_Cancel"
+msgstr "_Mégse"
+
+#: ../src/piwiz.c:2005
+msgid "_Restart"
+msgstr "_Újraindítás"
+
+#: ../src/piwiz.c:2008
+msgid "<b>User Renamed</b>"
+msgstr "<b>Felhasználó átnevezve</b>"
+
+#: ../src/piwiz.c:2009
+#, c-format
+msgid "The '%s' user has been renamed to '%s' and the new password set."
+msgstr "A korábbi ‘%s’ felhasználó ‘%s’ and the new password set."
+
+#: ../src/piwiz.c:2012
+msgid "Press 'Restart' to reboot and login as the new user."
+msgstr "Az új felhasználóval történő belépéshez nyomja le az ‘Újraindítás’-t."
+
+#: ../src/piwiz.c:2018
+msgid "_Done"
+msgstr "_Kész"
+
+#: ../src/piwiz.c:2145
+msgid "Setting location - please wait..."
+msgstr "Területi beállítások érvényesítése - kérem várjon…"
+
+#: ../src/piwiz.c:2164
+msgid "The username is blank."
+msgstr "Üres felhasználónév."
+
+#: ../src/piwiz.c:2169
+msgid "The username must be 32 characters or shorter."
+msgstr "A felhasználónév legfeljebb 32 karaktert tartalmazhat."
+
+#: ../src/piwiz.c:2174
+msgid "The first character of the username must be a lower-case letter."
+msgstr "A felhasználónévnek kisbetűvel kell kezdődnie."
+
+#: ../src/piwiz.c:2179 ../src/piwiz.c:2184
+msgid ""
+"This username is used by the system and cannot be used for a user account."
+msgstr ""
+"Ez a felhasználónév a rendszer által használt felhasználó és nem válaszható."
+
+#: ../src/piwiz.c:2193
+msgid "Usernames can only contain lower-case letters, digits and hyphens."
+msgstr "A felhasználónév csak kisbetűket, számokat és kötőjelet tartalmazhat."
+
+#: ../src/piwiz.c:2198
+msgid "The password is blank."
+msgstr "Üres jelszó."
+
+#: ../src/piwiz.c:2203
+msgid "The two passwords entered do not match."
+msgstr "A megadott jelszavak nem egyeznek."
+
+#: ../src/piwiz.c:2208
+msgid ""
+"You have used a known default value for the username or password.\n"
+"\n"
+"We strongly recommend you go back and choose something else."
+msgstr ""
+"Általánosan ismert felhasználónevet vagy jelszót használ.\n"
+"\n"
+"Javasoljuk, hogy lépjen vissza és változtassa meg őket."
+
+#: ../src/piwiz.c:2227
+#, c-format
+msgid "Enter the password for the WiFi network \"%s\"."
+msgstr "Adja meg a “%s” WiFi hálózathoz tartozó jelszót."
+
+#: ../src/piwiz.c:2237 ../src/piwiz.c:2245
+msgid "Connecting to WiFi network - please wait..."
+msgstr "Kapcsolódás a WiFi hálózathoz - kérem várjon…"
+
+#: ../src/piwiz.c:2273
+msgid "Synchronising clock - please wait..."
+msgstr "Időszinkronizáció - kérem várjon…"
+
+#: ../src/piwiz.c:2278
+msgid "No network connection found - unable to check for updates"
+msgstr "Nincs hálózati kapcsolat - a frissítések ellenőrzése nem lehetséges"
+
+#: ../src/piwiz.c:2282
+msgid "Restarting - please wait..."
+msgstr "Újraindítás - kérem várjon …"
+
+#: ../src/piwiz.c:2321
+msgid ""
+"If installing updates is skipped, translation files will not be installed, "
+"and the unused browser will not be uninstalled."
+msgstr ""
+"A frissítések kihagyása esetén a nyelvi fordítások nem lesznek telepítve, és "
+"a nem használt böngésző nem lesz eltávolítva."
+
+#: ../src/piwiz.c:2323
+msgid ""
+"If installing updates is skipped, translation files will not be installed."
+msgstr ""
+"A frissítések kihagyása esetén a nyelvi fordítások nem lesznek telepítve."
+
+#: ../src/piwiz.c:2325
+msgid ""
+"If installing updates is skipped, the unused browser will not be uninstalled."
+msgstr ""
+"A frissítések kihagyása esetén a nem használt böngésző nem lesz eltávolítva."
+
+#: ../src/piwiz.c:2377
+#, c-format
+msgid "<span font_desc=\"10.0\">IP : %s</span>"
+msgstr "<span font_desc=“10.0”>IP : %s</span>"
+
+#: ../data/piwiz.ui.h:1
+msgid "_OK"
+msgstr "_Ok"
+
+#: ../data/piwiz.ui.h:3
+msgid "Welcome to Raspberry Pi"
+msgstr "Köszönti a Raspberry Pi"
+
+#: ../data/piwiz.ui.h:4
+msgid ""
+"Welcome to the Raspberry Pi Desktop!\n"
+"\n"
+"Before you start using it, there are a few things to set up.\n"
+"\n"
+"Press 'Next' to get started. "
+msgstr ""
+"Köszöntjük a Raspberry Pi grafikus felületén!\n"
+"\n"
+"Mielőtt megkezdené a munkát, kérjük állítson be pár dolgot.\n"
+"\n"
+"A kezdéshez válassza a “Következő”-t. "
+
+#: ../data/piwiz.ui.h:9
+msgid ""
+"If you are using a Bluetooth keyboard or mouse, put them into pairing mode "
+"and wait for them to connect."
+msgstr ""
+"Bluetooth-os billentyűzet vagy egér használatához kapcsolja párosítás módba "
+"az eszközöket és várjon a csatlakozásra."
+
+#: ../data/piwiz.ui.h:10
+msgid "<span font_desc=\"10.0\"> </span>"
+msgstr "<span font_desc=“10.0”> </span>"
+
+#: ../data/piwiz.ui.h:11
+msgid "<b>Set Country</b>"
+msgstr "<b>Területi beállítások</b>"
+
+#: ../data/piwiz.ui.h:12
+msgid ""
+"Enter the details of your location. This is used to set the language, time "
+"zone, keyboard and other international settings."
+msgstr ""
+"Adja meg tartózkodásihelyét. Ez az információ szükséges a nyelvi, időzóna és "
+"más területi beállításokhoz valamint a billentyűzetkiosztás kiválasztásához."
+
+#: ../data/piwiz.ui.h:13
+msgid "Country:"
+msgstr "Ország:"
+
+#: ../data/piwiz.ui.h:14
+msgid "Set the country in which you are using your Pi"
+msgstr "Adja meg az országot ahol a Pi-t használja"
+
+#: ../data/piwiz.ui.h:15
+msgid "Language:"
+msgstr "Nyelv:"
+
+#: ../data/piwiz.ui.h:16
+msgid "Set the language in which applications should appear"
+msgstr "Adja meg az alkalmazásokban használni kívánt nyelvet"
+
+#: ../data/piwiz.ui.h:17
+msgid "Timezone:"
+msgstr "Időzóna:"
+
+#: ../data/piwiz.ui.h:18
+msgid "Set the closest city to your location"
+msgstr "Adja meg a helyzetéhez legközelebbi várost"
+
+#: ../data/piwiz.ui.h:19
+msgid "Use US keyboard"
+msgstr "US (amerikai) billentyűzetkiosztás használata"
+
+#: ../data/piwiz.ui.h:20
+msgid ""
+"Use the US keyboard layout instead of the default keyboard for your country"
+msgstr ""
+"A kiválasztott ország alapértelmezett billentyűkiosztása helyett US "
+"(amerikai) kiosztás használata"
+
+#: ../data/piwiz.ui.h:21
+msgid "Use English language"
+msgstr "Angol nyelv használata"
+
+#: ../data/piwiz.ui.h:22
+msgid "Use English instead of the default language for your country"
+msgstr ""
+"A kiválasztott ország alapértelmezett nyelve helyett angol nyelv használata"
+
+#: ../data/piwiz.ui.h:23
+msgid "Press 'Next' when you have made your selection."
+msgstr "Ha a beállítások megfelelőek válassza a Következő-t."
+
+#: ../data/piwiz.ui.h:24
+msgid "<b>Create User</b>"
+msgstr "<b>Felhasználó létrehozása</b>"
+
+#: ../data/piwiz.ui.h:25
+msgid ""
+"You need to create a user account to log in to your Raspberry Pi.\n"
+"\n"
+"The username can only contain lower-case letters, digits and hyphens, and "
+"must start with a letter."
+msgstr ""
+"Létre kell hoznia egy felhasználót a Raspberry Pi használatához.\n"
+"\n"
+"A felhasználónév csak kisbetűket, számokat és kötőjelet tartalmazhat "
+"valamint betűvel kell kezdődnie."
+
+#: ../data/piwiz.ui.h:28
+msgid "Enter password:"
+msgstr "Adja meg a jelszót:"
+
+#: ../data/piwiz.ui.h:29
+msgid "Confirm password:"
+msgstr "Jelszó megerősítése:"
+
+#: ../data/piwiz.ui.h:30
+msgid "Enter username:"
+msgstr "Adja meg a felhasználónevet:"
+
+#: ../data/piwiz.ui.h:31
+msgid "Enter a password"
+msgstr "Adja meg jelszót"
+
+#: ../data/piwiz.ui.h:32
+msgid "Enter the password again"
+msgstr "Adja meg újra a jelszót"
+
+#: ../data/piwiz.ui.h:33
+msgid "Enter a username"
+msgstr "Adja meg felhasználónevét"
+
+#: ../data/piwiz.ui.h:34
+msgid "Hide characters"
+msgstr "Szöveg elrejtése"
+
+#: ../data/piwiz.ui.h:35
+msgid "Show or hide the characters in your password"
+msgstr "A jelszó szövegének mutatása vagy elrejtése"
+
+#: ../data/piwiz.ui.h:36
+msgid "Press 'Next' to create your account."
+msgstr "A felhasználó létrehozásához válassza a ‘Következő’-t."
+
+#: ../data/piwiz.ui.h:37
+msgid "<b>Set Up Screen</b>"
+msgstr "<b>Képernyő beállítása</b>"
+
+#: ../data/piwiz.ui.h:38
+msgid ""
+"On some monitors, the desktop is larger than the screen and the edges are "
+"cut off. You can adjust this here."
+msgstr ""
+"Egyes monitorokon az asztal felülete nagyobb lehet a kijelző méreténél és a "
+"felület szélei kicsúszhatnak."
+
+#: ../data/piwiz.ui.h:39
+msgid "Reduce the size of the desktop on this monitor"
+msgstr "Az asztal méretének csökkentése ezen a monitoron"
+
+#: ../data/piwiz.ui.h:40
+msgid "Turn on to shrink the desktop to fit the monitor"
+msgstr ""
+"Kapcsolja be az asztal felületének a monitor méretéhez igazított összehúzását"
+
+#: ../data/piwiz.ui.h:41
+msgid "Reduce the size of the desktop on the second monitor"
+msgstr "Az asztal méretének csökkentése a második monitoron"
+
+#: ../data/piwiz.ui.h:42
+msgid "Turn on to shrink the desktop to fit the second monitor"
+msgstr ""
+"Kapcsolja be az asztal felületének a második monitor méretéhez igazított "
+"összehúzását"
+
+#: ../data/piwiz.ui.h:43
+msgid "Press 'Next' when the screen looks correct."
+msgstr "Ha a képernyőbeállítások megfelelőek nyomja le a ‘’Következő”-t."
+
+#: ../data/piwiz.ui.h:44
+msgid "<b>Select WiFi Network</b>"
+msgstr "<b>Válasszon WiFi hálózatot</b>"
+
+#: ../data/piwiz.ui.h:45
+msgid "Select your WiFi network from the list."
+msgstr "Válasszon a listából WiFi hálózatot."
+
+#: ../data/piwiz.ui.h:46
+msgid "Click the name of your network to select it"
+msgstr "Klikkeljen a hálózat nevére"
+
+#: ../data/piwiz.ui.h:47
+msgid "Press 'Next' to connect, or 'Skip' to continue without connecting."
+msgstr ""
+"Válassza a “Következő”-t a WiFi kapcsolat létrehozásához vagy lépjen tovább "
+"kapcsolódás nélkül a “Kihagy” gomb lenyomásával."
+
+#: ../data/piwiz.ui.h:48
+msgid "<b>Enter WiFi Password</b>"
+msgstr "<b>Adja meg a WiFi jelszót</b>"
+
+#: ../data/piwiz.ui.h:49
+msgid "Enter the password for your WiFi network."
+msgstr "Adja meg a WiFi hálózat jelszavát."
+
+#: ../data/piwiz.ui.h:50
+msgid "Password:"
+msgstr "Jelszó:"
+
+#: ../data/piwiz.ui.h:51
+msgid "Enter the password for your network"
+msgstr "Adja meg a hálózat jelszavát"
+
+#: ../data/piwiz.ui.h:52
+msgid "<b>Choose Browser</b>"
+msgstr "<b>Válasszon böngészőt</b>"
+
+#: ../data/piwiz.ui.h:53
+msgid ""
+"Both the Chromium and Firefox web browsers are preinstalled on Raspberry Pi "
+"OS. Select the one you prefer to use."
+msgstr ""
+"A Chromium és a Firefox böngésző telepítve van már ezen a Raspberry Pi "
+"rendszeren. Válassza ki melyiket szeretné alapértelmezetten használni."
+
+#: ../data/piwiz.ui.h:54
+msgid "Default Browser:"
+msgstr "Alapértelmezett böngésző:"
+
+#: ../data/piwiz.ui.h:55
+msgid "Chromium"
+msgstr "Chromium"
+
+#: ../data/piwiz.ui.h:56
+msgid "Firefox"
+msgstr "Firefox"
+
+#: ../data/piwiz.ui.h:57
+msgid "Tick here to uninstall the unused browser"
+msgstr "Pipálja be a nem használt böngésző eltávolításához"
+
+#: ../data/piwiz.ui.h:58
+msgid "Press 'Next' when you have chosen a browser."
+msgstr "Továbblépéshez válassza a “Következő”-t."
+
+#: ../data/piwiz.ui.h:59
+msgid "<b>Enable Raspberry Pi Connect</b>"
+msgstr "<b>”Raspberry Pi Connect” engedélyezése</b>"
+
+#: ../data/piwiz.ui.h:60
+msgid ""
+"Raspberry Pi Connect is a service which allows you to securely remotely "
+"access your Raspberry Pi's desktop from any computer."
+msgstr ""
+"A “Raspberry Pi Connect” szolgáltatás segítségével távolról, bármely "
+"számítógépről biztonságosan érheti el a Raspberry Pi grafikus vagy "
+"parancssoros felületét."
+
+#: ../data/piwiz.ui.h:61
+msgid "Enable Raspberry Pi Connect"
+msgstr "”Raspberry Pi Connect” engedélyezése"
+
+#: ../data/piwiz.ui.h:62
+msgid "Turn on to allow remote access"
+msgstr "Kapcsolja be a távoli elérés engedélyezéséhez"
+
+#: ../data/piwiz.ui.h:63
+msgid "Press 'Next' when you have made your choice."
+msgstr "Továbblépéshez válassza a “Következő”-t."
+
+#: ../data/piwiz.ui.h:64
+msgid "<b>Update Software</b>"
+msgstr "<b>Szoftverfrissítés</b>"
+
+#: ../data/piwiz.ui.h:65
+msgid ""
+"The operating system and applications will now be checked and updated if "
+"necessary. This may involve a large download.\n"
+"\n"
+"Press 'Next' to check and update software, or 'Skip' to continue without "
+"checking."
+msgstr ""
+"Az operációs rendszer és a telepített alkalmazások frissítése következik. Ez "
+"a lépés jelentősebb letöltéssel járhat.\n"
+"\n"
+"Válassza a “Következő”-t a frissítések ellenőrzéséhez vagy lépjen tovább "
+"frissítés nélkül a “Kihagy” gombbal."
+
+#: ../data/piwiz.ui.h:68
+msgid "<b>Setup Complete</b>"
+msgstr "<b>Beállítás sikeres</b>"
+
+#: ../data/piwiz.ui.h:69
+msgid "Your Raspberry Pi is now set up and ready to go."
+msgstr "Raspberry Pi számítógépe be van állítva és használatra kész."
+
+#: ../data/piwiz.ui.h:70
+msgid ""
+"Press 'Restart' to restart your Pi so the new settings will take effect."
+msgstr "Az új beállítások érvényesítéséhez válassza az “Újraindítás”-t."
+
+msgid "Reading update list - please wait..."
+msgstr "Elérhető frissítések beolvasása - kérem várjon…"
+
+msgid "Finding languages - please wait..."
+msgstr "Elérhető nyelvek keresése - kérem várjon…"
+
+msgid "Comparing versions - please wait..."
+msgstr "Verziók összehasonlítása - kérem várjon…"
+
+#, c-format
+msgid ""
+"Error finding languages.\n"
+"%s"
+msgstr ""
+"Hiba a nyelvek keresésekor.\n"
+"%s"
+
+#, c-format
+msgid ""
+"Error comparing versions.\n"
+"%s"
+msgstr ""
+"Hiba a verziók összehasonlításakor.\n"
+"%s"
+
+msgid "Could not connect to this network"
+msgstr "Ehhez a hálózathoz nem lehet kapcsolódni"
+
+msgid "Error creating new GIO Channel\n"
+msgstr "Hiba új GIO csatorna létrehozásakor\n"
+
+msgid "Error creating watch\n"
+msgstr "Hiba “watch” létrehozásakor\n"
+
+msgid "g_try_malloc\n"
+msgstr "g_try_malloc\n"
+
+msgid "Connection to dhcpcd lost"
+msgstr "Megszakadt a dhcpcd-vel a kapcsolat"
+
+#, c-format
+msgid "Connected to %s-%s"
+msgstr "Csatlakozva ehhez %s - %s"
+
+msgid "dhcpcd connection lost"
+msgstr "megszakadt a dhcpcd-vel a kapcsolat"
+
+msgid "Network event"
+msgstr "Hálózati esemény"
+
+#, c-format
+msgid "dhcpcd WPA connection lost: %s"
+msgstr "megszakadt a dhcpcd WPA kapcsolat: %s"
+
+msgid "New Access Point"
+msgstr "Új elérési pont"
+
+msgid "New Access Points"
+msgstr "Új elérési pontok"
+
+msgid "Connecting to dhcpcd ..."
+msgstr "Kapcsolódás a dhcpcd-hez…"
+
+msgid "Connecting ..."
+msgstr "Kapcsolódás …"
+
+msgid "Failed to disconnect."
+msgstr "Kapcsolatbontása sikertelen."
+
+msgid "Faile to reconfigure."
+msgstr "Beállítások módosítása sikertelen."
+
+msgid "Failed to set key management."
+msgstr "Sikertelen a kulcs menedzsment beállítása."
+
+msgid "Failed to set password, probably too short."
+msgstr "Sikertelen jelszóbeállítás, valószínűleg túl rövid."
+
+msgid "Failed to enable the network."
+msgstr "Sikertelen a hálózat engedélyezése."
+
+msgid "Failed to select the network."
+msgstr "Sikertelen a hálózat kiválasztása."
+
+msgid "Failed to start association."
+msgstr "Sikertelen a hozzárendelés indítása."
+
+msgid ""
+"Failed to save wpa_supplicant configuration.\n"
+"\n"
+"You should add update_config=1 to /etc/wpa_supplicant.conf."
+msgstr ""
+"Sikertelen a “wpa_supplicant” beállítás mentése.\n"
+"\n"
+"Adja hozzá az “update_config=1” sort a “/etc/wpa_supplicant.conf” fájlhoz."
+
+msgid "Error enabling network"
+msgstr "Hiba a hálózat engedélyezésekor"
+
+msgid "Pre Shared Key:"
+msgstr "Előmegosztott kulcs (PSK):"
+
+msgid "_Later"
+msgstr "_Később"
+
+#, c-format
+msgid "%s: Received scan results"
+msgstr "%s: Keresési eredmények érkeztek"
+
+msgid ""
+"The default 'pi' user account currently has the password 'raspberry'. It is "
+"strongly recommended that you change this to a different password that only "
+"you know."
+msgstr ""
+"Alapértelmezetten a “pi” felhasználónak “raspberry” a jelszava. Javasoljuk, "
+"hogy állítson be egy új, csak az ön számára ismert jelszót."
+
+msgid ""
+"You should be able to see the taskbar along the top of the screen.\n"
+"Tick the box if some or all of it does not fit on the screen."
+msgstr ""
+"A tálcának a képernyő felső szélén kell megjelennie.\n"
+"Jelölje be, ha a tálca részben vagy egyáltalán nem fér rá a képernyőre."
+
+msgid "The taskbar does not fit onto the screen"
+msgstr "A tálca nem fér rá a képernyőre"
+
+msgid "Tick this box if the taskbar is not completely visible"
+msgstr "Jelölje be, ha a tálca nem teljesen látható"
+
+msgid ""
+"The change will take effect when the Pi is restarted.\n"
+"\n"
+"Press 'Next' to save your setting."
+msgstr ""
+"A változások a Pi újraindítása után jutnak érvényre.\n"
+"\n"
+"Nyomja le a ”Következő“-t a beállítások mentéséhez."
+
+msgid ""
+"To run applications, click the raspberry icon in the top left corner of the "
+"screen to open the menu."
+msgstr "Alkalmazások futtatásához klikkeljen a tálca szélén lévő málna ikonra."
