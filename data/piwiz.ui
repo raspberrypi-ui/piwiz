@@ -1158,7 +1158,7 @@ The username can only contain lower-case letters, digits and hyphens, and must s
                   <object class="GtkLabel" id="p9title">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">&lt;b&gt;Enable Raspberry Pi Connect&lt;/b&gt;</property>
+                    <property name="label" translatable="yes">&lt;b&gt;Disable Raspberry Pi Connect&lt;/b&gt;</property>
                     <property name="use-markup">True</property>
                     <property name="max-width-chars">50</property>
                     <property name="xalign">0</property>
@@ -1173,7 +1173,9 @@ The username can only contain lower-case letters, digits and hyphens, and must s
                   <object class="GtkLabel" id="p9info">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">Raspberry Pi Connect is a service which allows you to securely remotely access your Raspberry Pi's desktop from any computer.</property>
+                    <property name="label" translatable="yes">Raspberry Pi Connect is a service which allows you to securely remotely access your Raspberry Pi's desktop from any computer.
+
+It is enabled by default - untick the box if you do not need to use it.</property>
                     <property name="wrap">True</property>
                     <property name="max-width-chars">50</property>
                     <property name="xalign">0</property>
@@ -1186,38 +1188,13 @@ The username can only contain lower-case letters, digits and hyphens, and must s
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkBox" id="p9hbox1">
+                  <object class="GtkCheckButton" id="p9rpcsw">
+                    <property name="label" translatable="yes">Use Raspberry Pi Connect</property>
                     <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="spacing">20</property>
-                    <child>
-                      <object class="GtkLabel" id="p9rpc">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="label" translatable="yes">Enable Raspberry Pi Connect</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkSwitch" id="p9rpcsw">
-                        <property name="visible">True</property>
-                        <property name="can-focus">True</property>
-                        <property name="tooltip-text" translatable="yes">Turn on to allow remote access</property>
-                        <accessibility>
-                          <relation type="labelled-by" target="p9rpc"/>
-                        </accessibility>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="pack-type">end</property>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
+                    <property name="can-focus">True</property>
+                    <property name="receives-default">False</property>
+                    <property name="tooltip-text" translatable="yes">Untick to disable Raspberry Pi Connect</property>
+                    <property name="draw-indicator">True</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>

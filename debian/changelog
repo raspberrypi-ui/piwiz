@@ -1,3 +1,9 @@
+piwiz (0.80) bookworm; urgency=medium
+
+  * Enable Connect by default.
+
+ -- Simon Long <simon@raspberrypi.com>  Fri, 04 Oct 2024 15:51:11 +0100
+
 piwiz (0.79) bookworm; urgency=medium
 
   * Update name of Chromium package

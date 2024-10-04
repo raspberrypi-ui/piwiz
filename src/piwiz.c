@@ -2201,7 +2201,7 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             change_page (FORWARD);
                             break;
 
-        case PAGE_RPC :     if (gtk_switch_get_active (GTK_SWITCH (rpc_sw)))
+        case PAGE_RPC :     if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (rpc_sw)))
                                 vsystem ("sudo systemctl --global enable rpi-connect;sudo systemctl --global enable rpi-connect-wayvnc");
                             else
                                 vsystem ("sudo systemctl --global disable rpi-connect;sudo systemctl --global disable rpi-connect-wayvnc");
@@ -2519,7 +2519,7 @@ int main (int argc, char *argv[])
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (uskey_chk), FALSE);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (chromium_rb), TRUE);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (uninstall_chk), FALSE);
-    gtk_switch_set_active (GTK_SWITCH (rpc_sw), FALSE);
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (rpc_sw), TRUE);
 
     // set up underscan
     uscan1_sw = (GtkWidget *) gtk_builder_get_object (builder, "p7switch1");
