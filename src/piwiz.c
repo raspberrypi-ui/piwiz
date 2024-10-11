@@ -2000,7 +2000,7 @@ static gboolean page_shown (int page)
 
         case PAGE_BROWSER : return browser;
 
-        case PAGE_RPC :     return rpc;
+        case PAGE_RPC :     return FALSE;
 
         case PAGE_WIFIPSK : return FALSE;
 
