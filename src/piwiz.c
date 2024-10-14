@@ -116,7 +116,7 @@ static GtkWidget *country_cb, *language_cb, *timezone_cb;
 static GtkWidget *ap_tv, *psk_label, *prompt, *ip_label, *bt_prompt;
 static GtkWidget *user_te, *pwd1_te, *pwd2_te, *psk_te;
 static GtkWidget *pwd_hide, *psk_hide, *eng_chk, *uskey_chk;
-static GtkWidget *uscan1_sw, *uscan2_sw, *uscan2_box, *rpc_sw;
+static GtkWidget *uscan1_sw, *uscan2_sw, *uscan2_box;
 static GtkWidget *rename_title, *rename_info, *rename_prompt;
 static GtkWidget *done_title, *done_info, *done_prompt;
 static GtkWidget *chromium_rb, *firefox_rb, *uninstall_chk;
@@ -143,7 +143,6 @@ gboolean reboot = TRUE, is_pi = TRUE;
 int last_btn = NEXT_BTN;
 int calls;
 gboolean browser = TRUE;
-gboolean rpc = TRUE;
 
 typedef enum {
     WM_OPENBOX,
@@ -2201,13 +2200,6 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             change_page (FORWARD);
                             break;
 
-        case PAGE_RPC :     if (gtk_switch_get_active (GTK_SWITCH (rpc_sw)))
-                                vsystem ("sudo systemctl --global enable rpi-connect;sudo systemctl --global enable rpi-connect-wayvnc");
-                            else
-                                vsystem ("sudo systemctl --global disable rpi-connect;sudo systemctl --global disable rpi-connect-wayvnc");
-                            change_page (FORWARD);
-                            break;
-
         case PAGE_UPDATE :  if (net_available ())
                             {
                                 if (clock_synced ())
@@ -2451,8 +2443,7 @@ int main (int argc, char *argv[])
     set_marketing_serial ("/etc/chromium/master_preferences");
     set_marketing_serial ("/usr/share/firefox/distribution/distribution.ini");
 
-    if (vsystem ("raspi-config nonint is_installed rpi-connect")) rpc = FALSE;
-    if (is_pi == FALSE) rpc = FALSE;
+    vsystem ("sudo systemctl --global disable rpi-connect;sudo systemctl --global disable rpi-connect-wayvnc");
 
     // GTK setup
     gtk_init (&argc, &argv);
@@ -2501,7 +2492,6 @@ int main (int argc, char *argv[])
     chromium_rb = (GtkWidget *) gtk_builder_get_object (builder, "p8rbcr");
     firefox_rb = (GtkWidget *) gtk_builder_get_object (builder, "p8rbff");
     uninstall_chk = (GtkWidget *) gtk_builder_get_object (builder, "p8chuninst");
-    rpc_sw = (GtkWidget *) gtk_builder_get_object (builder, "p9rpcsw");
 
     pwd_hide = (GtkWidget *) gtk_builder_get_object (builder, "p2check");
     g_signal_connect (pwd_hide, "toggled", G_CALLBACK (pwd_toggle), NULL);
@@ -2519,7 +2509,6 @@ int main (int argc, char *argv[])
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (uskey_chk), FALSE);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (chromium_rb), TRUE);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (uninstall_chk), FALSE);
-    gtk_switch_set_active (GTK_SWITCH (rpc_sw), FALSE);
 
     // set up underscan
     uscan1_sw = (GtkWidget *) gtk_builder_get_object (builder, "p7switch1");
