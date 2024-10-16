@@ -58,9 +58,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PAGE_WIFIAP 4
 #define PAGE_WIFIPSK 5
 #define PAGE_BROWSER 6
-#define PAGE_RPC 7
-#define PAGE_UPDATE 8
-#define PAGE_DONE 9
+#define PAGE_UPDATE 7
+#define PAGE_DONE 8
 
 #define NEXT_BTN 0
 #define SKIP_BTN 1
@@ -1999,8 +1998,6 @@ static gboolean page_shown (int page)
 
         case PAGE_BROWSER : return browser;
 
-        case PAGE_RPC :     return FALSE;
-
         case PAGE_WIFIPSK : return FALSE;
 
         case PAGE_INTRO :
@@ -2442,8 +2439,6 @@ int main (int argc, char *argv[])
     if (vsystem ("raspi-config nonint is_installed firefox")) browser = FALSE;
     set_marketing_serial ("/etc/chromium/master_preferences");
     set_marketing_serial ("/usr/share/firefox/distribution/distribution.ini");
-
-    vsystem ("sudo systemctl --global disable rpi-connect;sudo systemctl --global disable rpi-connect-wayvnc");
 
     // GTK setup
     gtk_init (&argc, &argv);

@@ -1,3 +1,9 @@
+piwiz (0.84) bookworm; urgency=medium
+
+  * Remove remaining Connect code
+
+ -- Simon Long <simon@raspberrypi.com>  Wed, 16 Oct 2024 07:31:17 +0100
+
 piwiz (0.83) bookworm; urgency=medium
 
   * Remove global enable of Connect

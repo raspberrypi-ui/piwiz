@@ -1149,104 +1149,6 @@ The username can only contain lower-case letters, digits and hyphens, and must s
               </packing>
             </child>
             <child>
-              <object class="GtkBox" id="p9vbox">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="orientation">vertical</property>
-                <property name="spacing">5</property>
-                <child>
-                  <object class="GtkLabel" id="p9title">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">&lt;b&gt;Enable Raspberry Pi Connect&lt;/b&gt;</property>
-                    <property name="use-markup">True</property>
-                    <property name="max-width-chars">50</property>
-                    <property name="xalign">0</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="position">0</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel" id="p9info">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">Raspberry Pi Connect is a service which allows you to securely remotely access your Raspberry Pi's desktop from any computer.</property>
-                    <property name="wrap">True</property>
-                    <property name="max-width-chars">50</property>
-                    <property name="xalign">0</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="padding">5</property>
-                    <property name="position">1</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkBox" id="p9hbox1">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="spacing">20</property>
-                    <child>
-                      <object class="GtkLabel" id="p9rpc">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="label" translatable="yes">Enable Raspberry Pi Connect</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkSwitch" id="p9rpcsw">
-                        <property name="visible">True</property>
-                        <property name="can-focus">True</property>
-                        <property name="tooltip-text" translatable="yes">Turn on to allow remote access</property>
-                        <accessibility>
-                          <relation type="labelled-by" target="p9rpc"/>
-                        </accessibility>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="pack-type">end</property>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">2</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel" id="p9prompt">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">Press 'Next' when you have made your choice.</property>
-                    <property name="wrap">True</property>
-                    <property name="max-width-chars">50</property>
-                    <property name="xalign">0</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="padding">5</property>
-                    <property name="position">4</property>
-                  </packing>
-                </child>
-              </object>
-              <packing>
-                <property name="position">7</property>
-              </packing>
-            </child>
-            <child>
               <object class="GtkBox" id="p5vbox">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
@@ -1287,7 +1189,7 @@ Press 'Next' to check and update software, or 'Skip' to continue without checkin
                 </child>
               </object>
               <packing>
-                <property name="position">8</property>
+                <property name="position">7</property>
               </packing>
             </child>
             <child>
@@ -1359,7 +1261,7 @@ Press 'Next' to check and update software, or 'Skip' to continue without checkin
                 </child>
               </object>
               <packing>
-                <property name="position">9</property>
+                <property name="position">8</property>
               </packing>
             </child>
           </object>
