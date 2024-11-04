@@ -2349,6 +2349,7 @@ static gboolean check_bluetooth (void)
 {
     if (!system ("rfkill list bluetooth | grep -q Bluetooth"))
     {
+        system ("rfkill unblock bluetooth");
         if (system ("test -f /boot/firmware/btautopair"))
         {
             system ("sudo touch /boot/firmware/btautopair");
