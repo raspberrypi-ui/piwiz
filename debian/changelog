@@ -1,3 +1,9 @@
+piwiz (0.86) bookworm; urgency=medium
+
+  * Fix threaded message boxes
+
+ -- Simon Long <simon@raspberrypi.com>  Mon, 09 Dec 2024 10:33:32 +0000
+
 piwiz (0.85) bookworm; urgency=medium
 
   * Unblock all Bluetooth devices

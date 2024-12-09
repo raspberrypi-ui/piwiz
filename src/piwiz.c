@@ -99,13 +99,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define JAPAN_FONTS "fonts-vlgothic fonts-mplus"
 
-typedef struct {
-    char *msg;
-    int type;
-} prog_msg;
-
-static prog_msg pm;
-
 /* Controls */
 
 static GtkWidget *main_dlg, *msg_dlg, *msg_msg, *msg_pb, *msg_btn;
@@ -354,11 +347,7 @@ static int get_status (char *cmd);
 static char *get_quoted_param (char *path, char *fname, char *toseek);
 static int vsystem (const char *fmt, ...);
 static void error_box (char *msg);
-static gboolean cb_error (gpointer data);
-static void thread_error (char *msg);
 static void message (char *msg, int type);
-static gboolean cb_message (gpointer data);
-static void thread_message (char *msg, int type);
 static void hide_message (void);
 static gboolean ok_clicked (GtkButton *button, gpointer data);
 static gboolean loc_done (gpointer data);
@@ -593,16 +582,6 @@ static void error_box (char *msg)
     else gtk_label_set_text (GTK_LABEL (err_msg), msg);
 }
 
-static gboolean cb_error (gpointer data)
-{
-    error_box ((char *) data);
-    return FALSE;
-}
-
-static void thread_error (char *msg)
-{
-    gdk_threads_add_idle (cb_error, msg);
-}
 
 static void message (char *msg, int type)
 {
@@ -656,20 +635,6 @@ static void message (char *msg, int type)
     }
 
     gtk_widget_show (msg_dlg);
-}
-
-static gboolean cb_message (gpointer data)
-{
-    prog_msg *pm = (prog_msg *) data;
-    message (pm->msg, pm->type);
-    return FALSE;
-}
-
-static void thread_message (char *msg, int type)
-{
-    pm.msg = msg;
-    pm.type = type;
-    gdk_threads_add_idle (cb_message, &pm);
 }
 
 static void hide_message (void)
@@ -1181,7 +1146,7 @@ static void nm_stop_scan (void)
 // callback to end async request_scan call
 static void nm_req_scan_finish_cb (GObject *device, GAsyncResult *result, gpointer data)
 {
-    GError *error;
+    GError *error = NULL;
     nm_device_wifi_request_scan_finish (NM_DEVICE_WIFI (device), result, &error);
 }
 
@@ -1664,7 +1629,7 @@ static void next_update (PkTask *task, update_type update_stage)
             {
                 pack_array = g_strsplit (lpack, " ", -1);
 
-                thread_message (_("Downloading languages - please wait..."), MSG_PULSE);
+                message (_("Downloading languages - please wait..."), MSG_PULSE);
                 pk_client_resolve_async (PK_CLIENT (task), 0, pack_array, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) resolve_lang_done, NULL);
                 g_strfreev (pack_array);
                 g_free (lpack);
@@ -1677,7 +1642,7 @@ static void next_update (PkTask *task, update_type update_stage)
                 if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (chromium_rb))) lpack = g_strdup ("firefox");
                 else lpack = g_strdup ("chromium");
                 pack_array = g_strsplit (lpack, " ", -1);
-                thread_message (_("Uninstalling browser - please wait..."), MSG_PULSE);
+                message (_("Uninstalling browser - please wait..."), MSG_PULSE);
                 pk_client_resolve_async (PK_CLIENT (task), 0, pack_array, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) resolve_browser_done, NULL);
                 g_strfreev (pack_array);
                 g_free (lpack);
@@ -1685,7 +1650,7 @@ static void next_update (PkTask *task, update_type update_stage)
             }
 
         case INSTALL_UPDATES:
-            thread_message (_("Getting updates - please wait..."), MSG_PULSE);
+            message (_("Getting updates - please wait..."), MSG_PULSE);
             pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
     }
 }
@@ -1701,7 +1666,7 @@ static PkResults *error_handler (PkTask *task, GAsyncResult *res, char *desc)
     if (error != NULL)
     {
         buf = g_strdup_printf (_("Error %s - %s"), desc, error->message);
-        thread_error (buf);
+        error_box (buf);
         g_free (buf);
         g_error_free (error);
         return NULL;
@@ -1711,7 +1676,7 @@ static PkResults *error_handler (PkTask *task, GAsyncResult *res, char *desc)
     if (pkerror != NULL)
     {
         buf = g_strdup_printf (_("Error %s - %s"), desc, pk_error_get_details (pkerror));
-        thread_error (buf);
+        error_box (buf);
         g_free (buf);
         g_object_unref (pkerror);
         return NULL;
@@ -1763,7 +1728,7 @@ static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
 
     if (pk_package_sack_get_size (fsack) > 0)
     {
-        thread_message (_("Downloading languages - please wait..."), MSG_PULSE);
+        message (_("Downloading languages - please wait..."), MSG_PULSE);
 
         gchar **ids = pk_package_sack_get_ids (fsack);
         pk_task_install_packages_async (task, ids, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) install_lang_done, NULL);
@@ -1791,7 +1756,7 @@ static void resolve_browser_done (PkTask *task, GAsyncResult *res, gpointer data
 
     if (pk_package_sack_get_size (fsack) > 0)
     {
-        thread_message (_("Uninstalling browser - please wait..."), MSG_PULSE);
+        message (_("Uninstalling browser - please wait..."), MSG_PULSE);
 
         gchar **ids = pk_package_sack_get_ids (fsack);
         pk_task_remove_packages_async (task, ids, TRUE, TRUE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) uninstall_browser_done, NULL);
@@ -1819,7 +1784,7 @@ static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
 
     if (pk_package_sack_get_size (fsack) > 0)
     {
-        thread_message (_("Getting updates - please wait..."), MSG_PULSE);
+        message (_("Getting updates - please wait..."), MSG_PULSE);
 
         gchar **ids = pk_package_sack_get_ids (fsack);
         pk_task_update_packages_async (task, ids, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) do_updates_done, NULL);
@@ -1830,7 +1795,7 @@ static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
         // check reboot flag set by install process
         if (!access ("/run/reboot-required", F_OK)) reboot = TRUE;
 
-        thread_message (_("System is up to date"), MSG_TERM);
+        message (_("System is up to date"), MSG_TERM);
     }
 
     g_object_unref (sack);
@@ -1847,7 +1812,7 @@ static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
     // re-set the serial number in case a browser update was installed
     set_marketing_serial ("/etc/chromium/master_preferences");
     set_marketing_serial ("/usr/share/firefox/distribution/distribution.ini");
-    thread_message (_("System is up to date"), MSG_TERM);
+    message (_("System is up to date"), MSG_TERM);
 }
 
 static gboolean clock_synced (void)
