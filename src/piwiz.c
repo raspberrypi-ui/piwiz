@@ -2564,6 +2564,8 @@ int main (int argc, char *argv[])
 
     gtk_widget_show (main_dlg);
     gtk_window_set_default_size (GTK_WINDOW (main_dlg), 1, 1);
+    gtk_widget_set_can_default (next_btn, TRUE);
+    gtk_window_set_default (GTK_WINDOW (main_dlg), next_btn);
     gtk_main ();
 
     return 0;
