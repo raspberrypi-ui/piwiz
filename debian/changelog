@@ -1,3 +1,9 @@
+piwiz (0.87) bookworm; urgency=medium
+
+  * Be more strict about PkTask vs PkClient, because trixie cares...
+
+ -- Simon Long <simon@raspberrypi.com>  Thu, 13 Mar 2025 14:08:56 +0000
+
 piwiz (0.86) bookworm; urgency=medium
 
   * Fix threaded message boxes
