@@ -384,14 +384,14 @@ static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data);
 static gboolean inst_filter_fn (PkPackage *package, gpointer user_data);
 static gboolean rem_filter_fn (PkPackage *package, gpointer user_data);
 static gboolean upd_filter_fn (PkPackage *package, gpointer user_data);
-static void next_update (PkTask *task, update_type update_stage);
-static PkResults *error_handler (PkTask *task, GAsyncResult *res, char *desc);
-static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data);
+static void next_update (PkClient *client, update_type update_stage);
+static PkResults *error_handler (PkTask *task, PkClient *client, GAsyncResult *res, char *desc);
+static void check_updates_done (PkClient *client, GAsyncResult *res, gpointer data);
 static void install_lang_done (PkTask *task, GAsyncResult *res, gpointer data);
-static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data);
+static void resolve_lang_done (PkClient *client, GAsyncResult *res, gpointer data);
 static void uninstall_browser_done (PkTask *task, GAsyncResult *res, gpointer data);
-static void resolve_browser_done (PkTask *task, GAsyncResult *res, gpointer data);
-static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data);
+static void resolve_browser_done (PkClient *client, GAsyncResult *res, gpointer data);
+static void refresh_cache_done (PkClient *client, GAsyncResult *res, gpointer data);
 static gpointer refresh_update_cache (gpointer data);
 static gboolean clock_synced (void);
 static void resync (void);
@@ -1606,7 +1606,7 @@ static gboolean upd_filter_fn (PkPackage *package, gpointer user_data)
     }
 }
 
-static void next_update (PkTask *task, update_type update_stage)
+static void next_update (PkClient *client, update_type update_stage)
 {
     gchar **pack_array;
     gchar *lpack, *buf, *tmp;
@@ -1630,7 +1630,7 @@ static void next_update (PkTask *task, update_type update_stage)
                 pack_array = g_strsplit (lpack, " ", -1);
 
                 message (_("Downloading languages - please wait..."), MSG_PULSE);
-                pk_client_resolve_async (PK_CLIENT (task), 0, pack_array, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) resolve_lang_done, NULL);
+                pk_client_resolve_async (client, 0, pack_array, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) resolve_lang_done, NULL);
                 g_strfreev (pack_array);
                 g_free (lpack);
                 break;
@@ -1643,7 +1643,7 @@ static void next_update (PkTask *task, update_type update_stage)
                 else lpack = g_strdup ("chromium");
                 pack_array = g_strsplit (lpack, " ", -1);
                 message (_("Uninstalling browser - please wait..."), MSG_PULSE);
-                pk_client_resolve_async (PK_CLIENT (task), 0, pack_array, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) resolve_browser_done, NULL);
+                pk_client_resolve_async (client, 0, pack_array, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) resolve_browser_done, NULL);
                 g_strfreev (pack_array);
                 g_free (lpack);
                 break;
@@ -1651,18 +1651,19 @@ static void next_update (PkTask *task, update_type update_stage)
 
         case INSTALL_UPDATES:
             message (_("Getting updates - please wait..."), MSG_PULSE);
-            pk_client_get_updates_async (PK_CLIENT (task), PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
+            pk_client_get_updates_async (client, PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
     }
 }
 
-static PkResults *error_handler (PkTask *task, GAsyncResult *res, char *desc)
+static PkResults *error_handler (PkTask *task, PkClient *client, GAsyncResult *res, char *desc)
 {
     PkResults *results;
     PkError *pkerror;
     GError *error = NULL;
     gchar *buf;
 
-    results = pk_task_generic_finish (task, res, &error);
+    if (task) results = pk_task_generic_finish (task, res, &error);
+    else results = pk_client_generic_finish (client, res, &error);
     if (error != NULL)
     {
         buf = g_strdup_printf (_("Error %s - %s"), desc, error->message);
@@ -1692,17 +1693,17 @@ static gpointer refresh_update_cache (gpointer data)
     return NULL;
 }
 
-static void refresh_cache_done (PkTask *task, GAsyncResult *res, gpointer data)
+static void refresh_cache_done (PkClient *client, GAsyncResult *res, gpointer data)
 {
-    if (!error_handler (task, res, _("checking for updates"))) return;
-    next_update (task, INSTALL_LANGUAGES);
+    if (!error_handler (NULL, client, res, _("checking for updates"))) return;
+    next_update (client, INSTALL_LANGUAGES);
 }
 
-static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
+static void resolve_lang_done (PkClient *client, GAsyncResult *res, gpointer data)
 {
     int i;
 
-    PkResults *results = error_handler (task, res, _("installing languages"));
+    PkResults *results = error_handler (NULL, client, res, _("installing languages"));
     if (!results) return;
 
     PkPackageSack *sack = pk_results_get_package_sack (results);
@@ -1731,10 +1732,10 @@ static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
         message (_("Downloading languages - please wait..."), MSG_PULSE);
 
         gchar **ids = pk_package_sack_get_ids (fsack);
-        pk_task_install_packages_async (task, ids, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) install_lang_done, NULL);
+        pk_task_install_packages_async (PK_TASK (client), ids, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) install_lang_done, NULL);
         g_strfreev (ids);
     }
-    else next_update (task, UNINSTALL_BROWSER);
+    else next_update (client, UNINSTALL_BROWSER);
 
     g_object_unref (sack);
     g_object_unref (fsack);
@@ -1742,13 +1743,13 @@ static void resolve_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
 
 static void install_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
 {
-    if (!error_handler (task, res, _("installing languages"))) return;
-    next_update (task, UNINSTALL_BROWSER);
+    if (!error_handler (task, NULL, res, _("installing languages"))) return;
+    next_update (PK_CLIENT (task), UNINSTALL_BROWSER);
 }
 
-static void resolve_browser_done (PkTask *task, GAsyncResult *res, gpointer data)
+static void resolve_browser_done (PkClient *client, GAsyncResult *res, gpointer data)
 {
-    PkResults *results = error_handler (task, res, _("uninstalling browser"));
+    PkResults *results = error_handler (NULL, client, res, _("uninstalling browser"));
     if (!results) return;
 
     PkPackageSack *sack = pk_results_get_package_sack (results);
@@ -1759,10 +1760,10 @@ static void resolve_browser_done (PkTask *task, GAsyncResult *res, gpointer data
         message (_("Uninstalling browser - please wait..."), MSG_PULSE);
 
         gchar **ids = pk_package_sack_get_ids (fsack);
-        pk_task_remove_packages_async (task, ids, TRUE, TRUE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) uninstall_browser_done, NULL);
+        pk_task_remove_packages_async (PK_TASK (client), ids, TRUE, TRUE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) uninstall_browser_done, NULL);
         g_strfreev (ids);
     }
-    else next_update (task, INSTALL_UPDATES);
+    else next_update (client, INSTALL_UPDATES);
 
     g_object_unref (sack);
     g_object_unref (fsack);
@@ -1770,13 +1771,13 @@ static void resolve_browser_done (PkTask *task, GAsyncResult *res, gpointer data
 
 static void uninstall_browser_done (PkTask *task, GAsyncResult *res, gpointer data)
 {
-    if (!error_handler (task, res, _("uninstalling browser"))) return;
-    next_update (task, INSTALL_UPDATES);
+    if (!error_handler (task, NULL, res, _("uninstalling browser"))) return;
+    next_update (PK_CLIENT (task), INSTALL_UPDATES);
 }
 
-static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
+static void check_updates_done (PkClient *client, GAsyncResult *res, gpointer data)
 {
-    PkResults *results = error_handler (task, res, _("getting updates"));
+    PkResults *results = error_handler (NULL, client, res, _("getting updates"));
     if (!results) return;
 
     PkPackageSack *sack = pk_results_get_package_sack (results);
@@ -1787,7 +1788,7 @@ static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
         message (_("Getting updates - please wait..."), MSG_PULSE);
 
         gchar **ids = pk_package_sack_get_ids (fsack);
-        pk_task_update_packages_async (task, ids, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) do_updates_done, NULL);
+        pk_task_update_packages_async (PK_TASK (client), ids, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) do_updates_done, NULL);
         g_strfreev (ids);
     }
     else
@@ -1804,7 +1805,7 @@ static void check_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
 
 static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
 {
-    if (!error_handler (task, res, _("getting updates"))) return;
+    if (!error_handler (task, NULL, res, _("getting updates"))) return;
 
     // check reboot flag set by install process
     if (!access ("/run/reboot-required", F_OK)) reboot = TRUE;
