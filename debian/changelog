@@ -1,3 +1,9 @@
+piwiz (0.88) bookworm; urgency=medium
+
+  * Use meson
+
+ -- Simon Long <simon@raspberrypi.com>  Wed, 19 Mar 2025 10:57:38 +0000
+
 piwiz (0.87) bookworm; urgency=medium
 
   * Be more strict about PkTask vs PkClient, because trixie cares...

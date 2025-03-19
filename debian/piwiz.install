@@ -1,2 +1,0 @@
-src/hdmi-audio-select usr/bin
-data/10-piwiz.rules usr/share/polkit-1/rules.d
