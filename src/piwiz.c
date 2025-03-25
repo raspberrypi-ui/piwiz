@@ -307,7 +307,7 @@ static const char kb_langs[MAX_KBS][3] = {
     "pt",
     "nn",
     "se",
-    "fi",
+    "dk",
     "ru",
     "tr",
     "he",
