@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <locale.h>
 
 #include <glib.h>
 #include <glib/gi18n.h>
@@ -131,6 +132,9 @@ gboolean reboot = TRUE, is_pi = TRUE;
 int last_btn = NEXT_BTN;
 int calls;
 gboolean browser = TRUE;
+
+GdkCursor *watch;
+gulong commit_handler;
 
 typedef enum {
     WM_OPENBOX,
@@ -1986,7 +1990,7 @@ static void change_page (int dir)
     }
 }
 
-static void next_page (GtkButton* btn, gpointer ptr)
+static void process_next (void)
 {
     GtkTreeModel *model;
     GtkTreeIter iter;
@@ -2182,6 +2186,21 @@ static void next_page (GtkButton* btn, gpointer ptr)
                             g_thread_new (NULL, final_setup, NULL);
                             break;
     }
+
+    gdk_window_set_cursor (gtk_widget_get_window (main_dlg), NULL);
+}
+
+static void commit_next (GdkWindow *win,  gpointer data)
+{
+    g_signal_handler_disconnect (win, commit_handler);
+    process_next ();
+}
+
+static void next_page (GtkButton* btn, gpointer ptr)
+{
+    gdk_window_set_cursor (gtk_widget_get_window (main_dlg), watch);
+    if (wm == WM_OPENBOX) process_next ();
+    else commit_handler = g_signal_connect (gtk_widget_get_window (main_dlg), "committed", G_CALLBACK (commit_next), NULL);
 }
 
 static void prev_page (GtkButton* btn, gpointer ptr)
@@ -2203,7 +2222,7 @@ static void prev_page (GtkButton* btn, gpointer ptr)
     else change_page (BACKWARD);
 }
 
-static void skip_page (GtkButton* btn, gpointer ptr)
+static void process_skip (void)
 {
     last_btn = SKIP_BTN;
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
@@ -2226,6 +2245,21 @@ static void skip_page (GtkButton* btn, gpointer ptr)
                             g_free (lpack);
                             break;
     }
+
+    gdk_window_set_cursor (gtk_widget_get_window (main_dlg), NULL);
+}
+
+static void commit_skip (GdkWindow *win,  gpointer data)
+{
+    g_signal_handler_disconnect (win, commit_handler);
+    process_skip ();
+}
+
+static void skip_page (GtkButton* btn, gpointer ptr)
+{
+    gdk_window_set_cursor (gtk_widget_get_window (main_dlg), watch);
+    if (wm == WM_OPENBOX) process_skip ();
+    else commit_handler = g_signal_connect (gtk_widget_get_window (main_dlg), "committed", G_CALLBACK (commit_skip), NULL);
 }
 
 static void pwd_toggle (GtkButton *btn, gpointer ptr)
@@ -2404,6 +2438,9 @@ int main (int argc, char *argv[])
     // GTK setup
     gtk_init (&argc, &argv);
     gtk_icon_theme_prepend_search_path (gtk_icon_theme_get_default(), PACKAGE_DATA_DIR);
+
+    // load the watch cursor
+    watch = gdk_cursor_new_for_display (gdk_display_get_default (), GDK_WATCH);
 
     // create the master databases
     locale_list = gtk_list_store_new (4, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
