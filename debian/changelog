@@ -1,3 +1,9 @@
+piwiz (0.89) bookworm; urgency=medium
+
+  * Add watch cursor
+
+ -- Simon Long <simon@raspberrypi.com>  Tue, 08 Apr 2025 09:09:42 +0100
+
 piwiz (0.88) bookworm; urgency=medium
 
   * Use meson
