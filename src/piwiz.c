@@ -2190,7 +2190,7 @@ static void process_next (void)
     gdk_window_set_cursor (gtk_widget_get_window (main_dlg), NULL);
 }
 
-static void commit_next (GdkWindow *win,  gpointer data)
+static void commit_next (GdkWindow *win, gpointer data)
 {
     g_signal_handler_disconnect (win, commit_handler);
     process_next ();
@@ -2249,7 +2249,7 @@ static void process_skip (void)
     gdk_window_set_cursor (gtk_widget_get_window (main_dlg), NULL);
 }
 
-static void commit_skip (GdkWindow *win,  gpointer data)
+static void commit_skip (GdkWindow *win, gpointer data)
 {
     g_signal_handler_disconnect (win, commit_handler);
     process_skip ();
