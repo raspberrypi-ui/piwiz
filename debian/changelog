@@ -1,3 +1,9 @@
+piwiz (0.91) bookworm; urgency=medium
+
+  * Copy labwc keyboard settings instead of wayfire for new user
+
+ -- Simon Long <simon@raspberrypi.com>  Thu, 08 May 2025 12:01:46 +0100
+
 piwiz (0.90) bookworm; urgency=medium
 
   * Remove marketing serial - now set in userconf script

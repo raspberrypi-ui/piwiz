@@ -1861,9 +1861,9 @@ static gboolean ntp_check (gpointer data)
 
 static gpointer final_setup (gpointer ptr)
 {
-    // copy the wayfire config file for the new user
-    if (!chuser) vsystem ("sudo mkdir -p /home/%s/.config/; sudo chown %s:%s /home/%s/.config/; sudo cp /home/rpi-first-boot-wizard/.config/wayfire.ini /home/%s/.config/wayfire.ini; sudo chown %s:%s /home/%s/.config/wayfire.ini",
-        init_user, init_user, init_user, init_user, init_user, init_user, init_user, init_user);
+    // copy the labwc config file for the new user
+    if (!chuser) vsystem ("sudo mkdir -p /home/%s/.config/labwc/; sudo chown %s:%s /home/%s/.config/; sudo chown %s:%s /home/%s/.config/labwc/; sudo cp /home/rpi-first-boot-wizard/.config/labwc/environment /home/%s/.config/labwc/environment; sudo chown %s:%s /home/%s/.config/labwc/environment",
+        init_user, init_user, init_user, init_user, init_user, init_user, init_user, init_user, init_user, init_user, init_user);
 
     // rename the pi user to the new user and set the password
     vsystem ("sudo /usr/lib/userconf-pi/userconf %s %s '%s'", chuser ? chuser : init_user, user, pw);
