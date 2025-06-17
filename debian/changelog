@@ -1,3 +1,9 @@
+piwiz (1.0) trixie; urgency=medium
+
+  * Restart lightdm instead of rebooting
+
+ -- Simon Long <simon@raspberrypi.com>  Tue, 17 Jun 2025 08:08:07 +0100
+
 piwiz (0.91) bookworm; urgency=medium
 
   * Copy labwc keyboard settings instead of wayfire for new user

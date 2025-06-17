@@ -102,7 +102,7 @@ static GtkWidget *main_dlg, *msg_dlg, *msg_msg, *msg_pb, *msg_btn;
 static GtkWidget *err_dlg, *err_msg, *err_btn;
 static GtkWidget *wizard_nb, *next_btn, *prev_btn, *skip_btn;
 static GtkWidget *country_cb, *language_cb, *timezone_cb;
-static GtkWidget *ap_tv, *psk_label, *prompt, *ip_label, *bt_prompt;
+static GtkWidget *ap_tv, *psk_label, *ip_label, *bt_prompt;
 static GtkWidget *user_te, *pwd1_te, *pwd2_te, *psk_te;
 static GtkWidget *pwd_hide, *psk_hide, *eng_chk, *uskey_chk;
 static GtkWidget *uscan1_sw, *uscan2_sw, *uscan2_box;
@@ -128,7 +128,7 @@ char *cc, *lc, *city, *ext, *lay, *var;
 char *ssid;
 char *user = NULL, *pw = NULL, *chuser = NULL, *init_user = NULL;
 gint conn_timeout = 0, pulse_timer = 0;
-gboolean reboot = TRUE, is_pi = TRUE;
+gboolean is_pi = TRUE;
 int last_btn = NEXT_BTN;
 int calls;
 gboolean browser = TRUE;
@@ -724,7 +724,6 @@ static gpointer set_locale (gpointer data)
     // set keyboard
     if (g_strcmp0 (init_kb, lay) || g_strcmp0 (init_var, var))
     {
-        reboot = TRUE;
         vsystem ("sudo raspi-config nonint do_change_keyboard_rc_gui pc105 %s %s", lay, var);
         if (init_kb)
         {
@@ -741,7 +740,6 @@ static gpointer set_locale (gpointer data)
     // set locale
     if (g_strcmp0 (init_country, cc) || g_strcmp0 (init_lang, lc))
     {
-        reboot = TRUE;
         vsystem ("sudo raspi-config nonint do_change_locale_rc_gui %s_%s%s", lc, cc, ext);
         if (init_country)
         {
@@ -1790,13 +1788,7 @@ static void check_updates_done (PkClient *client, GAsyncResult *res, gpointer da
         pk_task_update_packages_async (PK_TASK (client), ids, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) do_updates_done, NULL);
         g_strfreev (ids);
     }
-    else
-    {
-        // check reboot flag set by install process
-        if (!access ("/run/reboot-required", F_OK)) reboot = TRUE;
-
-        message (_("System is up to date"), MSG_TERM);
-    }
+    else message (_("System is up to date"), MSG_TERM);
 
     g_object_unref (sack);
     g_object_unref (fsack);
@@ -1805,9 +1797,6 @@ static void check_updates_done (PkClient *client, GAsyncResult *res, gpointer da
 static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
 {
     if (!error_handler (task, NULL, res, _("getting updates"))) return;
-
-    // check reboot flag set by install process
-    if (!access ("/run/reboot-required", F_OK)) reboot = TRUE;
 
     message (_("System is up to date"), MSG_TERM);
 }
@@ -1868,13 +1857,10 @@ static gpointer final_setup (gpointer ptr)
     // rename the pi user to the new user and set the password
     vsystem ("sudo /usr/lib/userconf-pi/userconf %s %s '%s'", chuser ? chuser : init_user, user, pw);
 
-    // set an autostart to set HDMI audio on reboot as new user
-    if (chuser == NULL) vsystem ("echo \"[Desktop Entry]\nType=Application\nName=Select HDMI Audio\nExec=sh -c '/usr/bin/hdmi-audio-select; sudo rm /etc/xdg/autostart/hdmiaudio.desktop'\" | sudo tee /etc/xdg/autostart/hdmiaudio.desktop", user);
-
     // delete autopair flag
     vsystem ("sudo rm -f /boot/firmware/btautopair");
 
-    if (reboot) vsystem ("sync; sudo reboot");
+    vsystem ("sync; sudo pkill lightdm");
     gtk_main_quit ();
     return NULL;
 }
@@ -1906,24 +1892,16 @@ static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, g
                             else start_scanning ();
                             break;
 
-        case PAGE_DONE :    if (reboot)
+        case PAGE_DONE :    if (chuser != NULL)
                             {
-                                gtk_widget_show (prompt);
+                                gtk_label_set_markup (GTK_LABEL (done_title), _("<b>User Renamed</b>"));
+                                char *msg = g_strdup_printf (_("The '%s' user has been renamed to '%s' and the new password set."), chuser, user);
+                                gtk_label_set_text (GTK_LABEL (done_info), msg);
+                                g_free (msg);
+                                gtk_label_set_text (GTK_LABEL (done_prompt), _("Press 'Restart' to reboot and login as the new user."));
                                 gtk_button_set_label (GTK_BUTTON (next_btn), _("_Restart"));
-                                if (chuser != NULL)
-                                {
-                                    gtk_label_set_markup (GTK_LABEL (done_title), _("<b>User Renamed</b>"));
-                                    char *msg = g_strdup_printf (_("The '%s' user has been renamed to '%s' and the new password set."), chuser, user);
-                                    gtk_label_set_text (GTK_LABEL (done_info), msg);
-                                    g_free (msg);
-                                    gtk_label_set_text (GTK_LABEL (done_prompt), _("Press 'Restart' to reboot and login as the new user."));
-                                }
                             }
-                            else
-                            {
-                                gtk_widget_hide (prompt);
-                                gtk_button_set_label (GTK_BUTTON (next_btn), _("_Done"));
-                            }
+                            else gtk_button_set_label (GTK_BUTTON (next_btn), _("_Launch"));
                             break;
 
         case PAGE_WIFIAP :  gtk_widget_show (skip_btn);
@@ -2177,7 +2155,7 @@ static void process_next (void)
                             break;
 
         case PAGE_DONE :    nm_stop_scan ();
-                            message (_("Restarting - please wait..."), MSG_PULSE);
+                            message (_("Launching desktop - please wait..."), MSG_PULSE);
                             gtk_widget_hide (main_dlg);
                             g_thread_new (NULL, final_setup, NULL);
                             break;
@@ -2412,7 +2390,6 @@ int main (int argc, char *argv[])
     kbd = get_pi_keyboard ();
     if (kbd > MAX_KBS - 1) kbd = 0;
 
-    reboot = TRUE;
     read_inits ();
 
     if (vsystem ("raspi-config nonint is_installed chromium")) browser = FALSE;
@@ -2458,7 +2435,6 @@ int main (int argc, char *argv[])
     pwd2_te = (GtkWidget *) gtk_builder_get_object (builder, "p2pwd2");
     psk_te = (GtkWidget *) gtk_builder_get_object (builder, "p4psk");
     psk_label = (GtkWidget *) gtk_builder_get_object (builder, "p4info");
-    prompt = (GtkWidget *) gtk_builder_get_object (builder, "p6prompt");
     rename_title = (GtkWidget *) gtk_builder_get_object (builder, "p2title");
     rename_info = (GtkWidget *) gtk_builder_get_object (builder, "p2info");
     rename_prompt = (GtkWidget *) gtk_builder_get_object (builder, "p2prompt");
