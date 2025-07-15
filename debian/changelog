@@ -1,3 +1,9 @@
+piwiz (1.1) trixie; urgency=medium
+
+  * Fix dependencies
+
+ -- Simon Long <simon@raspberrypi.com>  Tue, 15 Jul 2025 14:49:23 +0100
+
 piwiz (1.0) trixie; urgency=medium
 
   * Restart lightdm instead of rebooting

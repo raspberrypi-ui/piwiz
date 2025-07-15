@@ -10,6 +10,6 @@ Homepage: http://raspberrypi.com/
 
 Package: piwiz
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libgtk-3-0 (>= 3.24), packagekit, pi-language-support, raspi-config, alsa-utils, userconf-pi
+Depends: ${shlibs:Depends}, ${misc:Depends}, packagekit, pi-language-support, raspi-config, alsa-utils, userconf-pi
 Description: Raspberry Pi first-run wizard
  Wizard which performs initial configuration of Raspberry Pi system settings
