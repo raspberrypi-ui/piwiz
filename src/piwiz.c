@@ -96,6 +96,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define JAPAN_FONTS "fonts-vlgothic fonts-mplus"
 
+#define USERGUIDE_LANGS "fr,de,it,es,pt"
+
 /* Controls */
 
 static GtkWidget *main_dlg, *msg_dlg, *msg_msg, *msg_pb, *msg_btn;
@@ -1614,6 +1616,13 @@ static void next_update (PkClient *client, update_type update_stage)
             buf = g_strdup_printf ("check-language-support -l %s_%s", lc, cc);
             lpack = get_shell_string (buf, TRUE);
             g_free (buf);
+
+            if (strstr (USERGUIDE_LANGS, lc))
+            {
+                tmp = g_strdup_printf ("%s%s%s%s", "userguide-", lc, lpack ? " " : "", lpack);
+                g_free (lpack);
+                lpack = tmp;
+            }
 
             if (!g_strcmp0 (lc, "ja"))
             {
