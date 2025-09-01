@@ -1,3 +1,9 @@
+piwiz (1.2) trixie; urgency=medium
+
+  * Install translated user guide
+
+ -- Simon Long <simon@raspberrypi.com>  Mon, 01 Sep 2025 10:17:42 +0100
+
 piwiz (1.1) trixie; urgency=medium
 
   * Fix dependencies

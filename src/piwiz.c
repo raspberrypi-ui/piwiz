@@ -1619,7 +1619,7 @@ static void next_update (PkClient *client, update_type update_stage)
 
             if (strstr (USERGUIDE_LANGS, lc))
             {
-                tmp = g_strdup_printf ("%s%s%s%s", "userguide-", lc, lpack ? " " : "", lpack);
+                tmp = g_strdup_printf ("%s%s%s%s", "rpi-userguide-", lc, lpack ? " " : "", lpack);
                 g_free (lpack);
                 lpack = tmp;
             }
