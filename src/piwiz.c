@@ -2279,6 +2279,12 @@ static gboolean show_ip (void)
     ip = get_string ("hostname -I | tr ' ' \\\\n | grep \\\\. | tr \\\\n ','");
     if (ip)
     {
+        if (strstr (ip, "169.254."))
+        {
+            g_free (ip);
+            return TRUE;
+        }
+
         buf = ip;
         do
         {
