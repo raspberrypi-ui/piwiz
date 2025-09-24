@@ -2568,6 +2568,8 @@ int main (int argc, char *argv[])
 
     g_object_unref (builder);
 
+    g_object_set (gtk_widget_get_settings (main_dlg), "gtk-visible-focus", GTK_POLICY_ALWAYS, NULL);
+
     gtk_widget_show (main_dlg);
     gtk_window_set_default_size (GTK_WINDOW (main_dlg), 1, 1);
     gtk_widget_set_can_default (next_btn, TRUE);

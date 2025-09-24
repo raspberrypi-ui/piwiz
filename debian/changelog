@@ -1,3 +1,9 @@
+piwiz (1.4) trixie; urgency=medium
+
+  * Force keyboard focus display
+
+ -- Simon Long <simon@raspberrypi.com>  Wed, 24 Sep 2025 16:19:41 +0100
+
 piwiz (1.3) trixie; urgency=medium
 
   * Do not show link-local IP addresses
