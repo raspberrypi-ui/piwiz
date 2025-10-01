@@ -2326,7 +2326,7 @@ static gboolean check_bluetooth (void)
         system ("rfkill unblock bluetooth");
         if (system ("test -f /boot/firmware/btautopair"))
         {
-            system ("sudo touch /boot/firmware/btautopair");
+            system ("sudo touch /boot/firmware/btautopair; sync");
             gtk_label_set_text (GTK_LABEL (bt_prompt), _("To auto-pair a Bluetooth mouse and keyboard, please restart now by disconnecting and reconnecting the power cable."));
         }
         gtk_widget_show (bt_prompt);
