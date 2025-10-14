@@ -1814,7 +1814,7 @@ static gboolean clock_synced (void)
 {
     if (system ("test -e /usr/sbin/ntpd") == 0)
     {
-        if (system ("ntpq -p | grep -q ^\\*") == 0) return TRUE;
+        if (system ("/usr/sbin/ntpq -p | grep -q ^\\*") == 0) return TRUE;
     }
     else
     {
@@ -1985,7 +1985,7 @@ static void process_next (void)
     switch (gtk_notebook_get_current_page (GTK_NOTEBOOK (wizard_nb)))
     {
         case PAGE_INTRO :   // disable Bluetooth autoconnect after first page
-                            if (!system ("rfkill list bluetooth | grep -q Bluetooth"))
+                            if (!system ("/usr/sbin/rfkill list bluetooth | grep -q Bluetooth"))
                             {
                                 if (wm != WM_OPENBOX) vsystem ("wfpanelctl bluetooth apstop");
                                 else vsystem ("lxpanelctl command bluetooth apstop");
@@ -2321,9 +2321,9 @@ static gboolean net_available (void)
 
 static gboolean check_bluetooth (void)
 {
-    if (!system ("rfkill list bluetooth | grep -q Bluetooth"))
+    if (!system ("/usr/sbin/rfkill list bluetooth | grep -q Bluetooth"))
     {
-        system ("rfkill unblock bluetooth");
+        system ("/usr/sbin/rfkill unblock bluetooth");
         if (system ("test -f /boot/firmware/btautopair"))
         {
             system ("sudo touch /boot/firmware/btautopair; sync");

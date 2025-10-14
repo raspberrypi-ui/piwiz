@@ -1,3 +1,9 @@
+piwiz (1.5) trixie; urgency=medium
+
+  * Use full path for rfkill
+
+ -- Simon Long <simon@raspberrypi.com>  Tue, 14 Oct 2025 07:51:12 +0100
+
 piwiz (1.4) trixie; urgency=medium
 
   * Force keyboard focus display
