@@ -408,7 +408,7 @@ static gboolean show_ip (void);
 static gboolean net_available (void);
 static int get_pi_keyboard (void);
 static gboolean srprompt (gpointer data);
-static void uscan_toggle (GtkSwitch *sw, gpointer ptr);
+static gboolean uscan_toggle (GtkSwitch *sw, gpointer ptr);
 
 /* Helpers */
 
@@ -2356,13 +2356,14 @@ static gboolean close_prog (GtkWidget *widget, GdkEvent *event, gpointer data)
 
 /* Underscan */
 
-static void uscan_toggle (GtkSwitch *sw, gpointer ptr)
+static gboolean uscan_toggle (GtkSwitch *sw, gpointer ptr)
 {
     int enable = gtk_switch_get_active (sw) ? 0 : 1;
     if (GTK_WIDGET (sw) == uscan2_sw)
         vsystem ("sudo raspi-config nonint do_overscan_kms 2 %d", enable);
     else
         vsystem ("sudo raspi-config nonint do_overscan_kms 1 %d", enable);
+    return FALSE;
 }
 
 static int num_screens (void)
