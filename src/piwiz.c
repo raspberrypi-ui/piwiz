@@ -408,7 +408,7 @@ static gboolean show_ip (void);
 static gboolean net_available (void);
 static int get_pi_keyboard (void);
 static gboolean srprompt (gpointer data);
-static gboolean uscan_toggle (GtkSwitch *sw, gpointer ptr);
+static gboolean uscan_toggle (GtkSwitch *sw, gpointer, gpointer);
 
 /* Helpers */
 
@@ -2356,7 +2356,7 @@ static gboolean close_prog (GtkWidget *widget, GdkEvent *event, gpointer data)
 
 /* Underscan */
 
-static gboolean uscan_toggle (GtkSwitch *sw, gpointer ptr)
+static gboolean uscan_toggle (GtkSwitch *sw, gpointer, gpointer)
 {
     int enable = gtk_switch_get_active (sw) ? 0 : 1;
     if (GTK_WIDGET (sw) == uscan2_sw)
@@ -2484,8 +2484,8 @@ int main (int argc, char *argv[])
     uscan2_box  = (GtkWidget *) gtk_builder_get_object (builder, "p7hbox2");
     gtk_switch_set_active (GTK_SWITCH (uscan1_sw), !get_status ("raspi-config nonint get_overscan_kms 1"));
     gtk_switch_set_active (GTK_SWITCH (uscan2_sw), !get_status ("raspi-config nonint get_overscan_kms 2"));
-    g_signal_connect (uscan1_sw, "state-set", G_CALLBACK (uscan_toggle), NULL);
-    g_signal_connect (uscan2_sw, "state-set", G_CALLBACK (uscan_toggle), NULL);
+    g_signal_connect (uscan1_sw, "notify::active", G_CALLBACK (uscan_toggle), NULL);
+    g_signal_connect (uscan2_sw, "notify::active", G_CALLBACK (uscan_toggle), NULL);
     if (num_screens () != 2) gtk_widget_hide (uscan2_box);
 
     // set up the locale combo boxes
