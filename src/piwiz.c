@@ -2386,130 +2386,120 @@ typedef struct {
 
 static void pa_cb_state (pa_context *pacontext, void *userdata)
 {
-    pulse_data_t *vol = (pulse_data_t *) userdata;
+    pulse_data_t *pdata = (pulse_data_t *) userdata;
 
     if (pacontext == NULL)
     {
-        vol->pa_state = PA_CONTEXT_FAILED;
-        pa_threaded_mainloop_signal (vol->pa_mainloop, 0);
+        pdata->pa_state = PA_CONTEXT_FAILED;
+        pa_threaded_mainloop_signal (pdata->pa_mainloop, 0);
         return;
     }
 
-    vol->pa_state = pa_context_get_state (pacontext);
+    pdata->pa_state = pa_context_get_state (pacontext);
 
-    pa_threaded_mainloop_signal (vol->pa_mainloop, 0);
+    pa_threaded_mainloop_signal (pdata->pa_mainloop, 0);
 }
 
 static void pa_cb_generic_success (pa_context *context, int success, void *userdata)
 {
-    pulse_data_t *vol = (pulse_data_t *) userdata;
-    pa_threaded_mainloop_signal (vol->pa_mainloop, 0);
+    pulse_data_t *pdata = (pulse_data_t *) userdata;
+    pa_threaded_mainloop_signal (pdata->pa_mainloop, 0);
 }
 
 static void pa_cb_get_sink_info (pa_context *, const pa_sink_info *i, int eol, void *userdata)
 {
-    pulse_data_t *vol = (pulse_data_t *) userdata;
+    pulse_data_t *pdata = (pulse_data_t *) userdata;
 
     if (!eol)
     {
         if (i->description && !strncmp (i->description, "Built-in Audio", 14))
         {
             // if no device set, take the first one found...
-            if (!vol->pa_default_sink) vol->pa_default_sink = g_strdup (i->name);
+            if (!pdata->pa_default_sink) pdata->pa_default_sink = g_strdup (i->name);
             // ... if the set device is analogue and another has been found, it is HDMI - use it instead
-            else if (strstr (vol->pa_default_sink, "stereo-fallback"))
+            else if (strstr (pdata->pa_default_sink, "stereo-fallback"))
             {
-                g_free (vol->pa_default_sink);
-                vol->pa_default_sink = g_strdup (i->name);
+                g_free (pdata->pa_default_sink);
+                pdata->pa_default_sink = g_strdup (i->name);
             }
         }
     }
 
-    pa_threaded_mainloop_signal (vol->pa_mainloop, 0);
+    pa_threaded_mainloop_signal (pdata->pa_mainloop, 0);
 }
+
+#define PA_OP_WAIT \
+    if (op) \
+    { \
+        while (pa_operation_get_state (op) == PA_OPERATION_RUNNING) pa_threaded_mainloop_wait (pdata.pa_mainloop); \
+        pa_operation_unref (op); \
+    }
 
 static void set_audio_output (void)
 {
     pa_proplist *paprop;
     pa_mainloop_api *paapi;
     pa_operation *op;
-    pa_cvolume cvol;
+    pa_cvolume pacvol;
     pulse_data_t pdata;
-    pulse_data_t *vol = &pdata;
     int i;
 
-    vol->pa_mainloop = pa_threaded_mainloop_new ();
-    if (vol->pa_mainloop == NULL) goto pa_terminate;
-    pa_threaded_mainloop_start (vol->pa_mainloop);
-    pa_threaded_mainloop_lock (vol->pa_mainloop);
+    pdata.pa_mainloop = pa_threaded_mainloop_new ();
+    if (pdata.pa_mainloop == NULL) goto pa_terminate;
+    pa_threaded_mainloop_start (pdata.pa_mainloop);
+    pa_threaded_mainloop_lock (pdata.pa_mainloop);
 
     paprop = pa_proplist_new ();
     pa_proplist_sets (paprop, PA_PROP_APPLICATION_NAME, "unknown");
     pa_proplist_sets (paprop, PA_PROP_MEDIA_ROLE, "music");
-    paapi = pa_threaded_mainloop_get_api (vol->pa_mainloop);
-    vol->pa_cont = pa_context_new_with_proplist (paapi, "unknown", paprop);
+    paapi = pa_threaded_mainloop_get_api (pdata.pa_mainloop);
+    pdata.pa_cont = pa_context_new_with_proplist (paapi, "unknown", paprop);
     pa_proplist_free (paprop);
-    if (vol->pa_cont == NULL) goto pa_terminate;
+    if (pdata.pa_cont == NULL) goto pa_terminate;
 
-    vol->pa_state = PA_CONTEXT_UNCONNECTED;
-    pa_context_set_state_callback (vol->pa_cont, &pa_cb_state, vol);
-    pa_context_connect (vol->pa_cont, NULL, PA_CONTEXT_NOAUTOSPAWN, NULL);
-    while (vol->pa_state != PA_CONTEXT_READY && vol->pa_state != PA_CONTEXT_FAILED)
+    pdata.pa_state = PA_CONTEXT_UNCONNECTED;
+    pa_context_set_state_callback (pdata.pa_cont, &pa_cb_state, &pdata);
+    pa_context_connect (pdata.pa_cont, NULL, PA_CONTEXT_NOAUTOSPAWN, NULL);
+    while (pdata.pa_state != PA_CONTEXT_READY && pdata.pa_state != PA_CONTEXT_FAILED)
     {
-        pa_threaded_mainloop_wait (vol->pa_mainloop);
+        pa_threaded_mainloop_wait (pdata.pa_mainloop);
     }
-    if (vol->pa_state != PA_CONTEXT_READY) goto pa_terminate;
+    if (pdata.pa_state != PA_CONTEXT_READY) goto pa_terminate;
 
     // find sinks
-    vol->pa_default_sink = NULL;
-    op = pa_context_get_sink_info_list (vol->pa_cont, &pa_cb_get_sink_info, vol);
-    if (op)
-    {
-        while (pa_operation_get_state (op) == PA_OPERATION_RUNNING) pa_threaded_mainloop_wait (vol->pa_mainloop);
-        pa_operation_unref (op);
-    }
-    if (vol->pa_default_sink == NULL) goto pa_terminate;
+    pdata.pa_default_sink = NULL;
+    op = pa_context_get_sink_info_list (pdata.pa_cont, &pa_cb_get_sink_info, &pdata);
+    PA_OP_WAIT
+    if (pdata.pa_default_sink == NULL) goto pa_terminate;
 
     // set the default sink
-    op = pa_context_set_default_sink (vol->pa_cont, vol->pa_default_sink, &pa_cb_generic_success, vol);
-    if (op)
-    {
-        while (pa_operation_get_state (op) == PA_OPERATION_RUNNING) pa_threaded_mainloop_wait (vol->pa_mainloop);
-        pa_operation_unref (op);
-    }
+    op = pa_context_set_default_sink (pdata.pa_cont, pdata.pa_default_sink, &pa_cb_generic_success, &pdata);
+    PA_OP_WAIT
 
     // unmute the sink
-    op = pa_context_set_sink_mute_by_name (vol->pa_cont, vol->pa_default_sink, 0, &pa_cb_generic_success, vol);
-    if (op)
-    {
-        while (pa_operation_get_state (op) == PA_OPERATION_RUNNING) pa_threaded_mainloop_wait (vol->pa_mainloop);
-        pa_operation_unref (op);
-    }
+    op = pa_context_set_sink_mute_by_name (pdata.pa_cont, pdata.pa_default_sink, 0, &pa_cb_generic_success, &pdata);
+    PA_OP_WAIT
 
     // set the default sink volume
-    cvol.channels = PA_CHANNELS_MAX;
-    for (i = 0; i < cvol.channels; i++) cvol.values[i] = 65535;
-    op = pa_context_set_sink_volume_by_name (vol->pa_cont, vol->pa_default_sink, &cvol, &pa_cb_generic_success, vol);
-    if (op)
-    {
-        while (pa_operation_get_state (op) == PA_OPERATION_RUNNING) pa_threaded_mainloop_wait (vol->pa_mainloop);
-        pa_operation_unref (op);
-    }
+    pacvol.channels = PA_CHANNELS_MAX;
+    for (i = 0; i < pacvol.channels; i++) pacvol.values[i] = 65535;
+    op = pa_context_set_sink_volume_by_name (pdata.pa_cont, pdata.pa_default_sink, &pacvol, &pa_cb_generic_success, &pdata);
+    PA_OP_WAIT
 
 pa_terminate:
-    if (vol->pa_mainloop != NULL)
+    if (pdata.pa_mainloop != NULL)
     {
-        if (vol->pa_cont != NULL)
+        if (pdata.pa_cont != NULL)
         {
-            pa_context_disconnect (vol->pa_cont);
-            pa_context_unref (vol->pa_cont);
+            pa_context_disconnect (pdata.pa_cont);
+            pa_context_unref (pdata.pa_cont);
         }
 
-        pa_threaded_mainloop_unlock (vol->pa_mainloop);
-        pa_threaded_mainloop_stop (vol->pa_mainloop);
-        pa_threaded_mainloop_free (vol->pa_mainloop);
+        pa_threaded_mainloop_unlock (pdata.pa_mainloop);
+        pa_threaded_mainloop_stop (pdata.pa_mainloop);
+        pa_threaded_mainloop_free (pdata.pa_mainloop);
     }
-    if (vol->pa_default_sink) g_free (vol->pa_default_sink);
+    if (pdata.pa_default_sink) g_free (pdata.pa_default_sink);
 }
 
 /* The dialog... */
