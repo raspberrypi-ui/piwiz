@@ -2381,7 +2381,7 @@ typedef struct {
     pa_threaded_mainloop *pa_mainloop;  /* Controller loop variable */
     pa_context *pa_cont;                /* Controller context */
     pa_context_state_t pa_state;        /* Current controller state */
-    char *pa_default_sink;                       /* Default sink */
+    char *pa_default_sink;              /* Default sink */
 } pulse_data_t;
 
 static void pa_cb_state (pa_context *pacontext, void *userdata)
@@ -2432,112 +2432,84 @@ static void set_audio_output (void)
 {
     pa_proplist *paprop;
     pa_mainloop_api *paapi;
+    pa_operation *op;
+    pa_cvolume cvol;
     pulse_data_t pdata;
     pulse_data_t *vol = &pdata;
-    pa_operation *op;
+    int i;
 
-    vol->pa_cont = NULL;
     vol->pa_mainloop = pa_threaded_mainloop_new ();
+    if (vol->pa_mainloop == NULL) goto pa_terminate;
     pa_threaded_mainloop_start (vol->pa_mainloop);
-
     pa_threaded_mainloop_lock (vol->pa_mainloop);
-    paapi = pa_threaded_mainloop_get_api (vol->pa_mainloop);
 
     paprop = pa_proplist_new ();
     pa_proplist_sets (paprop, PA_PROP_APPLICATION_NAME, "unknown");
     pa_proplist_sets (paprop, PA_PROP_MEDIA_ROLE, "music");
+    paapi = pa_threaded_mainloop_get_api (vol->pa_mainloop);
     vol->pa_cont = pa_context_new_with_proplist (paapi, "unknown", paprop);
     pa_proplist_free (paprop);
-
-    if (vol->pa_cont == NULL)
-    {
-        pa_threaded_mainloop_unlock (vol->pa_mainloop);
-        goto pa_terminate;
-    }
+    if (vol->pa_cont == NULL) goto pa_terminate;
 
     vol->pa_state = PA_CONTEXT_UNCONNECTED;
-
     pa_context_set_state_callback (vol->pa_cont, &pa_cb_state, vol);
     pa_context_connect (vol->pa_cont, NULL, PA_CONTEXT_NOAUTOSPAWN, NULL);
-
     while (vol->pa_state != PA_CONTEXT_READY && vol->pa_state != PA_CONTEXT_FAILED)
     {
         pa_threaded_mainloop_wait (vol->pa_mainloop);
     }
-
-    pa_threaded_mainloop_unlock (vol->pa_mainloop);
-
-    if (vol->pa_state != PA_CONTEXT_READY)
-    {
-        goto pa_terminate;
-    }
+    if (vol->pa_state != PA_CONTEXT_READY) goto pa_terminate;
 
     // find sinks
     vol->pa_default_sink = NULL;
-    pa_threaded_mainloop_lock (vol->pa_mainloop);
     op = pa_context_get_sink_info_list (vol->pa_cont, &pa_cb_get_sink_info, vol);
     if (op)
     {
         while (pa_operation_get_state (op) == PA_OPERATION_RUNNING) pa_threaded_mainloop_wait (vol->pa_mainloop);
         pa_operation_unref (op);
     }
-    pa_threaded_mainloop_unlock (vol->pa_mainloop);
+    if (vol->pa_default_sink == NULL) goto pa_terminate;
 
-    // set the default sink...
-    pa_threaded_mainloop_lock (vol->pa_mainloop);
+    // set the default sink
     op = pa_context_set_default_sink (vol->pa_cont, vol->pa_default_sink, &pa_cb_generic_success, vol);
     if (op)
     {
         while (pa_operation_get_state (op) == PA_OPERATION_RUNNING) pa_threaded_mainloop_wait (vol->pa_mainloop);
         pa_operation_unref (op);
     }
-    pa_threaded_mainloop_unlock (vol->pa_mainloop);
 
     // unmute the sink
-    pa_threaded_mainloop_lock (vol->pa_mainloop);
     op = pa_context_set_sink_mute_by_name (vol->pa_cont, vol->pa_default_sink, 0, &pa_cb_generic_success, vol);
     if (op)
     {
         while (pa_operation_get_state (op) == PA_OPERATION_RUNNING) pa_threaded_mainloop_wait (vol->pa_mainloop);
         pa_operation_unref (op);
     }
-    pa_threaded_mainloop_unlock (vol->pa_mainloop);
 
     // set the default sink volume
-    pa_cvolume cvol;
-    int i;
-
-    cvol.channels = PA_CHANNELS_MAX; //vol->pa_channels;
+    cvol.channels = PA_CHANNELS_MAX;
     for (i = 0; i < cvol.channels; i++) cvol.values[i] = 65535;
-
-    pa_threaded_mainloop_lock (vol->pa_mainloop);
     op = pa_context_set_sink_volume_by_name (vol->pa_cont, vol->pa_default_sink, &cvol, &pa_cb_generic_success, vol);
     if (op)
     {
         while (pa_operation_get_state (op) == PA_OPERATION_RUNNING) pa_threaded_mainloop_wait (vol->pa_mainloop);
         pa_operation_unref (op);
     }
-    pa_threaded_mainloop_unlock (vol->pa_mainloop);
 
 pa_terminate:
-    if (vol->pa_default_sink) g_free (vol->pa_default_sink);
     if (vol->pa_mainloop != NULL)
     {
-        /* Disconnect the controller context */
         if (vol->pa_cont != NULL)
         {
-            pa_threaded_mainloop_lock (vol->pa_mainloop);
             pa_context_disconnect (vol->pa_cont);
             pa_context_unref (vol->pa_cont);
-            vol->pa_cont = NULL;
-            pa_threaded_mainloop_unlock (vol->pa_mainloop);
         }
 
-        /* Terminate the control loop */
+        pa_threaded_mainloop_unlock (vol->pa_mainloop);
         pa_threaded_mainloop_stop (vol->pa_mainloop);
         pa_threaded_mainloop_free (vol->pa_mainloop);
-        vol->pa_mainloop = NULL;
     }
+    if (vol->pa_default_sink) g_free (vol->pa_default_sink);
 }
 
 /* The dialog... */
