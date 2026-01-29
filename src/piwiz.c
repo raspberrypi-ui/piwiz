@@ -524,6 +524,11 @@ static int get_pi_keyboard (void)
     int val, ret = 0;
     char *res;
 
+    if (getenv("PIWIZ_KBD_INIT"))
+    {
+        return 0;
+    }
+
     res = get_string ("hexdump -n 1 -s 3 -e '1/1 \"%d\"' /proc/device-tree/chosen/rpi-country-code 2> /dev/null");
     if (res)
     {
