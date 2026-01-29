@@ -248,7 +248,7 @@ msgstr ""
 #: ../src/piwiz.c:2377
 #, c-format
 msgid "<span font_desc=\"10.0\">IP : %s</span>"
-msgstr "<span font_desc=“10.0”>IP : %s</span>"
+msgstr "<span font_desc=\"10.0\">IP : %s</span>"
 
 #: ../data/piwiz.ui.h:1
 msgid "_OK"
