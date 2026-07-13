@@ -142,8 +142,9 @@ gulong commit_handler;
 
 typedef enum {
     WM_OPENBOX,
-    WM_WAYFIRE,
-    WM_LABWC } wm_type;
+    WM_LABWC
+} wm_type;
+
 static wm_type wm;
 
 typedef enum {
@@ -2512,11 +2513,7 @@ int main (int argc, char *argv[])
     textdomain (GETTEXT_PACKAGE);
 
     if (system ("raspi-config nonint is_pi")) is_pi = FALSE;
-    if (getenv ("WAYLAND_DISPLAY"))
-    {
-        if (getenv ("WAYFIRE_CONFIG_FILE")) wm = WM_WAYFIRE;
-        else wm = WM_LABWC;
-    }
+    if (getenv ("WAYLAND_DISPLAY")) wm = WM_LABWC;
     else wm = WM_OPENBOX;
 
     init_user = get_string ("getent passwd 1000 | cut -d: -f1");
