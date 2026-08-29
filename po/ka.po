@@ -1,0 +1,524 @@
+# Georgian translation for piwiz.
+# Copyright (C) 2026 piwiz's authors.
+# This file is distributed under the same license as the piwiz package.
+# Ekaterine Papava <papava.e@gtu.ge>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: piwiz\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-13 15:47+0200\n"
+"PO-Revision-Date: 2026-08-29 13:30+0200\n"
+"Last-Translator: Ekaterine Papava <papava.e@gtu.ge>\n"
+"Language-Team: Georgian <(nothing)>\n"
+"Language: ka\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.9\n"
+
+#: src/piwiz.c:1082 src/piwiz.c:1505
+msgid "Searching for networks - please wait..."
+msgstr "მიმდინარეობს ქსელების ძებნა - მოითმინეთ..."
+
+#: src/piwiz.c:1102
+msgid "Failed to connect to network."
+msgstr "ქსელთან დაკავშირების შეცდომა."
+
+#: src/piwiz.c:1289
+msgid "Failed to connect - access point not available."
+msgstr "დაკავშირების შეცდომა - წვდომის წერტილი ხელმისაწვდომი არაა."
+
+#: src/piwiz.c:1531
+msgid "Downloading updates - please wait..."
+msgstr "მიმდინარეობს განახლებების გადმოწერა - მოითმინეთ..."
+
+#: src/piwiz.c:1533
+msgid "Installing updates - please wait..."
+msgstr "მიმდინარეობს განახლებების დაყენება - მოითმინეთ..."
+
+#: src/piwiz.c:1539 src/piwiz.c:1641 src/piwiz.c:1741
+msgid "Downloading languages - please wait..."
+msgstr "მიმდინარეობს ენების გადმოწერა - მოითმინეთ..."
+
+#: src/piwiz.c:1541
+msgid "Installing languages - please wait..."
+msgstr "მიმდინარეობს ენების დაყენება - მოითმინეთ..."
+
+#: src/piwiz.c:1547 src/piwiz.c:1654 src/piwiz.c:1769
+msgid "Uninstalling browser - please wait..."
+msgstr "მიმდინარეობს ბრაუზერის წაშლა - მოითმინეთ..."
+
+#: src/piwiz.c:1662 src/piwiz.c:1797
+msgid "Getting updates - please wait..."
+msgstr "მიმდინარეობს განახლებების მიღება - მოითმინეთ..."
+
+#: src/piwiz.c:1678 src/piwiz.c:1688
+#, c-format
+msgid "Error %s - %s"
+msgstr "%s-ის შეცდომა - %s"
+
+#: src/piwiz.c:1707
+msgid "checking for updates"
+msgstr "განახლებების შემოწმებa"
+
+#: src/piwiz.c:1715 src/piwiz.c:1755
+msgid "installing languages"
+msgstr "ენების დაყენება"
+
+#: src/piwiz.c:1761 src/piwiz.c:1783
+msgid "uninstalling browser"
+msgstr "ბრაუზერის წაშლა"
+
+#: src/piwiz.c:1789 src/piwiz.c:1811
+msgid "getting updates"
+msgstr "განახლებების მიღება"
+
+#: src/piwiz.c:1803 src/piwiz.c:1813
+msgid "System is up to date"
+msgstr "სისტემა განახლებულია"
+
+#: src/piwiz.c:1845 src/piwiz.c:2156
+msgid "Checking for updates - please wait..."
+msgstr "მიმდინარეობს განახლებების შემოწმება - მოითმინეთ..."
+
+#: src/piwiz.c:1854
+msgid "Could not sync time - unable to check for updates"
+msgstr "დროის სინქრონიზაცია შეუძლებელია - განახლებების შემოწმება შეუძლებელია"
+
+#: src/piwiz.c:1884 data/piwiz.ui:1315
+msgid "_Next"
+msgstr "_შემდეგი"
+
+#: src/piwiz.c:1885
+msgid "_Back"
+msgstr "_უკან"
+
+#: src/piwiz.c:1886 data/piwiz.ui:1300
+msgid "_Skip"
+msgstr "_გამოტოვება"
+
+#: src/piwiz.c:1897
+msgid "<b>Rename User</b>"
+msgstr "<b>მომხმარებლის სახელის გადარქმევა</b>"
+
+#: src/piwiz.c:1898
+#, c-format
+msgid ""
+"Your current user '%s' will be renamed.\n"
+"\n"
+"The new username can only contain lower-case letters, digits and hyphens, "
+"and must start with a letter."
+msgstr ""
+"თქვენი მომხმარებლის '%s' სახელი შეიცვლება.\n"
+"\n"
+"ახალი მომხმარებლის სახელი შეიძლება, მხოლოდ, შეიცავდეს მხედრულ ასოებს, "
+"ციფრებს და ტირეებს და უნდა იწყებოდეს ანბანის ასოთი."
+
+#: src/piwiz.c:1901
+msgid "Press 'Next' to rename the user."
+msgstr "მომხმარებლის სახელის გადასარქმევად დააჭირეთ ღილაკს 'შემდეგი'."
+
+#: src/piwiz.c:1902 data/piwiz.ui:1283
+msgid "_Cancel"
+msgstr "გაუ_ქმება"
+
+#: src/piwiz.c:1909
+msgid "<b>User Renamed</b>"
+msgstr "<b>მომხმარებლის სახელი შეიცვალა</b>"
+
+#: src/piwiz.c:1910
+#, c-format
+msgid "The '%s' user has been renamed to '%s' and the new password set."
+msgstr "მომხმარებლის '%s' სახელი შეიცვალა '%s'-ზე და აქვს ახალი პაროლი."
+
+#: src/piwiz.c:1913
+msgid "Press 'Restart' to reboot and login as the new user."
+msgstr ""
+"გადატვირთვისთვის და ახალი მომხმარებლის შესასვლელად დააჭირეთ ღილაკს "
+"'გადატვირთვა'."
+
+#: src/piwiz.c:1914
+msgid "_Restart"
+msgstr "გადატვი_რთვა"
+
+#: src/piwiz.c:1916
+msgid "_Launch"
+msgstr "_გაშვება"
+
+#: src/piwiz.c:2040
+msgid "Setting location - please wait..."
+msgstr "მიმდინარეობს მდებარეობის დაყენება - მოითმინეთ..."
+
+#: src/piwiz.c:2059
+msgid "The username is blank."
+msgstr "მომხმარებლის სახელი ცარიელია."
+
+#: src/piwiz.c:2064
+msgid "The username must be 32 characters or shorter."
+msgstr "მომხმარებლის სახელი 32, ან უფრო ნაკლებ სიმბოლოს უნდა შეიცავდეს."
+
+#: src/piwiz.c:2069
+msgid "The first character of the username must be a lower-case letter."
+msgstr "მომხმარებლის სახელის პირველი ასო მხედრული ასო უნდა იყოს."
+
+#: src/piwiz.c:2074 src/piwiz.c:2079
+msgid ""
+"This username is used by the system and cannot be used for a user account."
+msgstr ""
+"მომხმარებლის სახელი გამოიყენება სისტემის მიერ და მას მომხმარებლის "
+"ანგარიშისთვის ვერ გამოიყენებთ."
+
+#: src/piwiz.c:2088
+msgid "Usernames can only contain lower-case letters, digits and hyphens."
+msgstr ""
+"მომხმარებლის სახელი, მხოლოდ, პატარა ასოებს, ციფრებს, ტირეებს და ქვედა "
+"ტირეებს შეიძლება, შეიცავდეს."
+
+#: src/piwiz.c:2093
+msgid "The password is blank."
+msgstr "პაროლი ცარიელია."
+
+#: src/piwiz.c:2098
+msgid "The two passwords entered do not match."
+msgstr "შეყვანილი პაროლები არ ემთხვევა."
+
+#: src/piwiz.c:2103
+msgid ""
+"You have used a known default value for the username or password.\n"
+"\n"
+"We strongly recommend you go back and choose something else."
+msgstr ""
+"იყენებთ ცნობილ ნაგულისხმევ მნიშვნელობას მომხმარებლის სახელისთვის, ან "
+"პაროლისთვის.\n"
+"\n"
+"დაჟინებით გირჩევთ, დაბრუნდეთ უკან და რამე სხვა შეიყვანოთ."
+
+#: src/piwiz.c:2122
+#, c-format
+msgid "Enter the password for the WiFi network \"%s\"."
+msgstr "შეიყვანეთ პაროლი უსადენო ქსელისთვის \"%s\"."
+
+#: src/piwiz.c:2132 src/piwiz.c:2140
+msgid "Connecting to WiFi network - please wait..."
+msgstr "მიმდინარეობს უსადენო ქსელთან დაკავშირება - მოითმინეთ...."
+
+#: src/piwiz.c:2161
+msgid "Synchronising clock - please wait..."
+msgstr "საათის სინქრონიზაცია - მოითმინეთ..."
+
+#: src/piwiz.c:2166
+msgid "No network connection found - unable to check for updates"
+msgstr "ქსელთან კავშირი აღმოჩენილი არაა - განახლებების შემოწმება შეუძლებელია"
+
+#: src/piwiz.c:2170
+msgid "Launching desktop - please wait..."
+msgstr "მიმდინარეობს სამუშაო გარემოს გაშვება - მოითმინეთ..."
+
+#: src/piwiz.c:2224
+msgid ""
+"If installing updates is skipped, translation files will not be installed, "
+"and the unused browser will not be uninstalled."
+msgstr ""
+"თუ განახლებების დაყენება გამოტოვებულია, თარგმანის ფაილების დაყენება არ "
+"მოხდება და გამოუყენებელი ბრაუზერის წაშლა არ მოხდება."
+
+#: src/piwiz.c:2226
+msgid ""
+"If installing updates is skipped, translation files will not be installed."
+msgstr ""
+"თუ განახლებების დაყენება გამოტოვებულია, თარგმანის ფაილების დაყენება არ "
+"მოხდება."
+
+#: src/piwiz.c:2228
+msgid ""
+"If installing updates is skipped, the unused browser will not be uninstalled."
+msgstr ""
+"თუ განახლებების დაყენება გამოტოვებულია, გამოუყენებელი ბრაუზერის წაშლა არ "
+"მოხდება."
+
+#: src/piwiz.c:2301
+#, c-format
+msgid "<span font_desc=\"10.0\">IP : %s</span>"
+msgstr "<span font_desc=\"10.0\">IP : %s</span>"
+
+#: src/piwiz.c:2333
+msgid ""
+"To auto-pair a Bluetooth mouse and keyboard, please restart now by "
+"disconnecting and reconnecting the power cable."
+msgstr ""
+"ბლუთუზი თაგუნას და კლავიატურის ავტომატურად დასაწყვილებლად გადატვირთეთ "
+"მოწყობილობა ახლავე კვების კაბელის გამოერთებით და თავიდან შეერთებით."
+
+#: data/piwiz.ui:61 data/piwiz.ui:146
+msgid "_OK"
+msgstr "_დიახ"
+
+#: data/piwiz.ui:181
+msgid "Welcome to Raspberry Pi"
+msgstr "მოგესალმებათ Raspberry Pi"
+
+#: data/piwiz.ui:221
+msgid ""
+"Welcome to the Raspberry Pi Desktop!\n"
+"\n"
+"Before you start using it, there are a few things to set up.\n"
+"\n"
+"Press 'Next' to get started. "
+msgstr ""
+"მოგესალმებათ Raspberry Pi-ის სამუშაო გარემო!\n"
+"\n"
+"სანამ მის გამოყენებას დაიწყებთ, რამდენიმე რამ უნდა მოირგოთ.\n"
+"\n"
+"დასაწყებად დააჭირეთ ღილაკს 'შემდეგი'. "
+
+#: data/piwiz.ui:240
+msgid ""
+"If you are using a Bluetooth keyboard or mouse, put them into pairing mode "
+"and wait for them to connect."
+msgstr ""
+"თუ იყენებთ ბლუთუზის კლავიატურას და თაგუნას, გადართეთ ისინი დაწყვილების "
+"რეჟიმში და დაელოდეთ დაკავშირებას."
+
+#: data/piwiz.ui:255
+msgid "<span font_desc=\"10.0\"> </span>"
+msgstr "<span font_desc=\"10.0\"> </span>"
+
+#: data/piwiz.ui:278
+msgid "<b>Set Country</b>"
+msgstr "<b>ქვეყნის დაყენება</b>"
+
+#: data/piwiz.ui:293
+msgid ""
+"Enter the details of your location. This is used to set the language, time "
+"zone, keyboard and other international settings."
+msgstr ""
+"შეიყვანეთ თქვენი მდებარეობის დეტალები. ეს გამოიყენება ენის, დროის სარტყლის, "
+"კლავიატურის და სხვა პარამეტრების დასაყენებლად."
+
+#: data/piwiz.ui:313
+msgid "Country:"
+msgstr "ქვეყანა:"
+
+#: data/piwiz.ui:326
+msgid "Set the country in which you are using your Pi"
+msgstr "შეიყვანეთ ქვეყანა, საიდანაც თქვენს Pi-ს იყენებთ"
+
+#: data/piwiz.ui:352
+msgid "Language:"
+msgstr "ენა:"
+
+#: data/piwiz.ui:365
+msgid "Set the language in which applications should appear"
+msgstr "დააყენეთ ენა, რომელშიც აპლიკაციები გნებავთ, გამოჩნდეს"
+
+#: data/piwiz.ui:391
+msgid "Timezone:"
+msgstr "დროის სარტყელი:"
+
+#: data/piwiz.ui:404
+msgid "Set the closest city to your location"
+msgstr "დააყენეთ თქვენს მდებარეობასთან უახლოესი ქალაქი"
+
+#: data/piwiz.ui:429
+msgid "Use US keyboard"
+msgstr "აშშ კლავიატურის განლაგების გამოყენება"
+
+#: data/piwiz.ui:433
+msgid ""
+"Use the US keyboard layout instead of the default keyboard for your country"
+msgstr ""
+"აშშ კლავიატურის განლაგების გამოყენება თქვენი ქვეყნისთვის ნაგულისხმევი "
+"კლავიატურის მაგიერ"
+
+#: data/piwiz.ui:445
+msgid "Use English language"
+msgstr "ინგლისური ენის გამოყენება"
+
+#: data/piwiz.ui:449
+msgid "Use English instead of the default language for your country"
+msgstr "ინგლისურის გამოყენება თქვენი ქვეყნისთვის ნაგულისხმევი ენის მაგიერ"
+
+#: data/piwiz.ui:470
+msgid "Press 'Next' when you have made your selection."
+msgstr "გააკეთეთ არჩევანი და დააჭირეთ ღილაკს 'შემდეგი'."
+
+#: data/piwiz.ui:497
+msgid "<b>Create User</b>"
+msgstr "<b>მომხმარებლის შექმნა</b>"
+
+#: data/piwiz.ui:512
+msgid ""
+"You need to create a user account to log in to your Raspberry Pi.\n"
+"\n"
+"The username can only contain lower-case letters, digits and hyphens, and "
+"must start with a letter."
+msgstr ""
+"თქვენს Raspberry Pi-ზე შესასვლელად საჭიროა მომხმარებლის ანგარიშის შექმნა.\n"
+"\n"
+"მომხმარებლის სახელი შეიძლება შეიცავდეს, მხოლოდ, მხედრულ ასოებს, ციფრებს და "
+"ტირეებს და უნდა იწყებოდეს ანბანის ასოთი."
+
+#: data/piwiz.ui:536
+msgid "Enter password:"
+msgstr "შეიყვანეთ პაროლი:"
+
+#: data/piwiz.ui:549
+msgid "Confirm password:"
+msgstr "პაროლის დადასტურება:"
+
+#: data/piwiz.ui:562
+msgid "Enter username:"
+msgstr "შეიყვანეთ მომხმარებლის სახელი:"
+
+#: data/piwiz.ui:574
+msgid "Enter a password"
+msgstr "შეიყვანეთ პაროლი"
+
+#: data/piwiz.ui:590
+msgid "Enter the password again"
+msgstr "შეიყვანეთ პაროლი კიდევ ერთხელ"
+
+#: data/piwiz.ui:606
+msgid "Enter a username"
+msgstr "შეიყვანეთ მომხმარებლის სახელი"
+
+#: data/piwiz.ui:629 data/piwiz.ui:976
+msgid "Hide characters"
+msgstr "სიმბოლოების დამალვა"
+
+#: data/piwiz.ui:633 data/piwiz.ui:980
+msgid "Show or hide the characters in your password"
+msgstr "თქვენი პაროლის სიმბოლოების ჩვენება, ან დამალვა"
+
+#: data/piwiz.ui:654
+msgid "Press 'Next' to create your account."
+msgstr "თქვენი ანგარიშის შესაქმნელად დააჭირეთ ღილაკს 'შემდეგი'."
+
+#: data/piwiz.ui:681
+msgid "<b>Set Up Screen</b>"
+msgstr "<b>ეკრანის მორგება</b>"
+
+#: data/piwiz.ui:696
+msgid ""
+"On some monitors, the desktop is larger than the screen and the edges are "
+"cut off. You can adjust this here."
+msgstr ""
+"ზოგიერთ ეკრანზე სამუშაო მაგიდა ფიზიკურ ეკრანზე დიდია და წიბოები იკვეთება. "
+"ამის გასწორება აქ შეგიძლიათ."
+
+#: data/piwiz.ui:716
+msgid "Reduce the size of the desktop on this monitor"
+msgstr "სამუშაო მაგიდის ზომის შემცირება ამ ეკარანზე"
+
+#: data/piwiz.ui:729
+msgid "Turn on to shrink the desktop to fit the monitor"
+msgstr "ჩართეთ სამუშაო მაგიდის შესამცირებლად, რომ ის ეკრანზე დაეტიოს"
+
+#: data/piwiz.ui:756
+msgid "Reduce the size of the desktop on the second monitor"
+msgstr "სამუშაო მაგიდის ზომის შემცირება მეორე ეკრანზე"
+
+#: data/piwiz.ui:769
+msgid "Turn on to shrink the desktop to fit the second monitor"
+msgstr "ჩართეთ სამუშაო მაგიდის შესამცირებლად, რომ ის მეორე ეკრანზე დაეტიოს"
+
+#: data/piwiz.ui:792
+msgid "Press 'Next' when the screen looks correct."
+msgstr "როცა ყველაფერს გაასწორებთ, დააჭირეთ ღილაკს 'შემდეგი'."
+
+#: data/piwiz.ui:819
+msgid "<b>Select WiFi Network</b>"
+msgstr "<b>უსადენო ქსელის არჩევა</b>"
+
+#: data/piwiz.ui:834
+msgid "Select your WiFi network from the list."
+msgstr "აირჩიეთ თქვენი უსადენო ქსელი სიიდან."
+
+#: data/piwiz.ui:850
+msgid "Click the name of your network to select it"
+msgstr "დააწკაპუნეთ თქვენს ქსელზე მის მოსანიშნად"
+
+#: data/piwiz.ui:875 data/piwiz.ui:1001
+msgid "Press 'Next' to connect, or 'Skip' to continue without connecting."
+msgstr ""
+"დასაკავშირებლად დააწკაპუნეთ ღილაკზე 'შემდეგი'. დაკავშირების გარეშე "
+"გასაგრძელებლად დააჭირეთ ღილაკზე 'გამოტოვება'."
+
+#: data/piwiz.ui:902
+msgid "<b>Enter WiFi Password</b>"
+msgstr "<b>შეიყვანეთ WiFi-ის პაროლი</b>"
+
+#: data/piwiz.ui:917
+msgid "Enter the password for your WiFi network."
+msgstr "შეიყვანეთ პაროლი თქვენი WiFi ქსელისთვის."
+
+#: data/piwiz.ui:937
+msgid "Password:"
+msgstr "პაროლი:"
+
+#: data/piwiz.ui:950
+msgid "Enter the password for your network"
+msgstr "შეიყვანეთ პაროლი თქვენი ქსელისთვის"
+
+#: data/piwiz.ui:1028
+msgid "<b>Choose Browser</b>"
+msgstr "<b>ბრაუზერის არჩევა</b>"
+
+#: data/piwiz.ui:1043
+msgid ""
+"Both the Chromium and Firefox web browsers are preinstalled on Raspberry Pi "
+"OS. Select the one you prefer to use."
+msgstr ""
+"Raspberry Pi-ის ოს-ზე ორივე ბრაუზერი, Chromium და Firefox წინასწარაა "
+"დაყენებული. აირჩიეთ, რომლის გამოყენება გნებავთ."
+
+#: data/piwiz.ui:1064
+msgid "Default Browser:"
+msgstr "ნაგულისხმევი ბრაუზერი:"
+
+#: data/piwiz.ui:1074
+msgid "Chromium"
+msgstr "ქრომი"
+
+#: data/piwiz.ui:1092
+msgid "Firefox"
+msgstr "Firefox"
+
+#: data/piwiz.ui:1118
+msgid "Tick here to uninstall the unused browser"
+msgstr "დასვით ეს თოლია გამოუყენებელი ბრაუზერის წასაშლელად"
+
+#: data/piwiz.ui:1134
+msgid "Press 'Next' when you have chosen a browser."
+msgstr "როცა ბრაუზერს აირჩევთ, დააჭირეთ ღილაკზე 'შემდეგი'."
+
+#: data/piwiz.ui:1161
+msgid "<b>Update Software</b>"
+msgstr "<b>პროგრამების განახლება</b>"
+
+#: data/piwiz.ui:1176
+msgid ""
+"The operating system and applications will now be checked and updated if "
+"necessary. This may involve a large download.\n"
+"\n"
+"Press 'Next' to check and update software, or 'Skip' to continue without "
+"checking."
+msgstr ""
+"მოხდება ოპერაციული სისტემისა და აპლიკაციების შემოწმება და განახლება, თუ ეს "
+"საჭიროა. განახლება შეიძლება, საკმაოდ დიდი იყოს.\n"
+"\n"
+"დააჭირეთ ღილაკზე 'შემდეგი' პროგრამების შესამოწმებლად და განსაახლებლად, ან "
+"ღილაკზე 'გამოტოვება' შემოწმების გარეშე გასაგრძელებლად."
+
+#: data/piwiz.ui:1205
+msgid "<b>Setup Complete</b>"
+msgstr "<b>მორგება დასრულდა</b>"
+
+#: data/piwiz.ui:1220
+msgid "Your Raspberry Pi is now set up and ready to go."
+msgstr "თქვენი Raspberry Pi ახლა მორგებულია და მზადაა სამუსაოდ."
+
+#: data/piwiz.ui:1250
+msgid "Press 'Launch' to launch the desktop."
+msgstr "სამუშაო მაგიდის გასაშვებად დააჭირეთ ღილაკზე 'გაშვება'."
