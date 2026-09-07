@@ -1,3 +1,9 @@
+piwiz (1.8) trixie; urgency=medium
+
+  * Retry PackageKit cache update once - this can fail the first time
+
+ -- Simon Long <simon@raspberrypi.com>  Mon, 07 Sep 2026 13:58:02 +0100
+
 piwiz (1.7) trixie; urgency=medium
 
   * Add Georgian translation
