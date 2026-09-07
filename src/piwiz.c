@@ -1708,24 +1708,21 @@ static void refresh_cache_done (PkClient *client, GAsyncResult *res, gpointer da
     PkResults *results;
     PkError *pkerror;
     GError *error = NULL;
-    gboolean retry = FALSE;
 
     results = pk_client_generic_finish (client, res, &error);
-    if (error)
+    if (!error)
     {
-        retry = TRUE;
-        g_error_free (error);
+        pkerror = pk_results_get_error_code (results);
+        if (!pkerror)
+        {
+            next_update (client, INSTALL_LANGUAGES);
+            return;
+        }
+        else g_object_unref (pkerror);
     }
+    else g_error_free (error);
 
-    pkerror = pk_results_get_error_code (results);
-    if (pkerror)
-    {
-        retry = TRUE;
-        g_object_unref (pkerror);
-    }
-
-    if (retry) pk_client_refresh_cache_async (client, TRUE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) refresh_cache_retry_done, NULL);
-    else next_update (client, INSTALL_LANGUAGES);
+    pk_client_refresh_cache_async (client, TRUE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) refresh_cache_retry_done, NULL);
 }
 
 static void refresh_cache_retry_done (PkClient *client, GAsyncResult *res, gpointer data)
