@@ -112,7 +112,7 @@ static GtkWidget *pwd_hide, *psk_hide, *eng_chk, *uskey_chk;
 static GtkWidget *uscan1_sw, *uscan2_sw, *uscan2_box;
 static GtkWidget *rename_title, *rename_info, *rename_prompt;
 static GtkWidget *done_title, *done_info, *done_prompt;
-static GtkWidget *chromium_rb, *firefox_rb, *uninstall_chk;
+static GtkWidget *chromium_rb, *firefox_rb, *nobrowse_rb;
 
 /* Lists for localisation */
 
@@ -135,7 +135,6 @@ gint conn_timeout = 0, pulse_timer = 0;
 gboolean is_pi = TRUE;
 int last_btn = NEXT_BTN;
 int calls;
-gboolean browser = TRUE;
 
 GdkCursor *watch;
 gulong commit_handler;
@@ -149,7 +148,7 @@ static wm_type wm;
 
 typedef enum {
     INSTALL_LANGUAGES,
-    UNINSTALL_BROWSER,
+    INSTALL_BROWSER,
     INSTALL_UPDATES } update_type;
 
 NMClient *nm_client = NULL;
@@ -387,14 +386,13 @@ static char *nm_find_psk_for_network (char *ssid);
 static void progress (PkProgress *progress, PkProgressType type, gpointer data);
 static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data);
 static gboolean inst_filter_fn (PkPackage *package, gpointer user_data);
-static gboolean rem_filter_fn (PkPackage *package, gpointer user_data);
 static gboolean upd_filter_fn (PkPackage *package, gpointer user_data);
 static void next_update (PkClient *client, update_type update_stage);
 static PkResults *error_handler (PkTask *task, PkClient *client, GAsyncResult *res, char *desc);
 static void check_updates_done (PkClient *client, GAsyncResult *res, gpointer data);
 static void install_lang_done (PkTask *task, GAsyncResult *res, gpointer data);
 static void resolve_lang_done (PkClient *client, GAsyncResult *res, gpointer data);
-static void uninstall_browser_done (PkTask *task, GAsyncResult *res, gpointer data);
+static void install_browser_done (PkTask *task, GAsyncResult *res, gpointer data);
 static void resolve_browser_done (PkClient *client, GAsyncResult *res, gpointer data);
 static void refresh_cache_done (PkClient *client, GAsyncResult *res, gpointer data);
 static void refresh_cache_retry_done (PkClient *client, GAsyncResult *res, gpointer data);
@@ -1515,6 +1513,7 @@ static void start_scanning (void)
 
 static void progress (PkProgress *progress, PkProgressType type, gpointer data)
 {
+    update_type update_stage = (update_type) data;
     int role = pk_progress_get_role (progress);
     int status = pk_progress_get_status (progress);
     int percent = pk_progress_get_percentage (progress);
@@ -1537,15 +1536,19 @@ static void progress (PkProgress *progress, PkProgressType type, gpointer data)
                                                         break;
 
                 case PK_ROLE_ENUM_INSTALL_PACKAGES :    if (status == PK_STATUS_ENUM_DOWNLOAD)
-                                                            message (_("Downloading languages - please wait..."), percent);
+                                                        {
+                                                            if (update_stage == INSTALL_BROWSER)
+                                                                message (_("Downloading browser - please wait..."), percent);
+                                                            else
+                                                                message (_("Downloading languages - please wait..."), percent);
+                                                        }
                                                         else if (status == PK_STATUS_ENUM_INSTALL || status == PK_STATUS_ENUM_RUNNING)
-                                                            message (_("Installing languages - please wait..."), percent);
-                                                        else
-                                                            gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
-                                                        break;
-
-                case PK_ROLE_ENUM_REMOVE_PACKAGES :     if (status == PK_STATUS_ENUM_REMOVE || status == PK_STATUS_ENUM_RUNNING)
-                                                            message (_("Uninstalling browser - please wait..."), percent);
+                                                        {
+                                                            if (update_stage == INSTALL_BROWSER)
+                                                                message (_("Installing browser - please wait..."), percent);
+                                                            else
+                                                                message (_("Installing languages - please wait..."), percent);
+                                                        }
                                                         else
                                                             gtk_progress_bar_pulse (GTK_PROGRESS_BAR (msg_pb));
                                                         break;
@@ -1560,7 +1563,7 @@ static void progress (PkProgress *progress, PkProgressType type, gpointer data)
 
 static gboolean inst_filter_fn (PkPackage *package, gpointer user_data)
 {
-    if (!is_pi && strstr (pk_package_get_arch (package), "amd64")) return FALSE;
+    if (!is_pi && strstr (pk_package_get_arch (package), "i386")) return FALSE;
 
     PkInfoEnum info = pk_package_get_info (package);
 	switch (info)
@@ -1573,24 +1576,9 @@ static gboolean inst_filter_fn (PkPackage *package, gpointer user_data)
     }
 }
 
-static gboolean rem_filter_fn (PkPackage *package, gpointer user_data)
-{
-    if (!is_pi && strstr (pk_package_get_arch (package), "amd64")) return FALSE;
-
-    PkInfoEnum info = pk_package_get_info (package);
-	switch (info)
-    {
-        case PK_INFO_ENUM_INSTALLED:    return TRUE;
-                                        break;
-
-        default:                        return FALSE;
-                                        break;
-    }
-}
-
 static gboolean upd_filter_fn (PkPackage *package, gpointer user_data)
 {
-    if (!is_pi && strstr (pk_package_get_arch (package), "amd64")) return FALSE;
+    if (!is_pi && strstr (pk_package_get_arch (package), "i386")) return FALSE;
 
     PkInfoEnum info = pk_package_get_info (package);
 	switch (info)
@@ -1640,20 +1628,20 @@ static void next_update (PkClient *client, update_type update_stage)
                 pack_array = g_strsplit (lpack, " ", -1);
 
                 message (_("Downloading languages - please wait..."), MSG_PULSE);
-                pk_client_resolve_async (client, 0, pack_array, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) resolve_lang_done, NULL);
+                pk_client_resolve_async (client, 0, pack_array, NULL, (PkProgressCallback) progress, (void *) INSTALL_LANGUAGES, (GAsyncReadyCallback) resolve_lang_done, NULL);
                 g_strfreev (pack_array);
                 g_free (lpack);
                 break;
             }
 
-        case UNINSTALL_BROWSER:
-            if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (uninstall_chk)))
+        case INSTALL_BROWSER:
+            if (!gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (nobrowse_rb)))
             {
-                if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (chromium_rb))) lpack = g_strdup ("firefox");
-                else lpack = g_strdup ("chromium");
+                if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (chromium_rb))) lpack = g_strdup ("chromium");
+                else lpack = g_strdup ("firefox");
                 pack_array = g_strsplit (lpack, " ", -1);
-                message (_("Uninstalling browser - please wait..."), MSG_PULSE);
-                pk_client_resolve_async (client, 0, pack_array, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) resolve_browser_done, NULL);
+                message (_("Downloading browser - please wait..."), MSG_PULSE);
+                pk_client_resolve_async (client, 0, pack_array, NULL, (PkProgressCallback) progress, (void *) INSTALL_BROWSER, (GAsyncReadyCallback) resolve_browser_done, NULL);
                 g_strfreev (pack_array);
                 g_free (lpack);
                 break;
@@ -1661,7 +1649,7 @@ static void next_update (PkClient *client, update_type update_stage)
 
         case INSTALL_UPDATES:
             message (_("Getting updates - please wait..."), MSG_PULSE);
-            pk_client_get_updates_async (client, PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) check_updates_done, NULL);
+            pk_client_get_updates_async (client, PK_FILTER_ENUM_NONE, NULL, (PkProgressCallback) progress, (void *) INSTALL_UPDATES, (GAsyncReadyCallback) check_updates_done, NULL);
     }
 }
 
@@ -1764,10 +1752,10 @@ static void resolve_lang_done (PkClient *client, GAsyncResult *res, gpointer dat
         message (_("Downloading languages - please wait..."), MSG_PULSE);
 
         gchar **ids = pk_package_sack_get_ids (fsack);
-        pk_task_install_packages_async (PK_TASK (client), ids, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) install_lang_done, NULL);
+        pk_task_install_packages_async (PK_TASK (client), ids, NULL, (PkProgressCallback) progress, (void *) INSTALL_LANGUAGES, (GAsyncReadyCallback) install_lang_done, NULL);
         g_strfreev (ids);
     }
-    else next_update (client, UNINSTALL_BROWSER);
+    else next_update (client, INSTALL_BROWSER);
 
     g_object_unref (sack);
     g_object_unref (fsack);
@@ -1776,23 +1764,43 @@ static void resolve_lang_done (PkClient *client, GAsyncResult *res, gpointer dat
 static void install_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
 {
     if (!error_handler (task, NULL, res, _("installing languages"))) return;
-    next_update (PK_CLIENT (task), UNINSTALL_BROWSER);
+    next_update (PK_CLIENT (task), INSTALL_BROWSER);
 }
 
 static void resolve_browser_done (PkClient *client, GAsyncResult *res, gpointer data)
 {
-    PkResults *results = error_handler (NULL, client, res, _("uninstalling browser"));
+    int i;
+
+    PkResults *results = error_handler (NULL, client, res, _("installing browser"));
     if (!results) return;
 
     PkPackageSack *sack = pk_results_get_package_sack (results);
-    PkPackageSack *fsack = pk_package_sack_filter (sack, rem_filter_fn, NULL);
+    PkPackageSack *fsack = pk_package_sack_filter (sack, inst_filter_fn, NULL);
+
+    // remove armhf packages for which there is an arm64 equivalent...
+    GPtrArray *array = pk_package_sack_get_array (fsack);
+    for (i = 0; i < array->len; i++)
+    {
+        gchar *package_id, *arch;
+        PkPackage *item = g_ptr_array_index (array, i);
+        g_object_get (item, "package-id", &package_id, NULL);
+        if ((arch = strstr (package_id, "arm64")))
+        {
+            *(arch + 3) = 'h';
+            *(arch + 4) = 'f';
+            item = pk_package_sack_find_by_id_name_arch (fsack, package_id);
+            if (item) pk_package_sack_remove_package (fsack, item);
+        }
+        g_free (package_id);
+    }
+    g_ptr_array_unref (array);
 
     if (pk_package_sack_get_size (fsack) > 0)
     {
-        message (_("Uninstalling browser - please wait..."), MSG_PULSE);
+        message (_("Downloading browser - please wait..."), MSG_PULSE);
 
         gchar **ids = pk_package_sack_get_ids (fsack);
-        pk_task_remove_packages_async (PK_TASK (client), ids, TRUE, TRUE, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) uninstall_browser_done, NULL);
+        pk_task_install_packages_async (PK_TASK (client), ids, NULL, (PkProgressCallback) progress, (void *) INSTALL_BROWSER, (GAsyncReadyCallback) install_browser_done, NULL);
         g_strfreev (ids);
     }
     else next_update (client, INSTALL_UPDATES);
@@ -1801,9 +1809,9 @@ static void resolve_browser_done (PkClient *client, GAsyncResult *res, gpointer 
     g_object_unref (fsack);
 }
 
-static void uninstall_browser_done (PkTask *task, GAsyncResult *res, gpointer data)
+static void install_browser_done (PkTask *task, GAsyncResult *res, gpointer data)
 {
-    if (!error_handler (task, NULL, res, _("uninstalling browser"))) return;
+    if (!error_handler (task, NULL, res, _("installing browser"))) return;
     next_update (PK_CLIENT (task), INSTALL_UPDATES);
 }
 
@@ -1820,7 +1828,7 @@ static void check_updates_done (PkClient *client, GAsyncResult *res, gpointer da
         message (_("Getting updates - please wait..."), MSG_PULSE);
 
         gchar **ids = pk_package_sack_get_ids (fsack);
-        pk_task_update_packages_async (PK_TASK (client), ids, NULL, (PkProgressCallback) progress, NULL, (GAsyncReadyCallback) do_updates_done, NULL);
+        pk_task_update_packages_async (PK_TASK (client), ids, NULL, (PkProgressCallback) progress, (void *) INSTALL_UPDATES, (GAsyncReadyCallback) do_updates_done, NULL);
         g_strfreev (ids);
     }
     else message (_("System is up to date"), MSG_TERM);
@@ -1948,8 +1956,7 @@ static void page_changed (GtkNotebook *notebook, GtkWidget *page, int pagenum, g
         case PAGE_UPDATE :  gtk_widget_show (skip_btn);
                             break;
 
-        case PAGE_BROWSER : gtk_widget_set_visible (uninstall_chk, net_available ());
-                            break;
+        case PAGE_BROWSER : break;
     }
 
     // restore the keyboard focus
@@ -1971,13 +1978,12 @@ static gboolean page_shown (int page)
         case PAGE_WIFIAP :  if (wifi_if) return TRUE;
                             else return FALSE;
 
-        case PAGE_BROWSER : return browser;
-
         case PAGE_WIFIPSK : return FALSE;
 
         case PAGE_INTRO :
         case PAGE_LOCALE :
         case PAGE_PASSWD :
+        case PAGE_BROWSER :
         case PAGE_UPDATE :
         case PAGE_DONE :
         default :           return TRUE;
@@ -2165,11 +2171,7 @@ static void process_next (void)
                             nm_connect_wifi (ccptr);
                             break;
 
-        case PAGE_BROWSER : if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (chromium_rb)))
-                                vsystem ("sudo raspi-config nonint do_browser chromium %s", init_user);
-                            else
-                                vsystem ("sudo raspi-config nonint do_browser firefox %s", init_user);
-                            change_page (FORWARD);
+        case PAGE_BROWSER : change_page (FORWARD);
                             break;
 
         case PAGE_UPDATE :  if (net_available ())
@@ -2242,13 +2244,13 @@ static void process_skip (void)
 
         case PAGE_UPDATE :  gchar *buf = g_strdup_printf ("check-language-support -l %s_%s", lc, cc);
                             gchar *lpack = get_shell_string (buf, TRUE);
-                            gboolean uninst = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (uninstall_chk));
-                            if (lpack && uninst)
-                                message (_("If installing updates is skipped, translation files will not be installed, and the unused browser will not be uninstalled."), MSG_TERM);
+                            gboolean noinst = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (nobrowse_rb));
+                            if (lpack && !noinst)
+                                message (_("If installing updates is skipped, the selected browser and translation files will not be installed."), MSG_TERM);
                             else if (lpack)
                                 message (_("If installing updates is skipped, translation files will not be installed."), MSG_TERM);
-                            else if (uninst)
-                                message (_("If installing updates is skipped, the unused browser will not be uninstalled."), MSG_TERM);
+                            else if (!noinst)
+                                message (_("If installing updates is skipped, the selected browser will not be installed."), MSG_TERM);
                             else change_page (FORWARD);
                             g_free (buf);
                             g_free (lpack);
@@ -2551,9 +2553,6 @@ int main (int argc, char *argv[])
 
     read_inits ();
 
-    if (vsystem ("raspi-config nonint is_installed chromium")) browser = FALSE;
-    if (vsystem ("raspi-config nonint is_installed firefox")) browser = FALSE;
-
     // GTK setup
     gtk_init (&argc, &argv);
     gtk_icon_theme_prepend_search_path (gtk_icon_theme_get_default(), PACKAGE_DATA_DIR);
@@ -2600,9 +2599,9 @@ int main (int argc, char *argv[])
     done_title = (GtkWidget *) gtk_builder_get_object (builder, "p6title");
     done_info = (GtkWidget *) gtk_builder_get_object (builder, "p6info");
     done_prompt = (GtkWidget *) gtk_builder_get_object (builder, "p6prompt");
+    nobrowse_rb = (GtkWidget *) gtk_builder_get_object (builder, "p8rbnone");
     chromium_rb = (GtkWidget *) gtk_builder_get_object (builder, "p8rbcr");
     firefox_rb = (GtkWidget *) gtk_builder_get_object (builder, "p8rbff");
-    uninstall_chk = (GtkWidget *) gtk_builder_get_object (builder, "p8chuninst");
 
     pwd_hide = (GtkWidget *) gtk_builder_get_object (builder, "p2check");
     g_signal_connect (pwd_hide, "toggled", G_CALLBACK (pwd_toggle), NULL);
@@ -2618,8 +2617,7 @@ int main (int argc, char *argv[])
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (psk_hide), TRUE);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (eng_chk), FALSE);
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (uskey_chk), FALSE);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (chromium_rb), TRUE);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (uninstall_chk), FALSE);
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (nobrowse_rb), TRUE);
 
     // set up underscan
     uscan1_sw = (GtkWidget *) gtk_builder_get_object (builder, "p7switch1");
