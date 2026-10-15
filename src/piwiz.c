@@ -1570,8 +1570,7 @@ static gboolean filter_fn (PkPackage *package, gpointer user_data)
         case PK_INFO_ENUM_IMPORTANT:
         case PK_INFO_ENUM_SECURITY:
         case PK_INFO_ENUM_BUGFIX:
-        case PK_INFO_ENUM_ENHANCEMENT:
-        case PK_INFO_ENUM_BLOCKED:      return TRUE;
+        case PK_INFO_ENUM_ENHANCEMENT:  return TRUE;
                                         break;
 
         default:                        return FALSE;
