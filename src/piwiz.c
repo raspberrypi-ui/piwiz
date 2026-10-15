@@ -1628,7 +1628,7 @@ static void next_update (PkClient *client, update_type update_stage)
                 pack_array = g_strsplit (lpack, " ", -1);
 
                 message (_("Downloading languages - please wait..."), MSG_PULSE);
-                pk_client_resolve_async (client, 0, pack_array, NULL, (PkProgressCallback) progress, (void *) INSTALL_LANGUAGES, (GAsyncReadyCallback) resolve_lang_done, NULL);
+                pk_client_resolve_async (client, pk_bitfield_value (PK_FILTER_ENUM_ARCH), pack_array, NULL, (PkProgressCallback) progress, (void *) INSTALL_LANGUAGES, (GAsyncReadyCallback) resolve_lang_done, NULL);
                 g_strfreev (pack_array);
                 g_free (lpack);
                 break;
@@ -1641,7 +1641,7 @@ static void next_update (PkClient *client, update_type update_stage)
                 else lpack = g_strdup ("firefox");
                 pack_array = g_strsplit (lpack, " ", -1);
                 message (_("Downloading browser - please wait..."), MSG_PULSE);
-                pk_client_resolve_async (client, 0, pack_array, NULL, (PkProgressCallback) progress, (void *) INSTALL_BROWSER, (GAsyncReadyCallback) resolve_browser_done, NULL);
+                pk_client_resolve_async (client, pk_bitfield_value (PK_FILTER_ENUM_ARCH), pack_array, NULL, (PkProgressCallback) progress, (void *) INSTALL_BROWSER, (GAsyncReadyCallback) resolve_browser_done, NULL);
                 g_strfreev (pack_array);
                 g_free (lpack);
                 break;
@@ -1721,31 +1721,11 @@ static void refresh_cache_retry_done (PkClient *client, GAsyncResult *res, gpoin
 
 static void resolve_lang_done (PkClient *client, GAsyncResult *res, gpointer data)
 {
-    int i;
-
     PkResults *results = error_handler (NULL, client, res, _("installing languages"));
     if (!results) return;
 
     PkPackageSack *sack = pk_results_get_package_sack (results);
     PkPackageSack *fsack = pk_package_sack_filter (sack, inst_filter_fn, NULL);
-
-    // remove armhf packages for which there is an arm64 equivalent...
-    GPtrArray *array = pk_package_sack_get_array (fsack);
-    for (i = 0; i < array->len; i++)
-    {
-        gchar *package_id, *arch;
-        PkPackage *item = g_ptr_array_index (array, i);
-        g_object_get (item, "package-id", &package_id, NULL);
-        if ((arch = strstr (package_id, "arm64")))
-        {
-            *(arch + 3) = 'h';
-            *(arch + 4) = 'f';
-            item = pk_package_sack_find_by_id_name_arch (fsack, package_id);
-            if (item) pk_package_sack_remove_package (fsack, item);
-        }
-        g_free (package_id);
-    }
-    g_ptr_array_unref (array);
 
     if (pk_package_sack_get_size (fsack) > 0)
     {
@@ -1769,31 +1749,11 @@ static void install_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
 
 static void resolve_browser_done (PkClient *client, GAsyncResult *res, gpointer data)
 {
-    int i;
-
     PkResults *results = error_handler (NULL, client, res, _("installing browser"));
     if (!results) return;
 
     PkPackageSack *sack = pk_results_get_package_sack (results);
     PkPackageSack *fsack = pk_package_sack_filter (sack, inst_filter_fn, NULL);
-
-    // remove armhf packages for which there is an arm64 equivalent...
-    GPtrArray *array = pk_package_sack_get_array (fsack);
-    for (i = 0; i < array->len; i++)
-    {
-        gchar *package_id, *arch;
-        PkPackage *item = g_ptr_array_index (array, i);
-        g_object_get (item, "package-id", &package_id, NULL);
-        if ((arch = strstr (package_id, "arm64")))
-        {
-            *(arch + 3) = 'h';
-            *(arch + 4) = 'f';
-            item = pk_package_sack_find_by_id_name_arch (fsack, package_id);
-            if (item) pk_package_sack_remove_package (fsack, item);
-        }
-        g_free (package_id);
-    }
-    g_ptr_array_unref (array);
 
     if (pk_package_sack_get_size (fsack) > 0)
     {
