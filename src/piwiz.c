@@ -385,8 +385,7 @@ static gboolean nm_filter_dup_ap (GtkTreeModel *model, GtkTreeIter *iter, gpoint
 static char *nm_find_psk_for_network (char *ssid);
 static void progress (PkProgress *progress, PkProgressType type, gpointer data);
 static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data);
-static gboolean inst_filter_fn (PkPackage *package, gpointer user_data);
-static gboolean upd_filter_fn (PkPackage *package, gpointer user_data);
+static gboolean filter_fn (PkPackage *package, gpointer user_data);
 static void next_update (PkClient *client, update_type update_stage);
 static PkResults *error_handler (PkTask *task, PkClient *client, GAsyncResult *res, char *desc);
 static void check_updates_done (PkClient *client, GAsyncResult *res, gpointer data);
@@ -1561,25 +1560,8 @@ static void progress (PkProgress *progress, PkProgressType type, gpointer data)
     }
 }
 
-static gboolean inst_filter_fn (PkPackage *package, gpointer user_data)
+static gboolean filter_fn (PkPackage *package, gpointer user_data)
 {
-    if (!is_pi && strstr (pk_package_get_arch (package), "i386")) return FALSE;
-
-    PkInfoEnum info = pk_package_get_info (package);
-	switch (info)
-    {
-        case PK_INFO_ENUM_AVAILABLE:    return TRUE;
-                                        break;
-
-        default:                        return FALSE;
-                                        break;
-    }
-}
-
-static gboolean upd_filter_fn (PkPackage *package, gpointer user_data)
-{
-    if (!is_pi && strstr (pk_package_get_arch (package), "i386")) return FALSE;
-
     PkInfoEnum info = pk_package_get_info (package);
 	switch (info)
     {
@@ -1628,7 +1610,7 @@ static void next_update (PkClient *client, update_type update_stage)
                 pack_array = g_strsplit (lpack, " ", -1);
 
                 message (_("Downloading languages - please wait..."), MSG_PULSE);
-                pk_client_resolve_async (client, pk_bitfield_value (PK_FILTER_ENUM_ARCH), pack_array, NULL, (PkProgressCallback) progress, (void *) INSTALL_LANGUAGES, (GAsyncReadyCallback) resolve_lang_done, NULL);
+                pk_client_resolve_async (client, pk_bitfield_from_enums (PK_FILTER_ENUM_ARCH, PK_FILTER_ENUM_NOT_INSTALLED, -1), pack_array, NULL, (PkProgressCallback) progress, (void *) INSTALL_LANGUAGES, (GAsyncReadyCallback) resolve_lang_done, NULL);
                 g_strfreev (pack_array);
                 g_free (lpack);
                 break;
@@ -1641,7 +1623,7 @@ static void next_update (PkClient *client, update_type update_stage)
                 else lpack = g_strdup ("firefox");
                 pack_array = g_strsplit (lpack, " ", -1);
                 message (_("Downloading browser - please wait..."), MSG_PULSE);
-                pk_client_resolve_async (client, pk_bitfield_value (PK_FILTER_ENUM_ARCH), pack_array, NULL, (PkProgressCallback) progress, (void *) INSTALL_BROWSER, (GAsyncReadyCallback) resolve_browser_done, NULL);
+                pk_client_resolve_async (client, pk_bitfield_from_enums (PK_FILTER_ENUM_ARCH, PK_FILTER_ENUM_NOT_INSTALLED, -1), pack_array, NULL, (PkProgressCallback) progress, (void *) INSTALL_BROWSER, (GAsyncReadyCallback) resolve_browser_done, NULL);
                 g_strfreev (pack_array);
                 g_free (lpack);
                 break;
@@ -1725,20 +1707,18 @@ static void resolve_lang_done (PkClient *client, GAsyncResult *res, gpointer dat
     if (!results) return;
 
     PkPackageSack *sack = pk_results_get_package_sack (results);
-    PkPackageSack *fsack = pk_package_sack_filter (sack, inst_filter_fn, NULL);
 
-    if (pk_package_sack_get_size (fsack) > 0)
+    if (pk_package_sack_get_size (sack) > 0)
     {
         message (_("Downloading languages - please wait..."), MSG_PULSE);
 
-        gchar **ids = pk_package_sack_get_ids (fsack);
+        gchar **ids = pk_package_sack_get_ids (sack);
         pk_task_install_packages_async (PK_TASK (client), ids, NULL, (PkProgressCallback) progress, (void *) INSTALL_LANGUAGES, (GAsyncReadyCallback) install_lang_done, NULL);
         g_strfreev (ids);
     }
     else next_update (client, INSTALL_BROWSER);
 
     g_object_unref (sack);
-    g_object_unref (fsack);
 }
 
 static void install_lang_done (PkTask *task, GAsyncResult *res, gpointer data)
@@ -1753,20 +1733,18 @@ static void resolve_browser_done (PkClient *client, GAsyncResult *res, gpointer 
     if (!results) return;
 
     PkPackageSack *sack = pk_results_get_package_sack (results);
-    PkPackageSack *fsack = pk_package_sack_filter (sack, inst_filter_fn, NULL);
 
-    if (pk_package_sack_get_size (fsack) > 0)
+    if (pk_package_sack_get_size (sack) > 0)
     {
         message (_("Downloading browser - please wait..."), MSG_PULSE);
 
-        gchar **ids = pk_package_sack_get_ids (fsack);
+        gchar **ids = pk_package_sack_get_ids (sack);
         pk_task_install_packages_async (PK_TASK (client), ids, NULL, (PkProgressCallback) progress, (void *) INSTALL_BROWSER, (GAsyncReadyCallback) install_browser_done, NULL);
         g_strfreev (ids);
     }
     else next_update (client, INSTALL_UPDATES);
 
     g_object_unref (sack);
-    g_object_unref (fsack);
 }
 
 static void install_browser_done (PkTask *task, GAsyncResult *res, gpointer data)
@@ -1781,7 +1759,7 @@ static void check_updates_done (PkClient *client, GAsyncResult *res, gpointer da
     if (!results) return;
 
     PkPackageSack *sack = pk_results_get_package_sack (results);
-    PkPackageSack *fsack = pk_package_sack_filter (sack, upd_filter_fn, NULL);
+    PkPackageSack *fsack = pk_package_sack_filter (sack, filter_fn, NULL);
 
     if (pk_package_sack_get_size (fsack) > 0)
     {
