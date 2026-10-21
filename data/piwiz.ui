@@ -1053,13 +1053,13 @@ The username can only contain lower-case letters, digits and hyphens, and must s
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkRadioButton" id="p8rbnone">
-                    <property name="label" translatable="yes">Do not install a web browser</property>
+                  <object class="GtkRadioButton" id="p8rbcr">
+                    <property name="label" translatable="yes">Install Chromium</property>
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
-                    <property name="active">True</property>
                     <property name="draw-indicator">True</property>
+                    <property name="group">p8rbnone</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -1068,8 +1068,8 @@ The username can only contain lower-case letters, digits and hyphens, and must s
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkRadioButton" id="p8rbcr">
-                    <property name="label" translatable="yes">Install Chromium</property>
+                  <object class="GtkRadioButton" id="p8rbff">
+                    <property name="label" translatable="yes">Install Firefox</property>
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
@@ -1083,13 +1083,13 @@ The username can only contain lower-case letters, digits and hyphens, and must s
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkRadioButton" id="p8rbff">
-                    <property name="label" translatable="yes">Install Firefox</property>
+                  <object class="GtkRadioButton" id="p8rbnone">
+                    <property name="label" translatable="yes">Do not install a web browser</property>
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
+                    <property name="active">True</property>
                     <property name="draw-indicator">True</property>
-                    <property name="group">p8rbnone</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
