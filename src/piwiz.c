@@ -716,7 +716,7 @@ static gpointer set_locale (gpointer data)
     // set timezone
     if (g_strcmp0 (init_tz, city))
     {
-        vsystem ("sudo raspi-config nonint do_change_timezone_rc_gui %s", city);
+        vsystem ("sudo rcn nonint set_timezone %s", city);
         if (init_tz)
         {
             g_free (init_tz);
@@ -727,7 +727,7 @@ static gpointer set_locale (gpointer data)
     // set keyboard
     if (g_strcmp0 (init_kb, lay) || g_strcmp0 (init_var, var))
     {
-        vsystem ("sudo raspi-config nonint do_change_keyboard_rc_gui pc105 %s %s", lay, var);
+        vsystem ("sudo rcn nonint set_keyboard pc105 %s %s", lay, var);
         if (init_kb)
         {
             g_free (init_kb);
@@ -743,7 +743,7 @@ static gpointer set_locale (gpointer data)
     // set locale
     if (g_strcmp0 (init_country, cc) || g_strcmp0 (init_lang, lc))
     {
-        vsystem ("sudo raspi-config nonint do_change_locale_rc_gui %s_%s%s", lc, cc, ext);
+        vsystem ("sudo rcn nonint set_locale %s_%s%s", lc, cc, ext);
         if (init_country)
         {
             g_free (init_country);
@@ -1995,7 +1995,7 @@ static void process_next (void)
                             // set wifi country - this is quick, so no need for warning
                             if (wifi_if)
                             {
-                                vsystem ("sudo raspi-config nonint do_wifi_country %s > /dev/null", wc);
+                                vsystem ("sudo rcn nonint set_wifi_country %s", wc);
                             }
                             g_free (wc);
 
@@ -2325,9 +2325,9 @@ static void uscan_toggle (GtkSwitch *sw, gpointer, gpointer)
 {
     int enable = gtk_switch_get_active (sw) ? 0 : 1;
     if (GTK_WIDGET (sw) == uscan2_sw)
-        vsystem ("sudo raspi-config nonint do_overscan_kms 2 %d", enable);
+        vsystem ("sudo rcn nonint set_overscan_kms 2 %d", enable);
     else
-        vsystem ("sudo raspi-config nonint do_overscan_kms 1 %d", enable);
+        vsystem ("sudo rcn nonint set_overscan_kms 1 %d", enable);
 }
 
 static int num_screens (void)
@@ -2474,7 +2474,7 @@ int main (int argc, char *argv[])
     bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
     textdomain (GETTEXT_PACKAGE);
 
-    if (system ("raspi-config nonint is_pi")) is_pi = FALSE;
+    if (system ("rcn nonint get_matching_pis XX > /dev/null")) is_pi = FALSE;
     if (getenv ("WAYLAND_DISPLAY")) wm = WM_LABWC;
     else wm = WM_OPENBOX;
 
@@ -2560,8 +2560,8 @@ int main (int argc, char *argv[])
     uscan1_sw = (GtkWidget *) gtk_builder_get_object (builder, "p7switch1");
     uscan2_sw = (GtkWidget *) gtk_builder_get_object (builder, "p7switch2");
     uscan2_box  = (GtkWidget *) gtk_builder_get_object (builder, "p7hbox2");
-    gtk_switch_set_active (GTK_SWITCH (uscan1_sw), !get_status ("raspi-config nonint get_overscan_kms 1"));
-    gtk_switch_set_active (GTK_SWITCH (uscan2_sw), !get_status ("raspi-config nonint get_overscan_kms 2"));
+    gtk_switch_set_active (GTK_SWITCH (uscan1_sw), !get_status ("rcn nonint get_overscan_kms 1"));
+    gtk_switch_set_active (GTK_SWITCH (uscan2_sw), !get_status ("rcn nonint get_overscan_kms 2"));
     g_signal_connect (uscan1_sw, "notify::active", G_CALLBACK (uscan_toggle), NULL);
     g_signal_connect (uscan2_sw, "notify::active", G_CALLBACK (uscan_toggle), NULL);
     if (num_screens () != 2) gtk_widget_hide (uscan2_box);
