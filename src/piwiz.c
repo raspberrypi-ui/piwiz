@@ -2535,8 +2535,7 @@ int main (int argc, char *argv[])
     bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
     textdomain (GETTEXT_PACKAGE);
 
-    res = get_status ("rcn nonint get_pi_type");
-    if (res == 255) is_pi = FALSE;
+    if (system ("rcn nonint get_matching_pis XX > /dev/null")) is_pi = FALSE;
     if (getenv ("WAYLAND_DISPLAY")) wm = WM_LABWC;
     else wm = WM_OPENBOX;
 
