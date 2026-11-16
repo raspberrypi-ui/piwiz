@@ -1838,27 +1838,13 @@ static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
 
 static gboolean clock_synced (void)
 {
-    if (system ("test -e /usr/sbin/ntpd") == 0)
-    {
-        if (system ("/usr/sbin/ntpq -p | grep -q ^\\*") == 0) return TRUE;
-    }
-    else
-    {
-        if (system ("timedatectl status | grep -q \"synchronized: yes\"") == 0) return TRUE;
-    }
+    if (system ("timedatectl status | grep -q \"synchronized: yes\"") == 0) return TRUE;
     return FALSE;
 }
 
 static void resync (void)
 {
-    if (system ("test -e /usr/sbin/ntpd") == 0)
-    {
-        vsystem ("sudo /etc/init.d/ntp stop; sudo ntpd -gq; sudo /etc/init.d/ntp start");
-    }
-    else
-    {
-        vsystem ("systemctl -q restart systemd-timesyncd 2> /dev/null");
-    }
+    vsystem ("systemctl -q restart systemd-timesyncd 2> /dev/null");
 }
 
 static gboolean ntp_check (gpointer data)
@@ -2535,7 +2521,7 @@ int main (int argc, char *argv[])
     bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
     textdomain (GETTEXT_PACKAGE);
 
-    if (system ("rcn nonint get_matching_pis XX > /dev/null")) is_pi = FALSE;
+    if (vsystem ("rcn nonint get_matching_pis XX > /dev/null")) is_pi = FALSE;
     if (getenv ("WAYLAND_DISPLAY")) wm = WM_LABWC;
     else wm = WM_OPENBOX;
 
