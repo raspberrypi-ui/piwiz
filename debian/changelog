@@ -1,3 +1,9 @@
+piwiz (1.10) trixie; urgency=medium
+
+  * Remove ntpd; update polkit
+
+ -- Simon Long <simon@raspberrypi.com>  Mon, 16 Nov 2026 09:44:57 +0000
+
 piwiz (1.9) trixie; urgency=medium
 
   * Modify for rcn and no preinstalled browsers
