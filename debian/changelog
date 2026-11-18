@@ -1,3 +1,9 @@
+piwiz (0.91+sec1) bookworm; urgency=medium
+
+  * Polkit fix from trixie
+
+ -- Simon Long <simon@raspberrypi.com>  Wed, 18 Nov 2026 09:03:53 +0000
+
 piwiz (0.91) bookworm; urgency=medium
 
   * Copy labwc keyboard settings instead of wayfire for new user
