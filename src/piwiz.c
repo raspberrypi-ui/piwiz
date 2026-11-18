@@ -1814,27 +1814,13 @@ static void do_updates_done (PkTask *task, GAsyncResult *res, gpointer data)
 
 static gboolean clock_synced (void)
 {
-    if (system ("test -e /usr/sbin/ntpd") == 0)
-    {
-        if (system ("ntpq -p | grep -q ^\\*") == 0) return TRUE;
-    }
-    else
-    {
-        if (system ("timedatectl status | grep -q \"synchronized: yes\"") == 0) return TRUE;
-    }
+    if (system ("timedatectl status | grep -q \"synchronized: yes\"") == 0) return TRUE;
     return FALSE;
 }
 
 static void resync (void)
 {
-    if (system ("test -e /usr/sbin/ntpd") == 0)
-    {
-        vsystem ("sudo /etc/init.d/ntp stop; sudo ntpd -gq; sudo /etc/init.d/ntp start");
-    }
-    else
-    {
-        vsystem ("sudo systemctl -q stop systemd-timesyncd 2> /dev/null; sudo systemctl -q start systemd-timesyncd 2> /dev/null");
-    }
+    vsystem ("systemctl -q restart systemd-timesyncd 2> /dev/null");
 }
 
 static gboolean ntp_check (gpointer data)
