@@ -1,3 +1,9 @@
+piwiz (1.12) trixie; urgency=medium
+
+  * Remove rcn for now
+
+ -- Simon Long <simon@raspberrypi.com>  Wed, 25 Nov 2026 07:22:17 +0000
+
 piwiz (1.11) trixie; urgency=medium
 
   * Modify for rcn and no preinstalled browsers - internal
