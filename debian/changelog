@@ -1,3 +1,9 @@
+piwiz (1.13) trixie; urgency=medium
+
+  * Merge browser changes into rch
+
+ -- Simon Long <simon@raspberrypi.com>  Thu, 26 Nov 2026 15:07:48 +0000
+
 piwiz (1.12) trixie; urgency=medium
 
   * Remove rcn for now
