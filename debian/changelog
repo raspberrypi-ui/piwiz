@@ -1,3 +1,15 @@
+piwiz (1.12) trixie; urgency=medium
+
+  * Remove rcn for now
+
+ -- Simon Long <simon@raspberrypi.com>  Wed, 25 Nov 2026 07:22:17 +0000
+
+piwiz (1.11) trixie; urgency=medium
+
+  * Modify for rcn and no preinstalled browsers - internal
+
+ -- Simon Long <simon@raspberrypi.com>  Mon, 16 Nov 2026 10:59:13 +0000
+
 piwiz (1.10) trixie; urgency=medium
 
   * Remove ntpd; update polkit
